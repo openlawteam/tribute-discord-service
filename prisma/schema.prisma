@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Models
+// ------
+// @see https://www.prisma.io/docs/concepts/components/prisma-schema/data-model
+// @see https://www.prisma.io/docs/concepts/components/prisma-migrate
+
+model Org {
+  id        Int              @id @default(autoincrement())
+  createdAt DateTime         @default(now())
+  name      String           @unique @db.VarChar(255)
+  webhooks  DiscordWebhook[] // For Prisma; does not exist in the database.
+
+  @@map("orgs")
+}
+
+model DiscordWebhook {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  webhookID    String   @unique @db.VarChar(255)
+  webhookToken String   @db.VarChar(255)
+  org          Org      @relation(fields: [orgId], references: [id]) // For Prisma; does not exist in the database.
+  orgId        Int
+
+  @@map("discord_webhooks")
+}

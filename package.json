@@ -1,0 +1,67 @@
+{
+  "name": "tribute-discord-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Discord service to interact with curated TributeDAOs' Discord servers.",
+  "main": "index.js",
+  "engines": {
+    "node": "^14.0.0",
+    "npm": "^7.0.0"
+  },
+  "scripts": {
+    "dev": "npm run docker:up && npm run prisma:dev && npm run docker:attach",
+    "docker:attach": "docker ps -f 'name=service_db' --format='{{.Names}}' | xargs docker attach",
+    "docker:down": "docker-compose -f docker-compose.dev.yml down --remove-orphans",
+    "docker:teardown": "npm run docker:down -- -v",
+    "docker:up": "docker-compose -f docker-compose.dev.yml up --build -d --remove-orphans",
+    "prisma:dev": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "prisma:prod": "prisma migrate deploy",
+    "release": "np",
+    "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
+    "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openlawteam/tribute-discord-service.git"
+  },
+  "keywords": [
+    "tribute",
+    "tributedao",
+    "discord"
+  ],
+  "author": "OpenLaw Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/openlawteam/tribute-discord-service/issues"
+  },
+  "homepage": "https://github.com/openlawteam/tribute-discord-service#readme",
+  "prettier": {
+    "overrides": [
+      {
+        "files": [
+          "src/**/*.{js,ts}"
+        ],
+        "options": {
+          "singleQuote": true,
+          "bracketSpacing": false,
+          "jsxBracketSameLine": true,
+          "tabWidth": 2
+        }
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^16.7.1",
+    "np": "^7.5.0",
+    "prettier": "^2.3.2",
+    "prisma": "^2.29.1",
+    "ts-node": "^10.2.1",
+    "typechain": "^5.1.2",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@prisma/client": "^2.29.1"
+  }
+}
