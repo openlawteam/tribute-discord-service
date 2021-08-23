@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+  # Postgres
+  tribute_discord_service_db:
+    image: postgres
+    volumes:
+      - "tribute_discord_service_db_vol:/var/lib/postgresql/data"
+    ports:
+      - "15435:5432"
+    # @see https://www.postgresql.org/docs/9.4/pgstatstatements.html
+    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_DB: postgres
+
+volumes:
+  tribute_discord_service_db_vol: {}
