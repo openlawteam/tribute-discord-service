@@ -20,7 +20,8 @@
     "release": "np",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:dev": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -41,7 +42,7 @@
     "overrides": [
       {
         "files": [
-          "src/**/*.{js,ts}"
+          "{pages,prisma,src,styles,test}/**/*.{js,jsx,ts,tsx}"
         ],
         "options": {
           "singleQuote": true,
@@ -53,10 +54,14 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "@types/node": "^16.7.1",
+    "jest": "^27.0.6",
+    "jest-mock-extended": "2.0.2-beta2",
     "np": "^7.5.0",
     "prettier": "^2.3.2",
     "prisma": "^2.29.1",
+    "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
     "typechain": "^5.1.2",
     "typescript": "^4.3.5"
