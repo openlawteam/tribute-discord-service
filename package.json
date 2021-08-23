@@ -53,10 +53,13 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "@types/node": "^16.7.1",
+    "jest": "^27.0.6",
     "np": "^7.5.0",
     "prettier": "^2.3.2",
     "prisma": "^2.29.1",
+    "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
     "typechain": "^5.1.2",
     "typescript": "^4.3.5"
