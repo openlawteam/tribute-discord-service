@@ -1,0 +1,12 @@
+FROM node:14
+ENV NODE_ENV=development
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+# Make `wait-for-it` executable by the container
+RUN ["chmod", "+x", "./scripts/wait-for-it.sh"]
+# Make `wait-for-it` executable by the container
+RUN ["chmod", "+x", "./scripts/dev-start.sh"]
+# Wait for Postgres host:port to be open, then start the app
+ENTRYPOINT ["./scripts/wait-for-it.sh", "db:5432", "--", "./scripts/dev-start.sh"]
