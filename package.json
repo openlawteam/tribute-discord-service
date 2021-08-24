@@ -9,19 +9,17 @@
     "npm": "^7.0.0"
   },
   "scripts": {
-    "dev": "npm run docker:up && npm run prisma:dev && npm run docker:attach",
-    "docker:attach": "docker ps -f 'name=service_db' --format='{{.Names}}' | xargs docker attach",
+    "dev": "npx prisma generate --watch & npm run docker:up",
     "docker:down": "docker-compose -f docker-compose.dev.yml down --remove-orphans",
     "docker:teardown": "npm run docker:down -- -v",
-    "docker:up": "docker-compose -f docker-compose.dev.yml up --build -d --remove-orphans",
-    "prisma:dev": "prisma migrate dev",
-    "prisma:generate": "prisma generate",
-    "prisma:prod": "prisma migrate deploy",
+    "docker:up": "docker-compose -f docker-compose.dev.yml up --build --remove-orphans",
+    "migrate:dev": "dotenv -e .env.dev -- prisma migrate dev",
     "release": "np",
+    "start": "nodemon --watch 'src/**/*.{ts,js,json}' --exec 'ts-node' src/index.ts",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
-    "test": "jest",
-    "test:dev": "jest --watch"
+    "test:dev": "jest --watch",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -56,8 +54,10 @@
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "@types/node": "^16.7.1",
+    "dotenv-cli": "^4.0.0",
     "jest": "^27.0.6",
     "jest-mock-extended": "2.0.2-beta2",
+    "nodemon": "^2.0.12",
     "np": "^7.5.0",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.5",

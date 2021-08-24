@@ -1,18 +1,31 @@
 version: "3.7"
 services:
   # Postgres
-  tribute_discord_service_db:
+  db:
     image: postgres
-    volumes:
-      - "tribute_discord_service_db_vol:/var/lib/postgresql/data"
-    ports:
-      - "15435:5432"
+    env_file: .env.dev
     # @see https://www.postgresql.org/docs/9.4/pgstatstatements.html
     command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: let-me-in
-      POSTGRES_DB: postgres
+    volumes:
+      - "db_vol:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
+
+  # App
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    env_file: .env.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+    depends_on:
+      # Starts the `db` service first.
+      # Does not wait for Postgres itself to be ready.
+      - db
 
 volumes:
-  tribute_discord_service_db_vol: {}
+  db_vol: {}
