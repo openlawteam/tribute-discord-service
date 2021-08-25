@@ -1,1 +1,1 @@
-export * from './getWebhook';
+export * from './db/getWebhook';
