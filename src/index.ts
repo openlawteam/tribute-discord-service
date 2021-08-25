@@ -1,5 +1,7 @@
+import {envCheck} from './helpers';
+
 function main() {
-  console.log('Up and running!');
+  envCheck();
 }
 
 main();

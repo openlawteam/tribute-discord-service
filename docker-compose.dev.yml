@@ -3,7 +3,11 @@ services:
   # Postgres
   db:
     image: postgres
-    env_file: .env.dev
+    env_file:
+      # Committed to source control for convience.
+      - .env.dev
+      # Adding as well, as we require API key(s) for dev. Not in source control.
+      - .env
     # @see https://www.postgresql.org/docs/9.4/pgstatstatements.html
     command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
     volumes:
@@ -16,7 +20,11 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.dev
-    env_file: .env.dev
+    env_file:
+      # Committed to source control for convience.
+      - .env.dev
+      # Adding as well, as we require API key(s) for dev. Not in source control.
+      - .env
     ports:
       - "3000:3000"
     volumes:
