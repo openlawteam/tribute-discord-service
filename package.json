@@ -12,9 +12,11 @@
     "docker:down": "docker-compose -f docker-compose.dev.yml down --remove-orphans",
     "docker:teardown": "npm run docker:down -- -v",
     "docker:up": "docker-compose -f docker-compose.dev.yml up --build --remove-orphans",
+    "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/*.json'",
     "migrate:dev": "dotenv -e .env.dev -- prisma migrate dev",
+    "postinstall": "npm run generate-abi-types",
     "release": "np",
-    "start": "npx prisma generate --watch & npm run docker:up",
+    "start": "npx prisma generate --watch & npm run generate-abi-types && npm run docker:up",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "test:dev": "jest --watch",
@@ -39,7 +41,7 @@
     "overrides": [
       {
         "files": [
-          "{pages,prisma,src,styles,test}/**/*.{js,jsx,ts,tsx}"
+          "{pages,prisma,src,styles,test}/**/*.{js,jsx,ts,tsx,json}"
         ],
         "options": {
           "singleQuote": true,
@@ -51,6 +53,7 @@
     ]
   },
   "devDependencies": {
+    "@typechain/web3-v1": "^3.0.0",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.7.1",
     "dotenv-cli": "^4.0.0",
