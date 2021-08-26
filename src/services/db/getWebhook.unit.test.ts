@@ -1,7 +1,7 @@
 import {DiscordWebhook} from '@prisma/client';
 
 import {getWebhookByWebhookID} from './getWebhook';
-import {prismaMock} from '../../../test/singleton';
+import {prismaMock} from '../../../test/prismaMock';
 
 describe('getWebhook unit tests', () => {
   test('should get a webhook by its Discord webhook ID', async () => {
