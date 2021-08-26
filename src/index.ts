@@ -1,7 +1,3 @@
-import {envCheck} from './helpers';
+import {start} from './start';
 
-function main() {
-  envCheck();
-}
-
-main();
+start();
