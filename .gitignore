@@ -3,3 +3,7 @@ node_modules
 # Keep environment variables out of version control
 # `env.development`, `.env.test` are OK to commit.
 .env
+
+# types
+
+abi-types
