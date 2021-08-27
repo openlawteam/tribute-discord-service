@@ -1,5 +1,5 @@
 import {EventWeb3Logs} from '../types';
-import {getLazyABI} from '../../../helpers/getLazyABI';
+import {getLazyABI} from '../../../helpers';
 import {NODE_ENV} from '../../../config';
 import {NodeEnv} from '../../../types';
 import {RegistryTypes} from '../../types';
