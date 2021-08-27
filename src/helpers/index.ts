@@ -1,3 +1,3 @@
 export * from './envCheck';
-export * from './getEventSignature';
+export * from './getLazyABI';
 export * from './normalizeString';
