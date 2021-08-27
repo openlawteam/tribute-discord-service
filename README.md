@@ -9,6 +9,11 @@
 
 ### Running the local development environment
 
+**Dependencies**
+
+- Get an Alchemy API Key (i.e. sign up for their free tier)
+- Add `ALCHEMY_API_KEY=your_key` to `.env`
+
 ```sh
 npm ci
 npm start
@@ -39,7 +44,7 @@ When running `npm start` any migrations which have not yet been applied to the d
 
 Make sure the Docker containers have started, or at least the `db` service, then create and/or run the migrations.
 
-Read more: [developing with Prisma `migrate`](https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate)
+See [developing with Prisma `migrate`](https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate) for more information.
 
 ```sh
 # Creates a new migration, applies it to the database, and updates the generated Prisma Client

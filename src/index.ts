@@ -1,5 +1,3 @@
-function main() {
-  console.log('Up and running!');
-}
+import {start} from './start';
 
-main();
+start();

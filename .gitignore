@@ -1,5 +1,10 @@
 node_modules
+dist
 
-# Keep environment variables out of version control
+# Keep the root environment variables out of version control
 # `env.development`, `.env.test` are OK to commit.
-.env
+/.env
+
+# types
+
+abi-types
