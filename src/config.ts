@@ -1,3 +1,5 @@
+import {NodeEnv} from './types';
+
 // Destructure end export environment variables
 export const {
   ALCHEMY_API_KEY,
@@ -12,11 +14,12 @@ export const {
    */
   ETH_NETWORK_NAME,
   DATABASE_URL,
-  NODE_ENV,
   POSTGRES_DB,
   POSTGRES_PASSWORD,
   POSTGRES_USER,
 } = process.env;
+
+export const NODE_ENV = process.env.NODE_ENV as NodeEnv;
 
 /**
  * Environment variable keys used in the app.
