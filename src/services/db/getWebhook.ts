@@ -1,4 +1,4 @@
-import prisma from '../../client';
+import prisma from '../../prismaClientInstance';
 
 export async function getWebhookByWebhookID(webhookID: string) {
   try {

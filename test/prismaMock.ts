@@ -2,7 +2,7 @@ import {PrismaClient} from '@prisma/client';
 import {mockDeep, mockReset} from 'jest-mock-extended';
 import {DeepMockProxy} from 'jest-mock-extended/lib/mjs/Mock';
 
-import prisma from '../src/client';
+import prisma from '../src/prismaClientInstance';
 
 /**
  * Mock Prisma client
@@ -10,7 +10,7 @@ import prisma from '../src/client';
  * @see https://www.prisma.io/docs/guides/testing/unit-testing#singleton
  */
 
-jest.mock('../src/client', () => ({
+jest.mock('../src/prismaClientInstance', () => ({
   __esModule: true,
   default: mockDeep<PrismaClient>(),
 }));
