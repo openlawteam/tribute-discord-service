@@ -2,6 +2,7 @@ import {sha3} from 'web3-utils';
 
 /**
  * Web3 event signature constants
+ * for subscribing to Web3 event topics.
  */
 
 // @see `abis/SponsoredProposalEvent.json`
