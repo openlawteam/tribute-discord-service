@@ -13,7 +13,7 @@ export interface EventWeb3Logs extends EventBase {
   /**
    * Contract address (or addresses) to subscribe to logs for.
    */
-  address: LogsOptions['address'];
+  addresses: LogsOptions['address'];
   /**
    * For our purposes, the first topic index should be a `sha3(EVENT_SIGNATURE)`;
    * we should always be looking for a specific event - avoids crazy logs!

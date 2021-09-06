@@ -7,7 +7,7 @@ import {web3} from '../../../alchemyWeb3Instance';
  * subscribeLogs
  *
  * A wrapper to around `web3.eth.subscribe('logs')` with `fromBlock`
- * set to `latest`, and
+ * set to `latest`.
  *
  * To unsubscribe, call `unsubscribe(callback?)` on the return value.
  *
