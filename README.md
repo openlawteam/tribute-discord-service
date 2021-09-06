@@ -38,7 +38,7 @@ npm run docker:teardown -- --rmi=all
 
 ### Updating Prisma database migrations
 
-When running `npm start` any migrations which have not yet been applied to the database, or which are yet to be created as a result of a `schema.prisma` change, will be run.
+When running `npm start` any migrations will be run which have not yet been applied to the database, or which are yet to be created as a result of a `schema.prisma` change.
 
 #### Updating migrations after schema changes
 
