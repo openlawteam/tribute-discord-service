@@ -2,7 +2,7 @@ import {WebhookClient} from 'discord.js';
 
 import {getWebhookByWebhookID} from '../db';
 
-export async function getDiscordWebookClient(
+export async function getDiscordWebhookClient(
   webhookID: string
 ): Promise<WebhookClient> {
   const result = await getWebhookByWebhookID(webhookID);
