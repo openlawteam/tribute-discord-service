@@ -10,7 +10,7 @@ describe('getWebhook unit tests', () => {
       createdAt: new Date(0),
       webhookID: 'abc123',
       webhookToken: 'def456',
-      orgId: 1,
+      daoId: 1,
     };
 
     // Mock result
