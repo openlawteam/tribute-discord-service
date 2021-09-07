@@ -15,13 +15,14 @@ generator client {
 // @see https://www.prisma.io/docs/concepts/components/prisma-schema/data-model
 // @see https://www.prisma.io/docs/concepts/components/prisma-migrate
 
-model Org {
-  id        Int              @id @default(autoincrement())
-  createdAt DateTime         @default(now())
-  name      String           @unique @db.VarChar(255)
-  webhooks  DiscordWebhook[] // For Prisma; does not exist in the database.
+model Dao {
+  id              Int              @id @default(autoincrement())
+  createdAt       DateTime         @default(now())
+  name            String           @unique @db.VarChar(255)
+  registryAddress String           @unique @db.VarChar(42)
+  webhooks        DiscordWebhook[] // For Prisma; does not exist in the database.
 
-  @@map("orgs")
+  @@map("daos")
 }
 
 model DiscordWebhook {
@@ -29,8 +30,8 @@ model DiscordWebhook {
   createdAt    DateTime @default(now())
   webhookID    String   @unique @db.VarChar(255)
   webhookToken String   @db.VarChar(255)
-  org          Org      @relation(fields: [orgId], references: [id]) // For Prisma; does not exist in the database.
-  orgId        Int
+  dao          Dao      @relation(fields: [daoId], references: [id]) // For Prisma; does not exist in the database.
+  daoId        Int
 
   @@map("discord_webhooks")
 }
