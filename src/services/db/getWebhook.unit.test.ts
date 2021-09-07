@@ -25,7 +25,7 @@ describe('getWebhook unit tests', () => {
 
     try {
       await getWebhookByWebhookID('abc123');
-    } catch (error) {
+    } catch (error: any) {
       expect(error?.message).toMatch(/^ugh!$/i);
     }
   });
