@@ -1,5 +1,7 @@
+import {AbiItem} from 'web3-utils/types';
+
 import {EventWeb3Logs} from '../types';
-import {getLazyABI} from '../../../../helpers';
+import {getLazyImport} from '../../../../helpers';
 import {NODE_ENV} from '../../../../config';
 import {NodeEnv} from '../../../../types';
 import {RegistryTypes} from '../../types';
@@ -10,10 +12,13 @@ const ADDRESS_BY_ENV: Partial<Record<NodeEnv, string[]>> = {
   production: [''],
 };
 
+const abiPath: string =
+  '../../../../abis/tribute/DaoRegistrySponsoredProposalEvent.json';
+
 export const SPONSORED_PROPOSAL_WEB3_LOGS: EventWeb3Logs = {
   name: 'Sponsored Proposal',
   type: RegistryTypes.WEB3_LOGS,
   addresses: ADDRESS_BY_ENV[NODE_ENV],
-  lazyABI: getLazyABI('../../../abis/SponsoredProposalEvent.json'),
+  lazyABI: getLazyImport<AbiItem[]>(() => import(abiPath)),
   topics: [SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH],
 };
