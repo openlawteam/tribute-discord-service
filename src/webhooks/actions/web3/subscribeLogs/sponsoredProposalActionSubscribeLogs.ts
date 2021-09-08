@@ -5,11 +5,11 @@ import {
   SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH,
 } from '../../../events';
 import {actionErrorHandler} from '../../helpers/actionErrorHandler';
-import {getDiscordWebhookClient} from '../../../../services/discord';
 import {ETHERSCAN_URL, hexToBase16} from '../../../../helpers';
+import {getDaoByRegistryAddress} from '../../../../services/db';
+import {getDiscordWebhookClient} from '../../../../services/discord';
 import {SponsoredProposal} from '../../../../../abi-types/SponsoredProposalEvent';
 import {web3} from '../../../../alchemyWeb3Instance';
-import {getDaoByRegistryAddress} from '../../../../services/db';
 
 /**
  * Posts to a Discord channel when a DAO Registry's `SponsoredProposal` event is received.

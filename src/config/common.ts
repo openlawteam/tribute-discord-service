@@ -1,4 +1,4 @@
-import {NodeEnv} from './types';
+import {NodeEnv} from '../types';
 
 // Destructure end export environment variables
 export const {
