@@ -4,6 +4,7 @@ CREATE TABLE "daos" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" VARCHAR(255) NOT NULL,
     "registryAddress" VARCHAR(42) NOT NULL,
+    "fullURL" TEXT NOT NULL,
 
     PRIMARY KEY ("id")
 );
