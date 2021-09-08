@@ -3,7 +3,7 @@
  * INSTRUCTIONS
  *
  * If you want to test the app in localhost
- * rename or copy the contents of this file
+ * copy the contents of this file
  * to `daosLocalhost.ts`.
  * ----------------------------------------
  */
