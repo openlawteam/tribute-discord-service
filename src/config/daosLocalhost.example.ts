@@ -16,6 +16,13 @@
  * If you want a DAO to interact with a Discord server,
  * start by adding its information to the enum and
  * exported mapping below.
+ *
+ * ---
+ *
+ * Notes on localhost:
+ *
+ * The DAO does not have to be localhost (i.e. Ganache).
+ * The localhost DAO mapping is just so the config stays out of version control.
  */
 
 /*
