@@ -5,4 +5,4 @@
  * Comment-out, or remove, any individual runners not to be run.
  */
 
-export {sponsoredProposal} from './sponsoredProposal';
+export {sponsoredProposalRunnerSubscribeLogs} from './sponsoredProposalRunnerSubscribeLogs';

@@ -1,10 +1,11 @@
+import {EventBase} from '../../../events';
+
 export function subscribeErrorHandler(
-  subscriptionName: string
+  eventBase: EventBase
 ): (e: Error) => void {
   return (error: Error) => {
-    console.log(`
-    Error from Web3 subscription for ${subscriptionName}.
-    Error: ${error.message}
-    `);
+    console.log(
+      `Error from Web3 subscription for ${eventBase.name} (type: ${eventBase.type}).\n\nError: "${error.message}"`
+    );
   };
 }

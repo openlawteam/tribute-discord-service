@@ -9,7 +9,7 @@ export async function getDiscordWebhookClient(
 
   if (!result) {
     throw new Error(
-      `Could not create a Discord \`WebhookClient\`. No webhook found using \`webhookID\` ${webhookID}.`
+      `Could not create a Discord \`WebhookClient\`. No webhook data found using \`webhookID\` ${webhookID}.`
     );
   }
 

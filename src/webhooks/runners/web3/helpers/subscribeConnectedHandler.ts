@@ -1,9 +1,11 @@
+import {EventBase} from '../../../events';
+
 export function subscribeConnectedHandler(
-  subscriptionName: string
+  eventBase: EventBase
 ): (sid: string) => void {
   return (subscriptionId: string) => {
     console.log(
-      `Connected to Web3 subscriptions for ${subscriptionName}. Subscription ID: ${subscriptionId}.`
+      `Connected to Web3 subscriptions for ${eventBase.name} (type: ${eventBase.type}). Subscription ID: ${subscriptionId}.`
     );
   };
 }
