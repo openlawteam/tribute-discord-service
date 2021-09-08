@@ -9,7 +9,7 @@ export interface EventWeb3Logs extends EventBase {
    *
    * An ABI is needed when decoding logs `data`.
    */
-  lazyABI: () => Promise<AbiItem>;
+  lazyABI: () => Promise<AbiItem[]>;
   /**
    * Contract address (or addresses) to subscribe to logs for.
    */
