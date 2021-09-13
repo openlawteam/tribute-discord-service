@@ -19,8 +19,8 @@
     "start": "npx prisma generate --watch & npm run generate-abi-types && npm run docker:up",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
-    "test:dev": "jest --watch",
-    "test": "jest"
+    "test:dev": "npx prisma generate && jest --watch",
+    "test": "npx prisma generate && jest"
   },
   "repository": {
     "type": "git",
