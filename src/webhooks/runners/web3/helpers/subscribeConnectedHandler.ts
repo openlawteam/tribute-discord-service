@@ -5,7 +5,7 @@ export function subscribeConnectedHandler(
 ): (sid: string) => void {
   return (subscriptionId: string) => {
     console.log(
-      `Connected to Web3 subscriptions for ${eventBase.name} (type: ${eventBase.type}). Subscription ID: ${subscriptionId}.`
+      `Connected to Web3 subscriptions for ${eventBase.name}. Subscription ID: ${subscriptionId}.`
     );
   };
 }

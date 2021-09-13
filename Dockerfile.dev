@@ -1,9 +1,12 @@
 FROM node:16
-ENV NODE_ENV=development
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY . .
+COPY tsconfig.json ./
+COPY scripts scripts
+COPY prisma prisma
+COPY src src
+COPY abi-types abi-types
 # Make `wait-for-it` executable by the container
 RUN ["chmod", "+x", "./scripts/wait-for-it.sh"]
 # Make `wait-for-it` executable by the container

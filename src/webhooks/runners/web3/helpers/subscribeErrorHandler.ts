@@ -5,7 +5,7 @@ export function subscribeErrorHandler(
 ): (e: Error) => void {
   return (error: Error) => {
     console.log(
-      `Error from Web3 subscription for ${eventBase.name} (type: ${eventBase.type}).\n\nError: "${error.message}"`
+      `Error from Web3 subscription for ${eventBase.name}.\n\nError: "${error.message}"`
     );
   };
 }

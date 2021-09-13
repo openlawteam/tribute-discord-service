@@ -8,6 +8,7 @@
  * ----------------------------------------
  */
 
+// import {CORE_DAO_ADAPTERS} from './daoAdapters';
 // import {DaoData} from './types';
 
 /**
@@ -26,13 +27,24 @@
  */
 
 /*
-type DaoNames = 'test';
+export const DAO_NAMES_LOCALHOST = ['test'] as const;
 
-export const DAOS_LOCALHOST: Record<DaoNames, DaoData> = {
+export const DAOS_LOCALHOST: Record<
+  typeof DAO_NAMES_LOCALHOST[number],
+  DaoData
+> = {
   test: {
-    friendlyName: 'Localhost DAO',
-    fullURL: 'http://localhost:3000',
-    registryContractAddress: '0x',
+    actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],
+    adapters: {
+      [CORE_DAO_ADAPTERS.onboarding]: {
+        friendlyName: 'onboarding',
+        baseURLPath: 'membership',
+      },
+    },
+    baseURL: 'https://demo.tributedao.com',
+    events: [{name: 'SPONSORED_PROPOSAL'}],
+    friendlyName: 'Tribute DAO [DEV]',
+    registryContractAddress: '0x0000000000000000000000000000000000000000',
   },
 };
 */

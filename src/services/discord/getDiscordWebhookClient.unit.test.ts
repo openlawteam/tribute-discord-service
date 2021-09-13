@@ -11,7 +11,7 @@ describe('getDiscordWebhookClient unit tests', () => {
       createdAt: new Date(0),
       webhookID: 'abc123',
       webhookToken: 'def456',
-      daoId: 1,
+      name: 'A Test Webhook',
     };
 
     // Mock result
@@ -33,7 +33,7 @@ describe('getDiscordWebhookClient unit tests', () => {
       await getDiscordWebhookClient('abc123');
     } catch (error: any) {
       expect(error?.message).toMatch(
-        /^could not create a discord `webhookclient`\. no webhook found using `webhookid` abc123\.$/i
+        /^could not create a discord `webhookclient`\. no webhook data found using `webhookid` abc123\.$/i
       );
     }
   });

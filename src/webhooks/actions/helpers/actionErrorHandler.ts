@@ -10,9 +10,7 @@ export function actionErrorHandler({
   event: EventBase;
   error: Error;
 }): void {
-  const {name, type} = event;
-
   console.log(
-    `Error while executing ${actionName} action for ${name} event (type: ${type}).\nError: "${error.message}"`
+    `Error while executing ${actionName} action for ${event.name} event.\nError: "${error.stack}"`
   );
 }

@@ -1,3 +1,4 @@
+import {CORE_DAO_ADAPTERS} from '.';
 import {DaoData} from './types';
 
 /**
@@ -8,12 +9,23 @@ import {DaoData} from './types';
  * exported mapping below.
  */
 
-type DaoNames = 'muse0';
+export const DAO_NAMES_PRODUCTION = ['muse0'] as const;
 
-export const DAOS_PRODUCTION: Record<DaoNames, DaoData> = {
+export const DAOS_PRODUCTION: Record<
+  typeof DAO_NAMES_PRODUCTION[number],
+  DaoData
+> = {
   muse0: {
+    actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],
+    adapters: {
+      [CORE_DAO_ADAPTERS['tribute-nft']]: {
+        friendlyName: 'tribute-nft',
+        baseURLPath: 'curation',
+      },
+    },
+    baseURL: 'https://demo.tributedao.com',
+    events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Muse0',
-    fullURL: 'https://muse0.xyz',
     registryContractAddress: '0x7c8B281C56f7ef9b8099D3F491AF24DC2C2e3ee0',
   },
 };

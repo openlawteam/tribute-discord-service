@@ -16,7 +16,7 @@ describe('envCheck unit tests', () => {
     process.env.SOME_VAR = 'test';
 
     // Using supplied args; no logging
-    expect(envCheck(['SOME_VAR'], testOptions)).toBe(true);
+    expect(envCheck(['ALCHEMY_API_KEY'], testOptions)).toBe(true);
 
     // Reset env
     delete process.env.ALCHEMY_API_KEY;
@@ -32,6 +32,6 @@ describe('envCheck unit tests', () => {
     expect(envCheck(undefined, testOptions)).toBe(false);
 
     // Using supplied args; no logging
-    expect(envCheck(['SOME_VAR'], testOptions)).toBe(false);
+    expect(envCheck(['ALCHEMY_API_KEY'], testOptions)).toBe(false);
   });
 });

@@ -1,3 +1,4 @@
+import {CORE_DAO_ADAPTERS} from './daoAdapters';
 import {DaoData} from './types';
 
 /**
@@ -8,12 +9,23 @@ import {DaoData} from './types';
  * exported mapping below.
  */
 
-type DaoNames = 'tribute';
+export const DAO_NAMES_DEVELOPMENT = ['tribute'] as const;
 
-export const DAOS_DEVELOPMENT: Record<DaoNames, DaoData> = {
+export const DAOS_DEVELOPMENT: Record<
+  typeof DAO_NAMES_DEVELOPMENT[number],
+  DaoData
+> = {
   tribute: {
+    actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],
+    adapters: {
+      [CORE_DAO_ADAPTERS.onboarding]: {
+        friendlyName: 'onboarding',
+        baseURLPath: 'membership',
+      },
+    },
+    baseURL: 'https://demo.tributedao.com',
+    events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Tribute DAO [DEV]',
-    fullURL: 'https://demo.tributedao.com',
     registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
   },
 };
