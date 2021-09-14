@@ -76,10 +76,7 @@ export function sponsoredProposalActionSubscribeLogs(
       const txURL: string = `${getEtherscanURL()}/tx/${transactionHash}`;
 
       await client.send({
-        content: compileSimpleTemplate<SponsoredProposalEmbedTemplateData>(
-          SPONSORED_PROPOSAL_TEMPLATE,
-          {proposalURL, txURL}
-        ),
+        content: compileSimpleTemplate(SPONSORED_PROPOSAL_TEMPLATE),
         // @see https://discord.com/developers/docs/resources/channel#embed-object-embed-structure
         embeds: [
           {
