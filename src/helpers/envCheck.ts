@@ -1,4 +1,5 @@
 import {ENVIRONMENT_VARIABLE_KEYS} from '../config';
+import {getEnv} from './getEnv';
 
 /**
  * envCheck
@@ -12,7 +13,9 @@ import {ENVIRONMENT_VARIABLE_KEYS} from '../config';
  * @returns `boolean`
  */
 export function envCheck(
-  envKeys: string[] = ENVIRONMENT_VARIABLE_KEYS,
+  envKeys: Partial<
+    typeof ENVIRONMENT_VARIABLE_KEYS
+  > = ENVIRONMENT_VARIABLE_KEYS,
   options: {noLog?: boolean} = {}
 ): boolean {
   const {noLog} = options;
@@ -20,7 +23,7 @@ export function envCheck(
   const areAllSet: boolean = envKeys
     .map((name) => {
       // Do not log the environment variable value!
-      const value = process.env[name];
+      const value = getEnv(name);
 
       if (!value && !noLog) {
         console.warn(`⚠️  Missing environment variable for ${name}.`);

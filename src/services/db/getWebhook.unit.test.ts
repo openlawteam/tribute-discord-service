@@ -10,7 +10,7 @@ describe('getWebhook unit tests', () => {
       createdAt: new Date(0),
       webhookID: 'abc123',
       webhookToken: 'def456',
-      orgId: 1,
+      name: 'A Test Webhook',
     };
 
     // Mock result
@@ -25,7 +25,7 @@ describe('getWebhook unit tests', () => {
 
     try {
       await getWebhookByWebhookID('abc123');
-    } catch (error) {
+    } catch (error: any) {
       expect(error?.message).toMatch(/^ugh!$/i);
     }
   });

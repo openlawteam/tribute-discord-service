@@ -8,3 +8,7 @@ dist
 # types
 
 abi-types
+
+# Code config
+
+daosLocalhost.ts

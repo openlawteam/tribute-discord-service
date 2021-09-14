@@ -13,7 +13,7 @@ services:
     volumes:
       - "db_vol:/var/lib/postgresql/data"
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
 
   # App
   app:
@@ -26,7 +26,7 @@ services:
       # Adding as well, as we require API key(s) for dev. Not in source control.
       - .env
     ports:
-      - "3000:3000"
+      - "3000"
     volumes:
       - ./src:/app/src
       - ./prisma:/app/prisma
