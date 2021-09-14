@@ -20,8 +20,10 @@ describe('getDaos unit tests', () => {
       // Attempt assert `undefined` (no config file)
       expect(localhostDaos).toBe(undefined);
     } catch (error) {
-      // Assert result matches config   file's `DAOS_LOCALHOST`.
-      const {DAOS_LOCALHOST} = await import('../../config/daosLocalhost');
+      const maybeFile: string = '../../config/daosLocalhost';
+
+      // Assert result matches config file's `DAOS_LOCALHOST`.
+      const {DAOS_LOCALHOST} = await import(maybeFile);
 
       expect(localhostDaos).toEqual(DAOS_LOCALHOST);
     }
