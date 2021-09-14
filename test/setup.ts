@@ -31,22 +31,24 @@ process.env = {
 // Create a test suite mock Web3 provider so we can inject results and errors
 export const mockWeb3Provider = new FakeHttpProvider();
 
+/**
+ * Mock the Alchemy Web3 instance
+ *
+ * This should be hoisted to the module's top level.
+ *
+ * @see https://jestjs.io/docs/jest-object#jestmockmodulename-factory-options
+ */
+jest.mock('../src/alchemyWeb3Instance', () => {
+  return {
+    __esModule: true,
+    web3: new Web3(mockWeb3Provider as any) as any,
+  };
+});
+
 beforeAll(() => {
   // Start msw server before all tests
   server.listen({
     onUnhandledRequest: 'warn',
-  });
-
-  /**
-   * Mock the Alchemy Web3 instance
-   *
-   * @see https://jestjs.io/docs/jest-object#jestmockmodulename-factory-options
-   */
-  jest.mock('../src/alchemyWeb3Instance', () => {
-    return {
-      __esModule: true,
-      web3: new Web3(mockWeb3Provider as any) as any,
-    };
   });
 });
 
