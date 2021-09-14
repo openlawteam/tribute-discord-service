@@ -5,10 +5,20 @@ import {getEnv} from '../../helpers';
 
 describe('getDaos unit tests', () => {
   const appEnvOriginal = getEnv('APP_ENV');
+  const consoleWarnOriginal = console.warn;
+
+  beforeAll(() => {
+    console.warn = () => {};
+  });
 
   afterEach(() => {
     // Cleanup env var
     process.env.APP_ENV = appEnvOriginal;
+  });
+
+  afterAll(() => {
+    // Restore log warn
+    console.warn = consoleWarnOriginal;
   });
 
   test('should return localhost daos', async () => {
