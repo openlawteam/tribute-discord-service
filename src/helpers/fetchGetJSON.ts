@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 /**
  * Wraps `node-fetch` `GET` and returns JSON, or `undefined` if status code is 404.
  * Accepts a type for casting the type of the return value.
@@ -10,6 +8,13 @@ import fetch from 'node-fetch';
 export async function fetchGetJSON<T = any>(
   url: string
 ): Promise<T | undefined> {
+  /**
+   * Dynamically import `node-fetch`
+   *
+   * @see https://github.com/node-fetch/node-fetch#loading-and-configuring-the-module
+   */
+  const {default: fetch} = await import('node-fetch');
+
   let repsonseJSON: T | undefined;
 
   const response = await fetch(url);
@@ -21,7 +26,7 @@ export async function fetchGetJSON<T = any>(
 
   // Attempt to get any JSON response
   try {
-    repsonseJSON = await response.json();
+    repsonseJSON = (await response.json()) as T;
   } catch (error) {
     repsonseJSON = undefined;
   }
