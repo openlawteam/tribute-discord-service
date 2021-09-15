@@ -1,5 +1,6 @@
 import {ACTIONS} from './actions';
 import {EVENTS} from './events';
+import {SnapshotHubProposalBase} from '../services/snapshotHub/types';
 
 export type DaoDataEvent = {name: typeof EVENTS[number]; active?: boolean};
 
@@ -9,13 +10,17 @@ export type DaoDataAction = {
   active?: boolean;
 };
 
+export type Daos = Record<string, DaoData>;
+
 export type DaoData = {
   /**
-   * A friendly name for the DAO
-   *
-   * E.g. `Tribute DAO`
+   * Adapter information
    */
-  friendlyName: string;
+  adapters?: Record<AdapterID, DaoDataAdapter>;
+  /**
+   * Actions to be run, or not, for the DAO
+   */
+  actions: DaoDataAction[];
   /**
    * A public, full, base URL for the DAO
    *
@@ -23,34 +28,24 @@ export type DaoData = {
    */
   baseURL?: string;
   /**
-   * DAO's deployed `DaoRegistry.sol` contract address
-   */
-  registryContractAddress: string;
-  /**
-   * Adapter information
-   */
-  adapters?: Record<AdapterID, DaoDataAdapter>;
-  /**
    * Events to be watched, or not, for the DAO
    */
   events: DaoDataEvent[];
   /**
-   * Actions to be run, or not, for the DAO
+   * A friendly name for the DAO
+   *
+   * E.g. `Tribute DAO`
    */
-  actions: DaoDataAction[];
+  friendlyName: string;
+  /**
+   * Snapshot Hub data
+   */
+  snapshotHub?: DaoDataSnapshotHub;
+  /**
+   * DAO's deployed `DaoRegistry.sol` contract address
+   */
+  registryContractAddress: string;
 };
-
-export type Daos = Record<string, DaoData>;
-
-/**
- * bytes32 ID string
- *
- * keccak256 hash of the Adapter's readable ID.
- * i.e. `sha3('onboarding')` = "0x68c...5d89"
- *
- * @see `tribute-contracts`->`DaoFactory.sol`->`struct Adapter`
- */
-export type AdapterID = string;
 
 export type DaoDataAdapter = {
   /**
@@ -73,4 +68,33 @@ export type DaoDataAdapter = {
    * any descriptive Adapter name.
    */
   friendlyName: string;
+};
+
+/**
+ * bytes32 ID string
+ *
+ * keccak256 hash of the Adapter's readable ID.
+ * i.e. `sha3('onboarding')` = "0x68c...5d89"
+ *
+ * @see `tribute-contracts`->`DaoFactory.sol`->`struct Adapter`
+ */
+export type AdapterID = string;
+
+export type DaoDataSnapshotHub = {
+  /**
+   * Resolves `SnapshotProposalBase`
+   *
+   * It is generic as different DAOs may use different
+   * Snapshot Hubs - the API's may not be standard.
+   *
+   * i.e. GraphQL for recent core Snapshot Hub; custom API from Tribute team.
+   */
+  proposalResolver: (
+    proposalID: string,
+    space: string
+  ) => Promise<SnapshotHubProposalBase | undefined>;
+  /**
+   * Snapshot Hub `space` name
+   */
+  space: string;
 };
