@@ -1,9 +1,8 @@
-import {DAO_NAMES_LOCALHOST} from '../../src/config/daosLocalhost';
 import {DaoData} from '../../src/config/types';
 import {DEFAULT_EMPTY_BYTES32, DEFAULT_ETH_ADDRESS} from './constants';
 import {legacyTributeProposalResolver} from '../../src/services/snapshotHub';
 
-export const FAKE_DAOS: Record<typeof DAO_NAMES_LOCALHOST[number], DaoData> = {
+export const FAKE_DAOS: Record<string, DaoData> = {
   test: {
     actions: [
       {name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: '886976872611729439'},
