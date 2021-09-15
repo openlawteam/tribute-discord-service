@@ -12,16 +12,21 @@ import {
 } from '../../../../helpers';
 import {
   compileSimpleTemplate,
-  SponsoredProposalEmbedTemplateData,
   SPONSORED_PROPOSAL_TEMPLATE,
+  SponsoredProposalEmbedTemplateData,
+  SponsoredProposalTemplateData,
+  SPONSORED_PROPOSAL_FALLBACK_TEMPLATE,
   SPONSORED_PROPOSAL_EMBED_TEMPLATE,
 } from '../../../templates';
 import {actionErrorHandler} from '../../helpers/actionErrorHandler';
 import {DaoData} from '../../../../config/types';
 import {getDiscordWebhookClient} from '../../../../services/discord';
 import {getProposalAdapterID} from '../../../../services';
+import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
 import {SponsoredProposal} from '../../../../../abi-types/DaoRegistry';
 import {web3} from '../../../../alchemyWeb3Instance';
+
+const EMPTY_EMBED: MessageEmbedOptions[] = [];
 
 /**
  * Posts to a Discord channel when a DAO Registry's `SponsoredProposal` event is received.
@@ -40,7 +45,13 @@ export function sponsoredProposalActionSubscribeLogs(
       const dao = getDAODataByAddress(eventData.address, daos);
       const daoAction = getDaoAction('SPONSORED_PROPOSAL_WEBHOOK', dao);
 
-      if (!dao || !isDaoActionActive(daoAction) || !daoAction?.webhookID) {
+      if (
+        !dao ||
+        !dao.snapshotHub ||
+        !daoAction?.webhookID ||
+        !isDaoActionActive(daoAction) ||
+        !SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH
+      ) {
         return;
       }
 
@@ -50,12 +61,20 @@ export function sponsoredProposalActionSubscribeLogs(
         ({name, type}) => type === 'event' && name === 'SponsoredProposal'
       )?.inputs;
 
-      if (
-        !SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH ||
-        !sponsoredProposalEventInputs
-      ) {
+      if (!sponsoredProposalEventInputs) {
         return;
       }
+
+      const {
+        adapters,
+        baseURL,
+        friendlyName,
+        registryContractAddress,
+        snapshotHub: {
+          proposalResolver: snapshotProposalResolver,
+          space: snapshotSpace,
+        },
+      } = dao;
 
       const {data, transactionHash} = eventData;
 
@@ -69,26 +88,51 @@ export function sponsoredProposalActionSubscribeLogs(
 
       const adapterID = await getProposalAdapterID(
         proposalId,
-        dao.registryContractAddress
+        registryContractAddress
       );
 
-      const proposalURL: string = `${dao.baseURL}/${dao.adapters?.[adapterID].baseURLPath}/${proposalId}`;
+      const proposalURL: string = `${baseURL}/${adapters?.[adapterID].baseURLPath}/${proposalId}`;
       const txURL: string = `${getEtherscanURL()}/tx/${transactionHash}`;
 
+      const proposal = await snapshotProposalResolver(
+        proposalId,
+        snapshotSpace
+      );
+
+      const content: string =
+        compileSimpleTemplate<SponsoredProposalTemplateData>(
+          proposal
+            ? SPONSORED_PROPOSAL_TEMPLATE
+            : SPONSORED_PROPOSAL_FALLBACK_TEMPLATE,
+          proposal
+            ? {title: proposal.title, proposalURL, txURL}
+            : {proposalURL, txURL}
+        );
+
+      const embedDescription: string =
+        compileSimpleTemplate<SponsoredProposalEmbedTemplateData>(
+          SPONSORED_PROPOSAL_EMBED_TEMPLATE,
+          {body: proposal?.body}
+        );
+
+      // Falls back to empty embed if no proposal
+      const embedBody: MessageEmbedOptions[] | undefined = proposal
+        ? [
+            {
+              color: 'DEFAULT',
+              description: embedDescription,
+            },
+          ]
+        : EMPTY_EMBED;
+
+      // Merge any embeds
+      const embeds: (MessageEmbedOptions | MessageEmbed)[] = [...embedBody];
+
       await client.send({
-        content: compileSimpleTemplate(SPONSORED_PROPOSAL_TEMPLATE),
+        content,
         // @see https://discord.com/developers/docs/resources/channel#embed-object-embed-structure
-        embeds: [
-          {
-            color: 'DEFAULT',
-            description:
-              compileSimpleTemplate<SponsoredProposalEmbedTemplateData>(
-                SPONSORED_PROPOSAL_EMBED_TEMPLATE,
-                {proposalURL, txURL}
-              ),
-          },
-        ],
-        username: `${dao.friendlyName}`,
+        embeds,
+        username: `${friendlyName}`,
       });
     } catch (error) {
       if (error instanceof Error) {
