@@ -25,6 +25,9 @@ services:
       - .env.dev
       # Adding as well, as we require API key(s) for dev. Not in source control.
       - .env
+    command:
+      # Wait for `db` to be available at port, then run the `dev-start` script
+      ["./scripts/wait-for-it.sh", "db:5432", "--", "./scripts/dev-start.sh"]
     ports:
       - "3000"
     volumes:
@@ -34,6 +37,22 @@ services:
       # Starts the `db` service first.
       # Does not wait for Postgres itself to be ready.
       - db
+      - docker-host
+
+  ##
+  # This container will forward any traffic to your host machine.
+  # For example, this is helpful to access a separate docker container/app
+  # running from another `Dockerfile` or `docker-compose.yml`.
+  #
+  # @see https://github.com/qoomon/docker-host
+  # @see https://sam-ngu.medium.com/connecting-to-docker-host-mysql-from-docker-container-linux-ubuntu-766e526542fd
+  ##
+  docker-host:
+    image: qoomon/docker-host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    restart: on-failure
 
 volumes:
   db_vol: {}

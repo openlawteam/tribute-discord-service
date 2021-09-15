@@ -9,7 +9,5 @@ COPY src src
 COPY abi-types abi-types
 # Make `wait-for-it` executable by the container
 RUN ["chmod", "+x", "./scripts/wait-for-it.sh"]
-# Make `wait-for-it` executable by the container
+# Make `dev-start` executable by the container
 RUN ["chmod", "+x", "./scripts/dev-start.sh"]
-# Wait for Postgres host:port to be open, then start the app
-ENTRYPOINT ["./scripts/wait-for-it.sh", "db:5432", "--", "./scripts/dev-start.sh"]
