@@ -22,9 +22,11 @@ import {actionErrorHandler} from '../../helpers/actionErrorHandler';
 import {DaoData} from '../../../../config/types';
 import {getDiscordWebhookClient} from '../../../../services/discord';
 import {getProposalAdapterID} from '../../../../services';
-import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
+import {MessageEmbedOptions, MessageOptions} from 'discord.js';
 import {SponsoredProposal} from '../../../../../abi-types/DaoRegistry';
 import {web3} from '../../../../alchemyWeb3Instance';
+
+type DiscordMessageEmbeds = MessageOptions['embeds'];
 
 const EMPTY_EMBED: MessageEmbedOptions[] = [];
 
@@ -116,7 +118,7 @@ export function sponsoredProposalActionSubscribeLogs(
         );
 
       // Falls back to empty embed if no proposal
-      const embedBody: MessageEmbedOptions[] | undefined = proposal
+      const embedBody: DiscordMessageEmbeds = proposal
         ? [
             {
               color: 'DEFAULT',
@@ -126,7 +128,7 @@ export function sponsoredProposalActionSubscribeLogs(
         : EMPTY_EMBED;
 
       // Merge any embeds
-      const embeds: (MessageEmbedOptions | MessageEmbed)[] = [...embedBody];
+      const embeds: DiscordMessageEmbeds = [...embedBody];
 
       await client.send({
         content,

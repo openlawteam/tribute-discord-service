@@ -57,7 +57,9 @@ export async function legacyTributeProposalResolver({
       title: name,
     };
   } catch (error) {
-    getProposalErrorHandler({error: error as Error, proposalID});
+    if (error instanceof Error) {
+      getProposalErrorHandler({error: error, proposalID});
+    }
 
     return undefined;
   }
