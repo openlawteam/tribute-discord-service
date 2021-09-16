@@ -8,21 +8,17 @@ type AnyArgsFunction = (...args: AnyArgs) => void;
  * if logging is enabled (defaults to `true`).
  *
  * @param functions
- * @param enableLogging `boolean`
  * @returns void
  */
-export function runAll(
-  functions: AnyArgsFunction[],
-  enableLogging: boolean = true
-): AnyArgsFunction {
+export function runAll(functions: AnyArgsFunction[]): AnyArgsFunction {
   return (...args: AnyArgs): void => {
     functions.forEach((f) => {
       try {
         f(...args);
       } catch (error) {
-        if (enableLogging) {
+        if (error instanceof Error) {
           console.error(
-            `\`runAll\`: There was an error while running a function: "${f.name}".`
+            `\`runAll\`: There was an error while running a function: "${f.name}".\n${error.stack}`
           );
         }
       }

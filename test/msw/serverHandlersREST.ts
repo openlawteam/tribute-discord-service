@@ -1,6 +1,9 @@
 import {APIMessage} from 'discord-api-types';
 
-import {LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE} from '..';
+import {
+  DISCORD_WEBHOOK_POST_FIXTURE,
+  LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE,
+} from '..';
 import {rest} from './server';
 import {SnapshotHubLegacyTributeProposalEntry} from '../../src/services/snapshotHub';
 
@@ -20,7 +23,7 @@ const alchemyAPI = rest.get(
 
 const discordWebhookPOST = rest.post<undefined, APIMessage>(
   'https://discord.com/api/*/webhooks/*/*',
-  (_req, res, ctx) => res(ctx.json({} as any))
+  (_req, res, ctx) => res(ctx.json(DISCORD_WEBHOOK_POST_FIXTURE))
 );
 
 /**

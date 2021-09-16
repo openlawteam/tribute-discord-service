@@ -15,6 +15,7 @@ import {web3} from '../../../../alchemyWeb3Instance';
 
 type MockHelperReturn = Promise<{
   cleanup: () => void;
+
   errorHandlerSpy: jest.SpyInstance<
     void,
     [
@@ -25,7 +26,9 @@ type MockHelperReturn = Promise<{
       }
     ]
   >;
+
   sendSpy?: jest.Mock<any, any>;
+
   webhookClientMock?: jest.SpyInstance<
     Promise<WebhookClient>,
     [webhookID: string]
@@ -64,7 +67,7 @@ async function mockHelper(
     name: 'A Test Webhook',
   };
 
-  // Spy on error logging for test
+  // Spy on logging for test
 
   const actionErrorHandler = await import('../../helpers/actionErrorHandler');
 
