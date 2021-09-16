@@ -7,5 +7,6 @@ export * from './getEtherscanURL';
 export * from './getLazyDefaultImport';
 export * from './hexToBase16';
 export * from './isDaoActionActive';
+export * from './isDebug';
 export * from './normalizeString';
 export * from './runAll';

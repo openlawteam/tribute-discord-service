@@ -9,6 +9,7 @@ import {
   getDAODataByAddress,
   getEtherscanURL,
   isDaoActionActive,
+  isDebug,
 } from '../../../../helpers';
 import {
   compileSimpleTemplate,
@@ -130,12 +131,20 @@ export function sponsoredProposalActionSubscribeLogs(
       // Merge any embeds
       const embeds: DiscordMessageEmbeds = [...embedBody];
 
-      await client.send({
+      const response = await client.send({
         content,
         // @see https://discord.com/developers/docs/resources/channel#embed-object-embed-structure
         embeds,
         username: `${friendlyName}`,
       });
+
+      if (isDebug()) {
+        console.log(
+          `Sent Discord message after ${event.name} event for ${
+            dao.friendlyName
+          }. Response:\n${JSON.stringify(response, null, 2)}`
+        );
+      }
     } catch (error) {
       if (error instanceof Error) {
         actionErrorHandler({

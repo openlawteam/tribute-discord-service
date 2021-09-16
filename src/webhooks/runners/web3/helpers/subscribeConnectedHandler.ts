@@ -1,6 +1,6 @@
 import {Daos} from '../../../../config/types';
-import {getEnv, normalizeString} from '../../../../helpers';
 import {EventBase} from '../../../events';
+import {isDebug} from '../../../../helpers';
 
 export function subscribeConnectedHandler(
   eventBase: EventBase,
@@ -8,10 +8,10 @@ export function subscribeConnectedHandler(
 ): (sid: string) => void {
   return (subscriptionId: string) => {
     const message: string = `Connected to Web3 subscriptions (subscription ID: ${subscriptionId}) for ${eventBase.name} event`;
-    const debug = normalizeString(getEnv('DEBUG')) === 'true';
+    const debugActive = isDebug();
 
     const activeDaos: string =
-      debug && daos
+      debugActive && daos
         ? Object.entries(daos).reduce((acc, next, i, coll) => {
             const uniqueName = next[0];
             const {registryContractAddress} = next[1];
@@ -24,7 +24,7 @@ export function subscribeConnectedHandler(
           }, '')
         : '';
 
-    if (debug) {
+    if (debugActive) {
       console.log(`${message} on DAOs:\n${activeDaos}`);
       return;
     }

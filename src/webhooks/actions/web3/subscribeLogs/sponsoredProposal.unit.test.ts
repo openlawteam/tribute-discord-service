@@ -2,6 +2,7 @@ import {DiscordWebhook} from '@prisma/client';
 import {WebhookClient} from 'discord.js';
 
 import {
+  DISCORD_WEBHOOK_POST_FIXTURE,
   EMPTY_BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
@@ -15,6 +16,12 @@ import {web3} from '../../../../alchemyWeb3Instance';
 
 type MockHelperReturn = Promise<{
   cleanup: () => void;
+
+  consoleLogSpy: jest.SpyInstance<
+    void,
+    [message?: any, ...optionalParams: any[]]
+  >;
+
   errorHandlerSpy: jest.SpyInstance<
     void,
     [
@@ -25,7 +32,9 @@ type MockHelperReturn = Promise<{
       }
     ]
   >;
+
   sendSpy?: jest.Mock<any, any>;
+
   webhookClientMock?: jest.SpyInstance<
     Promise<WebhookClient>,
     [webhookID: string]
@@ -64,7 +73,9 @@ async function mockHelper(
     name: 'A Test Webhook',
   };
 
-  // Spy on error logging for test
+  // Spy on logging for test
+
+  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
   const actionErrorHandler = await import('../../helpers/actionErrorHandler');
 
@@ -111,6 +122,7 @@ async function mockHelper(
       webhookClientMock?.mockRestore();
       errorHandlerSpy.mockRestore();
     },
+    consoleLogSpy,
     errorHandlerSpy,
     sendSpy,
     webhookClientMock,
@@ -130,6 +142,38 @@ describe('sponsoredProposal unit tests', () => {
     expect(sendSpy?.mock.calls.length).toBe(1);
 
     cleanup();
+  });
+
+  test('should send Discord webhook message and log with `DEBUG=true`', async () => {
+    const consoleLogOriginal = process.env.DEBUG;
+
+    process.env.DEBUG = 'true';
+
+    // Don't mock the client
+    const {cleanup, consoleLogSpy, sendSpy} = await mockHelper(false);
+
+    await sponsoredProposalActionSubscribeLogs(
+      SPONSORED_PROPOSAL_WEB3_LOGS,
+      FAKE_DAOS_FIXTURE
+    )(EVENT_DATA);
+
+    // Assert OK and `WebhookClient.send` called
+    // expect(sendSpy?.mock.calls.length).toBe(1);
+    expect(consoleLogSpy.mock.calls.length).toBe(1);
+
+    expect(consoleLogSpy.mock.calls[0][0]).toMatch(
+      /sent discord message after sponsored_proposal event for tribute dao \[test\]/i
+    );
+
+    expect(consoleLogSpy.mock.calls[0][0]).toContain(
+      JSON.stringify(DISCORD_WEBHOOK_POST_FIXTURE, null, 2)
+    );
+
+    // Cleanup
+
+    cleanup();
+
+    process.env.DEBUG = consoleLogOriginal;
   });
 
   test('should not throw on Discord POST error', async () => {
