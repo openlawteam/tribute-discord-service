@@ -33,8 +33,13 @@ export function sponsoredProposalRunnerSubscribeLogs(
     sponsoredProposalActionSubscribeLogs(SPONSORED_PROPOSAL_WEB3_LOGS, daos),
   ]);
 
+  const onConnected = subscribeConnectedHandler(
+    SPONSORED_PROPOSAL_WEB3_LOGS,
+    filteredDaos
+  );
+
   const subscription = subscribeLogs(registryAddresses, topics)
-    .on('connected', subscribeConnectedHandler(SPONSORED_PROPOSAL_WEB3_LOGS))
+    .on('connected', onConnected)
     .on('data', actions)
     .on('error', subscribeErrorHandler(SPONSORED_PROPOSAL_WEB3_LOGS));
 
