@@ -53,3 +53,14 @@ npm run migrate:dev -- --name YOUR_MIGRATION_NAME
 # Creates a new migration file only; does not apply it to the database.
 npm run migrate:dev -- --name YOUR_MIGRATION_NAME --create-only
 ```
+
+#### Debugging
+
+Running the app with debugging enabled enhances logged output, where implemented.
+
+**Locally:** Add, or edit, a `/.env`
+**Upstream:** Edit where deployed (e.g. Google Cloud Kubernetes configuration)
+
+```
+DEBUG=true
+```
