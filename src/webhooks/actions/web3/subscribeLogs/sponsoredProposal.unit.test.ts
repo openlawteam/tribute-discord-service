@@ -157,8 +157,6 @@ describe('sponsoredProposal unit tests', () => {
       FAKE_DAOS_FIXTURE
     )(EVENT_DATA);
 
-    console.log('PROCESS', process.env.DEBUG);
-
     expect(consoleLogSpy.mock.calls.length).toBe(1);
 
     expect(consoleLogSpy.mock.calls[0][0]).toMatch(
