@@ -5,7 +5,7 @@ export function getProposalErrorHandler({
   error: Error;
   proposalID: string;
 }): void {
-  console.log(
+  console.error(
     `Error while getting Snapshot Hub proposal ${proposalID}.\nError: "${error.stack}"`
   );
 }
