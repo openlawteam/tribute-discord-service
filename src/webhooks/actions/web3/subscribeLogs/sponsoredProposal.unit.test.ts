@@ -145,12 +145,12 @@ describe('sponsoredProposal unit tests', () => {
   });
 
   test('should send Discord webhook message and log with `DEBUG=true`', async () => {
+    // Don't mock the client
+    const {cleanup, consoleLogSpy} = await mockHelper(false);
+
     const originalDEBUG = process.env.DEBUG;
 
     process.env.DEBUG = 'true';
-
-    // Don't mock the client
-    const {cleanup, consoleLogSpy} = await mockHelper(false);
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
