@@ -145,20 +145,20 @@ describe('sponsoredProposal unit tests', () => {
   });
 
   test('should send Discord webhook message and log with `DEBUG=true`', async () => {
-    const consoleLogOriginal = process.env.DEBUG;
+    const originalDEBUG = process.env.DEBUG;
 
     process.env.DEBUG = 'true';
 
     // Don't mock the client
-    const {cleanup, consoleLogSpy, sendSpy} = await mockHelper(false);
+    const {cleanup, consoleLogSpy} = await mockHelper(false);
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
       FAKE_DAOS_FIXTURE
     )(EVENT_DATA);
 
-    // Assert OK and `WebhookClient.send` called
-    // expect(sendSpy?.mock.calls.length).toBe(1);
+    console.log('PROCESS', process.env.DEBUG);
+
     expect(consoleLogSpy.mock.calls.length).toBe(1);
 
     expect(consoleLogSpy.mock.calls[0][0]).toMatch(
@@ -173,7 +173,7 @@ describe('sponsoredProposal unit tests', () => {
 
     cleanup();
 
-    process.env.DEBUG = consoleLogOriginal;
+    process.env.DEBUG = originalDEBUG;
   });
 
   test('should not throw on Discord POST error', async () => {
