@@ -13,5 +13,9 @@ import {ENVIRONMENT_VARIABLE_KEYS} from '../config';
 export function getEnv(
   variableName: Partial<typeof ENVIRONMENT_VARIABLE_KEYS>[number]
 ): string | undefined {
+  if (variableName === 'DEBUG') {
+    console.log('getEnv', process.env[(variableName || '').trim()]);
+  }
+
   return process.env[(variableName || '').trim()];
 }
