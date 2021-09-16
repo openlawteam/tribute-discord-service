@@ -145,20 +145,20 @@ describe('sponsoredProposal unit tests', () => {
     process.env.DEBUG = 'true';
 
     const consoleDebugOriginal = console.debug;
-    const consoleLogSpy = (console.debug = jest.fn());
+    const consoleDebugSpy = (console.debug = jest.fn());
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
       FAKE_DAOS_FIXTURE
     )(EVENT_DATA);
 
-    expect(consoleLogSpy.mock.calls.length).toBe(1);
+    expect(consoleDebugSpy.mock.calls.length).toBe(1);
 
-    expect(consoleLogSpy.mock.calls[0][0]).toMatch(
+    expect(consoleDebugSpy.mock.calls[0][0]).toMatch(
       /sent discord message after sponsored_proposal event for tribute dao \[test\]/i
     );
 
-    expect(consoleLogSpy.mock.calls[0][0]).toContain(
+    expect(consoleDebugSpy.mock.calls[0][0]).toContain(
       JSON.stringify(DISCORD_WEBHOOK_POST_FIXTURE, null, 2)
     );
 
@@ -166,7 +166,7 @@ describe('sponsoredProposal unit tests', () => {
 
     cleanup();
 
-    consoleLogSpy.mockReset();
+    consoleDebugSpy.mockReset();
     console.debug = consoleDebugOriginal;
 
     process.env.DEBUG = originalDEBUG;
