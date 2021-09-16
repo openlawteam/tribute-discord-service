@@ -8,7 +8,6 @@ import {
   FAKE_DAOS_FIXTURE,
 } from '../../../../../test';
 import {EventBase, SPONSORED_PROPOSAL_WEB3_LOGS} from '../../../events';
-import * as isDebugToMock from '../../../../helpers/isDebug';
 import {mockWeb3Provider} from '../../../../../test/setup';
 import {prismaMock} from '../../../../../test/prismaMock';
 import {rest, server} from '../../../../../test/msw/server';
@@ -138,18 +137,14 @@ describe('sponsoredProposal unit tests', () => {
   });
 
   test('should send Discord webhook message and log with `DEBUG=true`', async () => {
-    // const originalDEBUG = process.env.DEBUG;
-
-    // process.env.DEBUG = 'true';
+    const consoleDebugOriginal = console.debug;
+    const consoleDebugSpy = (console.debug = jest.fn());
 
     // Don't mock the client
     const {cleanup} = await mockHelper(false);
 
-    const consoleDebugOriginal = console.debug;
-    const consoleDebugSpy = (console.debug = jest.fn());
-
     const isDebugSpy = jest
-      .spyOn(isDebugToMock, 'isDebug')
+      .spyOn(await import('../../../../helpers/isDebug'), 'isDebug')
       .mockImplementation(() => true);
 
     await sponsoredProposalActionSubscribeLogs(
@@ -174,8 +169,6 @@ describe('sponsoredProposal unit tests', () => {
     consoleDebugSpy.mockReset();
     console.debug = consoleDebugOriginal;
     isDebugSpy.mockRestore();
-
-    // process.env.DEBUG = originalDEBUG;
   });
 
   test('should not throw on Discord POST error', async () => {
