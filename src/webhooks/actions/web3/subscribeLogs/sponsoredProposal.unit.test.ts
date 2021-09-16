@@ -13,6 +13,7 @@ import {prismaMock} from '../../../../../test/prismaMock';
 import {rest, server} from '../../../../../test/msw/server';
 import {sponsoredProposalActionSubscribeLogs} from './sponsoredProposal';
 import {web3} from '../../../../alchemyWeb3Instance';
+import {getEnv} from '../../../../helpers';
 
 type MockHelperReturn = Promise<{
   cleanup: () => void;
@@ -148,6 +149,7 @@ describe('sponsoredProposal unit tests', () => {
     const consoleDebugSpy = (global.console.debug = jest.fn());
 
     console.log('process.env.DEBUG', process.env.DEBUG);
+    console.log('getEnv', getEnv('DEBUG'));
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
