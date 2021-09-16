@@ -147,13 +147,9 @@ describe('sponsoredProposal unit tests', () => {
     const consoleDebugOriginal = console.debug;
     const consoleDebugSpy = (console.debug = jest.fn());
 
-    const getEnvSpy = jest
-      .spyOn(await import('../../../../helpers/getEnv'), 'getEnv')
-      .mockImplementation((env) => {
-        if (env === 'DEBUG') {
-          return 'true';
-        }
-      });
+    const isDebugSpy = jest
+      .spyOn(await import('../../../../helpers/isDebug'), 'isDebug')
+      .mockImplementation(() => true);
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
@@ -176,7 +172,7 @@ describe('sponsoredProposal unit tests', () => {
 
     consoleDebugSpy.mockReset();
     console.debug = consoleDebugOriginal;
-    getEnvSpy.mockRestore();
+    isDebugSpy.mockRestore();
 
     // process.env.DEBUG = originalDEBUG;
   });
