@@ -2,7 +2,6 @@ import {DiscordWebhook} from '@prisma/client';
 import {WebhookClient} from 'discord.js';
 
 import {
-  DISCORD_WEBHOOK_POST_FIXTURE,
   EMPTY_BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
