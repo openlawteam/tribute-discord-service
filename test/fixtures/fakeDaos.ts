@@ -1,14 +1,14 @@
 import {DaoData} from '../../src/config/types';
-import {DEFAULT_EMPTY_BYTES32, DEFAULT_ETH_ADDRESS} from './constants';
+import {EMPTY_BYTES32_FIXTURE, ETH_ADDRESS_FIXTURE} from './constants';
 import {legacyTributeProposalResolver} from '../../src/services/snapshotHub';
 
-export const FAKE_DAOS: Record<string, DaoData> = {
+export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
   test: {
     actions: [
       {name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: '886976872611729439'},
     ],
     adapters: {
-      [DEFAULT_EMPTY_BYTES32]: {
+      [EMPTY_BYTES32_FIXTURE]: {
         friendlyName: 'onboarding',
         baseURLPath: 'membership',
       },
@@ -16,7 +16,7 @@ export const FAKE_DAOS: Record<string, DaoData> = {
     baseURL: 'http://localhost:3000',
     events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Tribute DAO [Test]',
-    registryContractAddress: DEFAULT_ETH_ADDRESS,
+    registryContractAddress: ETH_ADDRESS_FIXTURE,
     snapshotHub: {
       proposalResolver: async (proposalID, space) =>
         await legacyTributeProposalResolver({

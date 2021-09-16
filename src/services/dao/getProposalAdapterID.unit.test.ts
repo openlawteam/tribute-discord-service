@@ -1,4 +1,4 @@
-import {DEFAULT_EMPTY_BYTES32, DEFAULT_ETH_ADDRESS} from '../../../test';
+import {EMPTY_BYTES32_FIXTURE, ETH_ADDRESS_FIXTURE} from '../../../test';
 import {getProposalAdapterID} from './getProposalAdapterID';
 import {mockWeb3Provider} from '../../../test/setup';
 import {web3} from '../../alchemyWeb3Instance';
@@ -9,7 +9,7 @@ describe('getProposalAdapterID unit tests', () => {
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['address', 'uint256'],
-        [DEFAULT_ETH_ADDRESS, 1]
+        [ETH_ADDRESS_FIXTURE, 1]
       )
     );
 
@@ -17,7 +17,7 @@ describe('getProposalAdapterID unit tests', () => {
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['bytes32', 'uint256'],
-        [DEFAULT_EMPTY_BYTES32, 1]
+        [EMPTY_BYTES32_FIXTURE, 1]
       )
     );
 
@@ -26,7 +26,7 @@ describe('getProposalAdapterID unit tests', () => {
         '0x0000000000000000000000000000000000000000000000000000000000000000',
         '0x0000000000000000000000000000000000000000'
       )
-    ).toBe(DEFAULT_EMPTY_BYTES32);
+    ).toBe(EMPTY_BYTES32_FIXTURE);
   });
 
   test('should throw an error when call fails', async () => {

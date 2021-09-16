@@ -2,9 +2,9 @@ import {DiscordWebhook} from '@prisma/client';
 import {WebhookClient} from 'discord.js';
 
 import {
-  DEFAULT_EMPTY_BYTES32,
-  DEFAULT_ETH_ADDRESS,
-  FAKE_DAOS,
+  EMPTY_BYTES32_FIXTURE,
+  ETH_ADDRESS_FIXTURE,
+  FAKE_DAOS_FIXTURE,
 } from '../../../../../test';
 import {EventBase, SPONSORED_PROPOSAL_WEB3_LOGS} from '../../../events';
 import {mockWeb3Provider} from '../../../../../test/setup';
@@ -33,7 +33,7 @@ type MockHelperReturn = Promise<{
 }>;
 
 const EVENT_DATA = {
-  address: DEFAULT_ETH_ADDRESS,
+  address: ETH_ADDRESS_FIXTURE,
   topics: [
     '0x5b96711deea669ec50fcc8f3d230291ab4711de1d67a0747e6de4ae6c4263d7c',
   ],
@@ -93,7 +93,7 @@ async function mockHelper(
   mockWeb3Provider.injectResult(
     web3.eth.abi.encodeParameters(
       ['address', 'uint256'],
-      [DEFAULT_ETH_ADDRESS, 1]
+      [ETH_ADDRESS_FIXTURE, 1]
     )
   );
 
@@ -101,7 +101,7 @@ async function mockHelper(
   mockWeb3Provider.injectResult(
     web3.eth.abi.encodeParameters(
       ['bytes32', 'uint256'],
-      [DEFAULT_EMPTY_BYTES32, 1]
+      [EMPTY_BYTES32_FIXTURE, 1]
     )
   );
 
@@ -123,7 +123,7 @@ describe('sponsoredProposal unit tests', () => {
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
-      FAKE_DAOS
+      FAKE_DAOS_FIXTURE
     )(EVENT_DATA);
 
     // Assert OK and `WebhookClient.send` called
@@ -147,7 +147,7 @@ describe('sponsoredProposal unit tests', () => {
     try {
       await sponsoredProposalActionSubscribeLogs(
         SPONSORED_PROPOSAL_WEB3_LOGS,
-        FAKE_DAOS
+        FAKE_DAOS_FIXTURE
       )(EVENT_DATA);
     } catch (error) {
       assertError = error;
@@ -176,7 +176,7 @@ describe('sponsoredProposal unit tests', () => {
     try {
       await sponsoredProposalActionSubscribeLogs(
         SPONSORED_PROPOSAL_WEB3_LOGS,
-        FAKE_DAOS
+        FAKE_DAOS_FIXTURE
       )(EVENT_DATA);
     } catch (error) {
       assertError = error;

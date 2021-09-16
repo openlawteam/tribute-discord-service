@@ -1,6 +1,6 @@
 import {APIMessage} from 'discord-api-types';
 
-import {DEFAULT_EMPTY_BYTES32} from '..';
+import {LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE} from '..';
 import {rest} from './server';
 import {SnapshotHubLegacyTributeProposalEntry} from '../../src/services/snapshotHub';
 
@@ -30,23 +30,8 @@ const discordWebhookPOST = rest.post<undefined, APIMessage>(
 const snapshotHubLegacyTributeProposalGET = rest.get<
   undefined,
   SnapshotHubLegacyTributeProposalEntry
->(
-  'http://*/api/*/proposal/*',
-  // Just responding with something so the msw doesn't log a warning
-  (_req, res, ctx) =>
-    res(
-      ctx.json({
-        body: {
-          data: {erc712DraftHash: DEFAULT_EMPTY_BYTES32},
-          msg: {
-            payload: {
-              name: 'Test Proposal',
-              body: 'Wow, what a cool submission!',
-            },
-          },
-        },
-      })
-    )
+>('http://*/api/*/proposal/*', (_req, res, ctx) =>
+  res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE))
 );
 
 /**
