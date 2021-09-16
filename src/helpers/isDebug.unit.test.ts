@@ -1,7 +1,7 @@
 import {isDebug} from './isDebug';
 
 describe('isDebug unit tests', () => {
-  test.skip('should return `true` when `DEBUG=true`', () => {
+  test('should return `true` when `DEBUG=true`', () => {
     const originalDEBUG = process.env.DEBUG;
 
     process.env.DEBUG = 'true';
@@ -13,7 +13,7 @@ describe('isDebug unit tests', () => {
     process.env.DEBUG = originalDEBUG;
   });
 
-  test.skip('should return `false` when `DEBUG=false`', () => {
+  test('should return `false` when `DEBUG=false`', () => {
     const originalDEBUG = process.env.DEBUG;
 
     process.env.DEBUG = 'false';
