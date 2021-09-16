@@ -139,6 +139,8 @@ export function sponsoredProposalActionSubscribeLogs(
       });
 
       if (isDebug()) {
+        console.log('MADE IT!');
+
         console.debug(
           `Sent Discord message after ${event.name} event for ${
             dao.friendlyName
