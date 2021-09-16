@@ -13,7 +13,6 @@ import {prismaMock} from '../../../../../test/prismaMock';
 import {rest, server} from '../../../../../test/msw/server';
 import {sponsoredProposalActionSubscribeLogs} from './sponsoredProposal';
 import {web3} from '../../../../alchemyWeb3Instance';
-import {getEnv} from '../../../../helpers';
 
 type MockHelperReturn = Promise<{
   cleanup: () => void;
@@ -138,18 +137,23 @@ describe('sponsoredProposal unit tests', () => {
   });
 
   test('should send Discord webhook message and log with `DEBUG=true`', async () => {
-    const originalDEBUG = process.env.DEBUG;
+    // const originalDEBUG = process.env.DEBUG;
 
-    process.env.DEBUG = 'true';
+    // process.env.DEBUG = 'true';
 
     // Don't mock the client
     const {cleanup} = await mockHelper(false);
 
     const consoleDebugOriginal = console.debug;
-    const consoleDebugSpy = (global.console.debug = jest.fn());
+    const consoleDebugSpy = (console.debug = jest.fn());
 
-    console.log('process.env.DEBUG', process.env.DEBUG);
-    console.log('getEnv', getEnv('DEBUG'));
+    const getEnvSpy = jest
+      .spyOn(await import('../../../../helpers/getEnv'), 'getEnv')
+      .mockImplementation((env) => {
+        if (env === 'DEBUG') {
+          return 'true';
+        }
+      });
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
@@ -171,9 +175,10 @@ describe('sponsoredProposal unit tests', () => {
     cleanup();
 
     consoleDebugSpy.mockReset();
-    global.console.debug = consoleDebugOriginal;
+    console.debug = consoleDebugOriginal;
+    getEnvSpy.mockRestore();
 
-    process.env.DEBUG = originalDEBUG;
+    // process.env.DEBUG = originalDEBUG;
   });
 
   test('should not throw on Discord POST error', async () => {
