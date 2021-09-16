@@ -77,10 +77,6 @@ async function mockHelper(
     // Noop function to remove implementation, i.e. noisy error logs
     .mockImplementation(() => {});
 
-  const isDebugSpy = jest
-    .spyOn(await import('../../../../helpers/isDebug'), 'isDebug')
-    .mockImplementationOnce(() => true);
-
   // Mock result
   prismaMock.discordWebhook.findUnique.mockResolvedValue(webhook);
 
@@ -138,41 +134,6 @@ describe('sponsoredProposal unit tests', () => {
     expect(sendSpy?.mock.calls.length).toBe(1);
 
     cleanup();
-  });
-
-  test('should send Discord webhook message and log with `DEBUG=true`', async () => {
-    const consoleDebugOriginal = console.debug;
-    const consoleDebugSpy = (console.debug = jest.fn());
-
-    // Don't mock the client
-    const {cleanup} = await mockHelper(false);
-
-    // const isDebugSpy = jest
-    //   .spyOn(await import('../../../../helpers/isDebug'), 'isDebug')
-    //   .mockImplementationOnce(() => true);
-
-    await sponsoredProposalActionSubscribeLogs(
-      SPONSORED_PROPOSAL_WEB3_LOGS,
-      FAKE_DAOS_FIXTURE
-    )(EVENT_DATA);
-
-    expect(consoleDebugSpy.mock.calls.length).toBe(1);
-
-    expect(consoleDebugSpy.mock.calls[0][0]).toMatch(
-      /sent discord message after sponsored_proposal event for tribute dao \[test\]/i
-    );
-
-    expect(consoleDebugSpy.mock.calls[0][0]).toContain(
-      JSON.stringify(DISCORD_WEBHOOK_POST_FIXTURE, null, 2)
-    );
-
-    // Cleanup
-
-    cleanup();
-
-    consoleDebugSpy.mockReset();
-    console.debug = consoleDebugOriginal;
-    // isDebugSpy.mockRestore();
   });
 
   test('should not throw on Discord POST error', async () => {
