@@ -1,3 +1,5 @@
+import {response} from 'msw';
+
 type ResponseStub = {
   jsonrpc: '2.0';
   id: number;
@@ -12,10 +14,11 @@ type ErrorStub = {
   debugName?: string;
 };
 
-type ResponseError = {
-  code: number;
-  message: string;
-};
+type CreateError = {message: string; code?: number};
+
+interface ResponseError extends Error {
+  code?: number;
+}
 
 export type InjectResultOptions = {
   /**
@@ -69,16 +72,20 @@ export class FakeHttpProvider {
   }
 
   createErrorStub(
-    error: ResponseError = {
-      code: 1234,
+    {message, code}: CreateError = {
       message: 'Stub error',
+      code: 1234,
     },
     options?: InjectErrorOptions
   ): ErrorStub {
+    const responseError: ResponseError = new Error(message);
+
+    responseError.code = code;
+
     return {
       jsonrpc: '2.0',
       id: this.countId,
-      error,
+      error: responseError,
       debugName: options?.debugName,
     };
   }
@@ -161,7 +168,7 @@ export class FakeHttpProvider {
     this.response.push(this.createResponseStub(result, options));
   }
 
-  injectError(error: ResponseError, options?: InjectErrorOptions): void {
+  injectError(error: CreateError, options?: InjectErrorOptions): void {
     this.error.push(this.createErrorStub(error, options));
   }
 

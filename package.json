@@ -20,7 +20,7 @@
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "test:dev": "npm run generate-abi-types && npx prisma generate && jest --watch",
-    "test": "npm run generate-abi-types && npx prisma generate && jest"
+    "test": "npm run generate-abi-types && npx prisma generate && CI=true jest"
   },
   "repository": {
     "type": "git",
@@ -57,9 +57,11 @@
     "@typechain/web3-v1": "^3.0.0",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.7.1",
+    "@types/node-fetch": "^2.5.12",
     "dotenv-cli": "^4.0.0",
     "jest": "^27.0.6",
     "jest-mock-extended": "2.0.2-beta2",
+    "msw": "^0.35.0",
     "nodemon": "^2.0.12",
     "np": "^7.5.0",
     "prettier": "^2.3.2",
@@ -75,6 +77,7 @@
     "abi-decoder": "^2.4.0",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
+    "node-fetch": "^2.6.2",
     "prisma": "^2.29.1"
   }
 }

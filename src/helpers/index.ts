@@ -1,4 +1,5 @@
 export * from './envCheck';
+export * from './fetchGetJSON';
 export * from './getDaoAction';
 export * from './getDaoDataByAddress';
 export * from './getEnv';

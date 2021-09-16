@@ -10,7 +10,7 @@ export function actionErrorHandler({
   event: EventBase;
   error: Error;
 }): void {
-  console.log(
-    `Error while executing ${actionName} action for ${event.name} event.\nError: "${error.stack}"`
+  console.error(
+    `Error while executing ${actionName} action for ${event.name} event.\n${error.stack}`
   );
 }
