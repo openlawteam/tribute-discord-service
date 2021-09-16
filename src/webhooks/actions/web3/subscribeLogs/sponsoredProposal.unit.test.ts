@@ -17,11 +17,6 @@ import {web3} from '../../../../alchemyWeb3Instance';
 type MockHelperReturn = Promise<{
   cleanup: () => void;
 
-  consoleLogSpy: jest.SpyInstance<
-    void,
-    [message?: any, ...optionalParams: any[]]
-  >;
-
   errorHandlerSpy: jest.SpyInstance<
     void,
     [
@@ -75,8 +70,6 @@ async function mockHelper(
 
   // Spy on logging for test
 
-  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
   const actionErrorHandler = await import('../../helpers/actionErrorHandler');
 
   const errorHandlerSpy = jest
@@ -122,7 +115,6 @@ async function mockHelper(
       webhookClientMock?.mockRestore();
       errorHandlerSpy.mockRestore();
     },
-    consoleLogSpy,
     errorHandlerSpy,
     sendSpy,
     webhookClientMock,
@@ -146,11 +138,15 @@ describe('sponsoredProposal unit tests', () => {
 
   test('should send Discord webhook message and log with `DEBUG=true`', async () => {
     // Don't mock the client
-    const {cleanup, consoleLogSpy} = await mockHelper(false);
+    const {cleanup} = await mockHelper(false);
 
     const originalDEBUG = process.env.DEBUG;
 
     process.env.DEBUG = 'true';
+
+    const consoleLogSpy = jest
+      .spyOn(console, 'log')
+      .mockImplementation(() => {});
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
@@ -170,6 +166,8 @@ describe('sponsoredProposal unit tests', () => {
     // Cleanup
 
     cleanup();
+
+    consoleLogSpy.mockRestore();
 
     process.env.DEBUG = originalDEBUG;
   });
