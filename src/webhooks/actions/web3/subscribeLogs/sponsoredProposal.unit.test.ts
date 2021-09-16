@@ -77,6 +77,10 @@ async function mockHelper(
     // Noop function to remove implementation, i.e. noisy error logs
     .mockImplementation(() => {});
 
+  const isDebugSpy = jest
+    .spyOn(await import('../../../../helpers/isDebug'), 'isDebug')
+    .mockImplementationOnce(() => true);
+
   // Mock result
   prismaMock.discordWebhook.findUnique.mockResolvedValue(webhook);
 
@@ -143,9 +147,9 @@ describe('sponsoredProposal unit tests', () => {
     // Don't mock the client
     const {cleanup} = await mockHelper(false);
 
-    const isDebugSpy = jest
-      .spyOn(await import('../../../../helpers/isDebug'), 'isDebug')
-      .mockImplementationOnce(() => true);
+    // const isDebugSpy = jest
+    //   .spyOn(await import('../../../../helpers/isDebug'), 'isDebug')
+    //   .mockImplementationOnce(() => true);
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
@@ -168,7 +172,7 @@ describe('sponsoredProposal unit tests', () => {
 
     consoleDebugSpy.mockReset();
     console.debug = consoleDebugOriginal;
-    isDebugSpy.mockRestore();
+    // isDebugSpy.mockRestore();
   });
 
   test('should not throw on Discord POST error', async () => {
