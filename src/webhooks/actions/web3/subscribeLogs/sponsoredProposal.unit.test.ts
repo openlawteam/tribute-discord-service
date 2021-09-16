@@ -144,16 +144,13 @@ describe('sponsoredProposal unit tests', () => {
 
     process.env.DEBUG = 'true';
 
-    const consoleLogSpy = jest
-      .spyOn(global.console, 'debug')
-      .mockImplementation(() => {});
+    const consoleDebugOriginal = console.debug;
+    const consoleLogSpy = (console.debug = jest.fn());
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
       FAKE_DAOS_FIXTURE
     )(EVENT_DATA);
-
-    console.log(process.env.DEBUG);
 
     expect(consoleLogSpy.mock.calls.length).toBe(1);
 
@@ -169,7 +166,8 @@ describe('sponsoredProposal unit tests', () => {
 
     cleanup();
 
-    consoleLogSpy.mockRestore();
+    consoleLogSpy.mockReset();
+    console.debug = consoleDebugOriginal;
 
     process.env.DEBUG = originalDEBUG;
   });
