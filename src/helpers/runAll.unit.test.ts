@@ -34,11 +34,16 @@ describe('runAll unit tests', () => {
   });
 
   test('should not exit loop if a function throws', () => {
+    const error = new Error('So bad!');
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
     const spyFunctionOne = jest.fn();
     const spyFunctionThree = jest.fn();
 
     const spyFunctionTwo = jest.fn(() => {
-      throw new Error('So bad!');
+      throw error;
     });
 
     const testArgs = [
@@ -50,10 +55,7 @@ describe('runAll unit tests', () => {
     ];
 
     // Run with arguments passed; logging off
-    runAll(
-      [spyFunctionOne, spyFunctionTwo, spyFunctionThree],
-      false
-    )(...testArgs);
+    runAll([spyFunctionOne, spyFunctionTwo, spyFunctionThree])(...testArgs);
 
     expect(spyFunctionOne.mock.calls.length).toBe(1);
     expect(spyFunctionOne.mock.calls[0][0]).toBe(testArgs[0]);
@@ -67,5 +69,17 @@ describe('runAll unit tests', () => {
     expect(spyFunctionThree.mock.calls[0][0]).toBe(testArgs[0]);
     expect(spyFunctionThree.mock.calls[0][1]).toBe(testArgs[1]);
     expect(spyFunctionThree.mock.calls[0][2]).toEqual(testArgs[2]);
+
+    expect(consoleErrorSpy.mock.calls.length).toBe(1);
+
+    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
+      /^`runall`: there was an error while running a function: \"mockconstructor\"\./i
+    );
+
+    expect(consoleErrorSpy.mock.calls[0][0]).toContain(error.message);
+
+    // Cleanup
+
+    consoleErrorSpy.mockRestore();
   });
 });
