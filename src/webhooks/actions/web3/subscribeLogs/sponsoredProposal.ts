@@ -138,6 +138,7 @@ export function sponsoredProposalActionSubscribeLogs(
         username: `${friendlyName}`,
       });
 
+      console.log('isDebug()', isDebug());
       if (isDebug()) {
         console.debug(
           `Sent Discord message after ${event.name} event for ${
