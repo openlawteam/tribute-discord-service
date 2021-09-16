@@ -25,7 +25,7 @@ export function subscribeConnectedHandler(
         : '';
 
     if (debugActive) {
-      console.log(`${message} on DAOs:\n${activeDaos}`);
+      console.debug(`${message} on DAOs:\n${activeDaos}`);
       return;
     }
 

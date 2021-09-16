@@ -139,7 +139,7 @@ export function sponsoredProposalActionSubscribeLogs(
       });
 
       if (isDebug()) {
-        console.log(
+        console.debug(
           `Sent Discord message after ${event.name} event for ${
             dao.friendlyName
           }. Response:\n${JSON.stringify(response, null, 2)}`

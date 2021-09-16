@@ -145,7 +145,7 @@ describe('sponsoredProposal unit tests', () => {
     process.env.DEBUG = 'true';
 
     const consoleLogSpy = jest
-      .spyOn(console, 'log')
+      .spyOn(console, 'debug')
       .mockImplementation(() => {});
 
     await sponsoredProposalActionSubscribeLogs(
