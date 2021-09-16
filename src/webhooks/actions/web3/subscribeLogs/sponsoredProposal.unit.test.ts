@@ -137,15 +137,17 @@ describe('sponsoredProposal unit tests', () => {
   });
 
   test('should send Discord webhook message and log with `DEBUG=true`', async () => {
-    // Don't mock the client
-    const {cleanup} = await mockHelper(false);
-
     const originalDEBUG = process.env.DEBUG;
 
     process.env.DEBUG = 'true';
 
+    // Don't mock the client
+    const {cleanup} = await mockHelper(false);
+
     const consoleDebugOriginal = console.debug;
-    const consoleDebugSpy = (console.debug = jest.fn());
+    const consoleDebugSpy = (global.console.debug = jest.fn());
+
+    console.log('process.env.DEBUG', process.env.DEBUG);
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
@@ -167,7 +169,7 @@ describe('sponsoredProposal unit tests', () => {
     cleanup();
 
     consoleDebugSpy.mockReset();
-    console.debug = consoleDebugOriginal;
+    global.console.debug = consoleDebugOriginal;
 
     process.env.DEBUG = originalDEBUG;
   });
