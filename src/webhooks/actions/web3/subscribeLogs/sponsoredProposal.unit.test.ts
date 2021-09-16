@@ -145,7 +145,7 @@ describe('sponsoredProposal unit tests', () => {
 
     const isDebugSpy = jest
       .spyOn(await import('../../../../helpers/isDebug'), 'isDebug')
-      .mockImplementation(() => true);
+      .mockImplementationOnce(() => true);
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,
