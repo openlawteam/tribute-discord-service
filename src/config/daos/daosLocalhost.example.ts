@@ -45,6 +45,16 @@ export const DAOS_LOCALHOST: Record<
     events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Tribute DAO [DEV]',
     registryContractAddress: '0x0000000000000000000000000000000000000000',
+    snapshotHub: {
+      proposalResolver: async (proposalID, space) =>
+        await legacyTributeProposalResolver({
+          // @see `docker-host` in `docker-compose.dev.yml`
+          apiBaseURL: 'http://docker-host:8081/api',
+          proposalID,
+          space,
+        }),
+      space: 'test',
+    },
   },
 };
 */
