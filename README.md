@@ -58,8 +58,8 @@ npm run migrate:dev -- --name YOUR_MIGRATION_NAME --create-only
 
 Running the app with debugging enabled enhances logged output, where implemented.
 
-**Locally:** Add, or edit, a `/.env`
-**Upstream:** Edit where deployed (e.g. Google Cloud Kubernetes configuration)
+- **Locally:** Add, or edit, a `/.env`
+- **Upstream:** Edit where deployed (e.g. Google Cloud Kubernetes configuration)
 
 ```
 DEBUG=true
