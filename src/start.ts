@@ -1,6 +1,6 @@
 import {envCheck, getEnv} from './helpers';
 import {getDaos} from './services/dao/getDaos';
-import {runners} from './webhooks/runners';
+import {runners} from './webhook-tasks/runners';
 
 // Check if all environment variables are set
 envCheck();
