@@ -1,5 +1,5 @@
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
-import {DaoData} from './types';
+import {DaoData} from '../types';
 
 /**
  * A DEVELOPMENT configuration mapping for DAO's this app recognises.

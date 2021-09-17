@@ -7,18 +7,22 @@ export async function getDaos(): Promise<Daos | undefined> {
   try {
     switch (appEnv) {
       case 'production':
-        const {DAOS_PRODUCTION} = await import('../../config/daosProduction');
+        const {DAOS_PRODUCTION} = await import(
+          '../../config/daos/daosProduction'
+        );
 
         return DAOS_PRODUCTION;
 
       case 'development':
-        const {DAOS_DEVELOPMENT} = await import('../../config/daosDevelopment');
+        const {DAOS_DEVELOPMENT} = await import(
+          '../../config/daos/daosDevelopment'
+        );
 
         return DAOS_DEVELOPMENT;
 
       case 'localhost':
         // Evade TypeScript errors for a file which may not exist by moving to a variable
-        const localhostPath: string = '../../config/daosLocalhost';
+        const localhostPath: string = '../../config/daos/daosLocalhost';
 
         try {
           const {DAOS_LOCALHOST} = await import(localhostPath);

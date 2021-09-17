@@ -1,5 +1,4 @@
-import {DAOS_DEVELOPMENT} from '../../config/daosDevelopment';
-import {DAOS_PRODUCTION} from '../../config/daosProduction';
+import {DAOS_DEVELOPMENT, DAOS_PRODUCTION} from '../../config/daos';
 import {getDaos} from './getDaos';
 import {getEnv} from '../../helpers';
 

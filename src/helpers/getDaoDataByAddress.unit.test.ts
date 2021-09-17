@@ -1,4 +1,4 @@
-import {DAOS_DEVELOPMENT} from '../config/daosDevelopment';
+import {DAOS_DEVELOPMENT} from '../config/daos';
 import {getDAODataByAddress} from './getDaoDataByAddress';
 import {getDaos} from '../services/dao/getDaos';
 import {getEnv} from './getEnv';
