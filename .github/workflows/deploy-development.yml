@@ -1,0 +1,61 @@
+name: GKE development deployment
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GKE_CLUSTER: dev-cluster
+  GKE_ZONE: us-east4-b
+  SKAFFOLD_PROFILE: dev
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Use the GCP official setup action to auth, note that while mentioned in
+      # the documentation, `service_account_email` value is not required if
+      # using a JSON key versus legacy P12.
+      #
+      # Also the GCP_SA_KEY should be a base64 encoding of the JSON key file
+      # obtained for a service account with appropriate permissions.
+      - name: Set up Google Cloud Platform SDK and authenticate
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      ## skaffold is not preinstalled on GHA VMs currently, nor is it a
+      # "standard" GCP component, so install manually (via gcloud SDK here)
+      # - name: Install Skaffold
+      #   run: gcloud components install skaffold
+
+      # alternative way to install skaffold by just pulling binary, faster
+      - name: Install Skaffold
+        run: |
+          curl -Lo /tmp/skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+          chmod +x /tmp/skaffold
+          sudo mv /tmp/skaffold /usr/local/bin/skaffold
+
+      # Configure Docker to use the gcloud command-line tool as a credential
+      # helper for authentication.  Needed if pushing images to GCR.io, etc.
+      - name: Configure Docker for GCP credential helper
+        run: gcloud --quiet auth configure-docker
+
+      # Get the GKE credentials so we can deploy to the cluster
+      - name: Obtain GKE k8s cluster credentials
+        run: |-
+          gcloud container clusters get-credentials "$GKE_CLUSTER" \
+            --zone "$GKE_ZONE"
+
+      - name: Build and deploy to GKE cluster
+        run: skaffold run --profile="$SKAFFOLD_PROFILE" --status-check=true
+        env:
+          CP_ENVIRONMENT: development
+          CP_DEFAULT_CHAIN: 4
+          CP_INFURA_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_INFURA_PROJECT_ID }}
