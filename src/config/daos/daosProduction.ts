@@ -1,5 +1,6 @@
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
 import {DaoData} from '../types';
+import {legacyTributeProposalResolver} from '../../services/snapshotHub';
 
 /**
  * A PRODUCTION configuration mapping for DAO's this app recognises.
@@ -16,7 +17,9 @@ export const DAOS_PRODUCTION: Record<
   DaoData
 > = {
   muse0: {
-    actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],
+    actions: [
+      {name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: '888443179039354941'},
+    ],
     adapters: {
       [CORE_DAO_ADAPTERS['tribute-nft']]: {
         friendlyName: 'tribute-nft',
@@ -27,5 +30,14 @@ export const DAOS_PRODUCTION: Record<
     events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Muse0',
     registryContractAddress: '0x7c8B281C56f7ef9b8099D3F491AF24DC2C2e3ee0',
+    snapshotHub: {
+      proposalResolver: async (proposalID, space) =>
+        await legacyTributeProposalResolver({
+          apiBaseURL: 'https://snapshot-hub-erc712.thelao.io/api',
+          proposalID,
+          space,
+        }),
+      space: 'museo',
+    },
   },
 };

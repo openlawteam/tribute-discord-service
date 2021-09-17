@@ -1,5 +1,6 @@
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
 import {DaoData} from '../types';
+import {legacyTributeProposalResolver} from '../../services/snapshotHub';
 
 /**
  * A DEVELOPMENT configuration mapping for DAO's this app recognises.
@@ -27,5 +28,14 @@ export const DAOS_DEVELOPMENT: Record<
     events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Tribute DAO [DEV]',
     registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
+    snapshotHub: {
+      proposalResolver: async (proposalID, space) =>
+        await legacyTributeProposalResolver({
+          apiBaseURL: 'https://snapshot-hub-erc712.dev.thelao.io/api',
+          proposalID,
+          space,
+        }),
+      space: 'tribute',
+    },
   },
 };
