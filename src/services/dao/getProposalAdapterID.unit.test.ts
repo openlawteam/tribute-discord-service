@@ -1,7 +1,7 @@
 import {EMPTY_BYTES32_FIXTURE, ETH_ADDRESS_FIXTURE} from '../../../test';
 import {getProposalAdapterID} from './getProposalAdapterID';
 import {mockWeb3Provider} from '../../../test/setup';
-import {web3} from '../../alchemyWeb3Instance';
+import {web3} from '../../singletons';
 
 describe('getProposalAdapterID unit tests', () => {
   test("should return a proposal's adapter address", async () => {
