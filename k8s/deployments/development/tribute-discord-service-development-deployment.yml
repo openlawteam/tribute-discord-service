@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tribute-discord-service-development-deployment
+  labels:
+    app: tribute-discord-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tribute-discord-service
+  template:
+    metadata:
+      labels:
+        app: tribute-discord-service
+    spec:
+      containers:
+        - name: tribute-discord-service
+          # using the Cloud Code extension or skaffold (from the command-line or
+          # via the deploy GH Action) to deploy will automatically generate and
+          # append the tag used for the deployment
+          image: gcr.io/thelao/tribute-discord-service
+          ports:
+            - containerPort: 3000
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudsql-db-credentials
+                  key: password
+            - name: ALCHEMY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tribute-discord-service-development-secrets
+                  key: ALCHEMY_API_KEY
+            - name: NODE_ENV
+              value: 'development'
+              ##
+              # Name of the host environment the app is running in.
+              # E.g. localhost, development, staging, production
+              ##
+            - name: APP_ENV
+              value: 'development'
+              ##
+              # ETH network name
+              # 
+              # goerli
+              # kovan
+              # mainnet
+              # rinkeby
+              # ropsten
+              ##
+            - name: ETH_NETWORK_NAME
+              value: 'rinkeby'
+              # Set to `true` for more verbose stdout, stderr from the application code
+            - name: DEBUG
+              value: false
+              ##
+              # Prisma
+              ##
+            - name: DATABASE_URL
+              value: postgres://postgres:$(POSTGRES_PASSWORD)@localhost:5432/tribute-discord-service?schema=public
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/db
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          # define expected resource usage
+          resources: {}
+
+        # [START sqlcloud proxy container]
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.17
+          command:
+            [
+              "/cloud_sql_proxy",
+              "-instances=thelao:us-east4:dev-db=tcp:5432",
+              "-credential_file=/secrets/cloudsql/credentials.json",
+              "-log_debug_stdout=true",
+            ]
+          securityContext:
+            runAsUser: 2 # non-root user
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+          # empty resources to satisfy linter
+          resources: {}
+
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
