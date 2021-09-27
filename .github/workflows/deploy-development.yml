@@ -5,7 +5,7 @@ on:
       - main
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_ID: ${{ secrets.GPC_THELAO_PROJECT_ID }}
   GKE_CLUSTER: dev-cluster
   GKE_ZONE: us-east4-b
   SKAFFOLD_PROFILE: dev
@@ -26,8 +26,8 @@ jobs:
       - name: Set up Google Cloud Platform SDK and authenticate
         uses: google-github-actions/setup-gcloud@master
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GPC_THELAO_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_THELAO_SA_KEY }}
           export_default_credentials: true
 
       ## skaffold is not preinstalled on GHA VMs currently, nor is it a
