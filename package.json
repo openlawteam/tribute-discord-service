@@ -9,13 +9,14 @@
     "npm": "^7.0.0"
   },
   "scripts": {
-    "build": "npx tsc",
+    "build": "npm run generate-abi-types && npx tsc",
     "docker:down": "docker-compose -f docker-compose.dev.yml down --remove-orphans",
     "docker:teardown": "npm run docker:down -- -v",
     "docker:up": "docker-compose -f docker-compose.dev.yml up --build --remove-orphans",
     "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/**/*.json'",
     "migrate:dev": "dotenv -e .env.dev -- prisma migrate dev",
     "release": "np",
+    "start:deployed": "prisma migrate deploy && dist/src/index.js",
     "start": "npx prisma generate --watch & npm run generate-abi-types && npm run docker:up",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
