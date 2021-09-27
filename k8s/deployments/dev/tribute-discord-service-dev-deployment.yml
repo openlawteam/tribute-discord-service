@@ -21,7 +21,7 @@ spec:
           # append the tag used for the deployment
           image: gcr.io/thelao/tribute-discord-service
           ports:
-            - containerPort: 3000
+            - containerPort: 8080
           env:
             - name: POSTGRES_PASSWORD
               valueFrom:
@@ -63,13 +63,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /api/health
-              port: 3000
+              port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /api/db
-              port: 3000
+              port: 8080
             initialDelaySeconds: 10
             periodSeconds: 5
 
