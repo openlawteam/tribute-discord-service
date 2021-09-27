@@ -54,7 +54,7 @@ spec:
               value: 'rinkeby'
               # Set to `true` for more verbose stdout, stderr from the application code
             - name: DEBUG
-              value: false
+              value: true
               ##
               # Prisma
               ##
