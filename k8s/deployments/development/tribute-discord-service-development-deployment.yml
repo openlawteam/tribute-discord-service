@@ -34,7 +34,7 @@ spec:
                   name: tribute-discord-service-development-secrets
                   key: ALCHEMY_API_KEY
             - name: NODE_ENV
-              value: 'development'
+              value: 'production'
               ##
               # Name of the host environment the app is running in.
               # E.g. localhost, development, staging, production
