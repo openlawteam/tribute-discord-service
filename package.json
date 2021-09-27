@@ -9,7 +9,7 @@
     "npm": "^7.0.0"
   },
   "scripts": {
-    "build": "npm run generate-abi-types && npx tsc",
+    "build": "npx tsc",
     "docker:down": "docker-compose -f docker-compose.dev.yml down --remove-orphans",
     "docker:teardown": "npm run docker:down -- -v",
     "docker:up": "docker-compose -f docker-compose.dev.yml up --build --remove-orphans",
