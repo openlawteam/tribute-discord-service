@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tribute-discord-service-development-deployment
+  name: tribute-discord-service-dev-deployment
   labels:
     app: tribute-discord-service
 spec:
@@ -31,7 +31,7 @@ spec:
             - name: ALCHEMY_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: tribute-discord-service-development-secrets
+                  name: tribute-discord-service-dev-secrets
                   key: ALCHEMY_API_KEY
             - name: NODE_ENV
               value: 'production'
