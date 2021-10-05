@@ -4,7 +4,7 @@ import {httpServer} from './httpServer';
 
 describe('httpServer unit tests', () => {
   test('should start server and return Koa app', async () => {
-    const server = httpServer({noLog: true});
+    const server = httpServer({noLog: true, useAnyAvailablePort: true});
 
     expect(server).toBeInstanceOf(Server);
 

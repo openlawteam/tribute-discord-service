@@ -6,7 +6,7 @@ import {httpServer} from '../httpServer';
 
 describe('health unit tests', () => {
   test('should return response when `GET /health`', async () => {
-    const server = httpServer({noLog: true});
+    const server = httpServer({noLog: true, useAnyAvailablePort: true});
     const {port} = server?.address() as AddressInfo;
 
     // Temporarily hide warnings from `msw`

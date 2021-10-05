@@ -4,7 +4,9 @@ import {Server} from 'http';
 import {getEnv} from '../helpers';
 import {koaInstance as app, middlewares} from '.';
 
-type HTTPServerOptions = {noLog: boolean} | undefined;
+type HTTPServerOptions =
+  | {noLog?: boolean; useAnyAvailablePort?: boolean}
+  | undefined;
 
 export function httpServer(options?: HTTPServerOptions): Server | undefined {
   try {
@@ -16,7 +18,7 @@ export function httpServer(options?: HTTPServerOptions): Server | undefined {
       app.use(m());
     });
 
-    const server = app.listen(port);
+    const server = app.listen(options?.useAnyAvailablePort ? undefined : port);
 
     if (!options?.noLog) {
       console.log(
