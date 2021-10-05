@@ -1,17 +1,15 @@
 import Application from 'koa';
 
-import {koaInstance as app} from '../';
-
+// @see https://github.com/koajs/koa/wiki/Error-Handling
 export function errorHandler(): Application.Middleware {
   return async (ctx, next): Promise<void> => {
-    // Catch all downstream errors
     try {
       await next();
-    } catch (err) {
+    } catch (error) {
       ctx.status = 500;
+      ctx.body = (error as Error).message;
 
-      // Emit on app for log
-      app.emit('error', err, ctx);
+      ctx.app.emit('error', error, ctx);
     }
   };
 }
