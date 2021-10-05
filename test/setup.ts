@@ -6,7 +6,7 @@ import {server} from './msw/server';
 const path = require('path');
 
 /**
- * Test suite setup. Runs before tests start.
+ * Test suite setup. Runs before each test starts.
  *
  * @see https://jestjs.io/docs/configuration#setupfilesafterenv-array
  */
