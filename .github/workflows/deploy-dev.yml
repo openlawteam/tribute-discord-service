@@ -5,8 +5,8 @@ on:
       - main
 
 env:
-  DOCKER_REPO: openlaw/tribute-discord-service
-  IMAGE_NAME: openlaw/tribute-discord-service
+  REGISTRY_HOSTNAME: gcr.io
+  IMAGE_NAME: thelao/tribute-discord-service
   # https://github.com/kubernetes-sigs/kustomize/releases
   KUSTOMIZE_VERSION: 'v4.4.0'
   GIT_COMMITTER_NAME: 'Pizza Dog'
@@ -23,19 +23,33 @@ jobs:
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v2.x
-      
-      - name: Build Docker image and tag
-        uses: docker/build-push-action@v1
-        env:
-          DOCKER_BUILDKIT: 1
+
+      # Use the GCP official setup action to auth, note that while mentioned in
+      # the documentation, `service_account_email` value is not required if
+      # using a JSON key versus legacy P12.
+      #
+      # Also the GCP_SA_KEY should be a base64 encoding of the JSON key file
+      # obtained for a service account with appropriate permissions.
+      - name: Set up Google Cloud Platform SDK and authenticate
+        uses: google-github-actions/setup-gcloud@master
         with:
-          username: ${{ secrets.PUB_REPO_DOCKERHUB_USERNAME }}
-          password: ${{ secrets.PUB_REPO_DOCKERHUB_ACCESS_TOKEN }}
-          repository: ${{ env.DOCKER_REPO }}
-          # Automatically tags the built image with the git short SHA prefixed with the branch name, e.g: master-xxxxxxx
-          tags: ${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}, dev
-          # Only push on git master branch
-          push: ${{ startsWith(github.ref, 'refs/heads/master') }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      # Configure Docker to use the gcloud command-line tool as a credential
+      # helper for authentication. Needed if pushing images to GCR.io, etc.
+      - name: Configure Docker for GCP credential helper
+        run: gcloud --quiet auth configure-docker
+
+      - name: Build and Publish Docker Image to GCR.io
+        run: |
+          export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
+          echo $TAG
+          docker build -t "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG" .
+          docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG"
+          docker tag "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG" "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:main
+          docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:main
           
       - name: Checkout openlawteam/lao-backends repo
         uses: actions/checkout@v2
@@ -57,11 +71,13 @@ jobs:
       - name: Update and commit new dev image tag
         run: |
           ls
-          cd dev
-          ./../kustomize edit set image "${{ env.IMAGE_NAME }}:${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}"
+          cd k8s/dev/deployments
+          export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
+          echo $TAG
+          ./../kustomize edit set image "${{ env.IMAGE_NAME }}:$TAG"
           git config --local user.email ${{ env.GIT_COMMITTER_EMAIL }}
           git config --local user.name ${{ env.GIT_COMMITTER_NAME }}
-          git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}"
+          git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"
           git show
       - name: Push changes to openlawteam/lao-backends
         uses: ad-m/github-push-action@master
