@@ -16,7 +16,7 @@
     "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/**/*.json'",
     "migrate:dev": "dotenv -e .env.dev -- prisma migrate dev",
     "release": "np",
-    "start:deployed": "prisma migrate deploy && dist/src/index.js",
+    "start:deployed": "prisma migrate deploy && dist/index.js",
     "start": "npx prisma generate --watch & npm run generate-abi-types && npm run docker:up",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
