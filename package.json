@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "A Discord service to interact with curated TributeDAOs' Discord servers.",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "engines": {
     "node": "^16.0.0",
     "npm": "^7.0.0"

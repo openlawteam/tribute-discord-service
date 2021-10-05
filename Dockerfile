@@ -20,8 +20,6 @@ COPY prisma prisma
 COPY src src
 # Generate ABI types and compile to JavaScript using TypeSript
 RUN ["npm", "run", "build"]
-# Copy the generated abi-types
-COPY abi-types abi-types
 
 # This stage npm installs the production node
 # modules only, so that they can be copied over to the production
