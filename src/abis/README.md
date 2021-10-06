@@ -1,6 +1,6 @@
 # ABIs
 
-The ABIs here are meant to be as small as possible. Not all ABI files will be of the entire contract.
+The ABIs here are meant to be as small as possible. Not all ABI files may be of the entire contract.
 
 **Example:**
 
