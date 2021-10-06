@@ -57,12 +57,13 @@ jobs:
 
       - name: Update and commit new dev image tag
         run: |
-          ls
+          cd k8s/deployments/dev
           export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
           echo $TAG
+          'sed -i 's/${{ env.IMAGE_NAME }}:main-.*/${{ env.IMAGE_NAME }}:$TAG/g' tribute-discord-deployment.yaml'
           git config --local user.email ${{ env.GIT_COMMITTER_EMAIL }}
           git config --local user.name ${{ env.GIT_COMMITTER_NAME }}
-          git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"
+          'git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"'
           git show
 
       - name: Push changes to openlawteam/lao-backends
