@@ -29,7 +29,7 @@ services:
       # Wait for `db` to be available at port, then run the `dev-start` script
       ["./scripts/wait-for-it.sh", "db:5432", "--", "./scripts/dev-start.sh"]
     ports:
-      - "3000"
+      - "3000:3000"
     volumes:
       - ./src:/app/src
       - ./prisma:/app/prisma

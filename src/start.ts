@@ -1,9 +1,6 @@
-import {envCheck, getEnv} from './helpers';
 import {getDaos} from './services/dao/getDaos';
+import {getEnv} from './helpers';
 import {runners} from './webhook-tasks/runners';
-
-// Check if all environment variables are set
-envCheck();
 
 export async function start() {
   const daos = await getDaos();

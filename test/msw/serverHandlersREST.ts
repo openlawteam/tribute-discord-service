@@ -8,6 +8,16 @@ import {rest} from './server';
 import {SnapshotHubLegacyTributeProposalEntry} from '../../src/services/snapshotHub';
 
 /**
+ * HTTP API
+ */
+
+const httpAPIAllGET = rest.get(
+  'http://localhost:*/api/*',
+  // Bypass and use original response
+  (_req, _res, _ctx) => undefined
+);
+
+/**
  * Alchemy API
  */
 
@@ -44,5 +54,6 @@ const snapshotHubLegacyTributeProposalGET = rest.get<
 export const handlers = [
   alchemyAPI,
   discordWebhookPOST,
+  httpAPIAllGET,
   snapshotHubLegacyTributeProposalGET,
 ];

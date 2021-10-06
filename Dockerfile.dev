@@ -1,3 +1,7 @@
+##
+# `Dockerfile` for local development using Docker Compose.
+##
+
 FROM node:16
 WORKDIR /app
 COPY package*.json ./

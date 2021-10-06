@@ -1,5 +1,9 @@
 {
-  "extends": "@tsconfig/node14/tsconfig.json",
+  // @see https://www.typescriptlang.org/tsconfig#exclude
+  "exclude": ["src/**/*.test.ts"],
+  "extends": "@tsconfig/node16/tsconfig.json",
+  // @see https://www.typescriptlang.org/tsconfig#include
+  "include": ["src/**/*"],
   "compilerOptions": {
     "outDir": "dist",
     "resolveJsonModule": true
