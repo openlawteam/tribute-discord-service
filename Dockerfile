@@ -26,6 +26,7 @@ RUN ["npm", "run", "build"]
 # stage.  This is done in an independent stage so that NPM/bash
 # can be left out of the final production image for security.
 FROM build as only-npm-dependencies
+WORKDIR /app
 ##
 # Set to `production` for npm to install only
 # `dependencies` for the app to run.
@@ -42,11 +43,16 @@ RUN npm ci --production
 #
 # @see https://github.com/GoogleContainerTools/distroless#why-should-i-use-distroless-images
 ##
-FROM gcr.io/distroless/nodejs:16
+FROM node:16-alpine
 # Copy `node_modules` from the `only-npm-dependencies` step
 COPY --from=only-npm-dependencies /app/node_modules /app/node_modules
-# Copy the compiled `dist` directory from the `build` step
+# Copy the TS-compiled `dist` directory from the `build` step to run the app
 COPY --from=build /app/dist /app/dist
+# Copy the `prisma` directory from the `build` step to migrate the database
+COPY --from=build /app/prisma /app/prisma
+# Copy `package.json` file from the `build` step to run our start commands
+COPY --from=build /app/package.json /app/package.json
 WORKDIR /app
+EXPOSE 8080
 # Run any DB migrations and start the app
 ENTRYPOINT ["npm", "run", "start:deployed"]
