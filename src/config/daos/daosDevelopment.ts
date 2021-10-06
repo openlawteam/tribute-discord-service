@@ -17,7 +17,9 @@ export const DAOS_DEVELOPMENT: Record<
   DaoData
 > = {
   tribute: {
-    actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],
+    actions: [
+      {name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: '886976872611729439'},
+    ],
     adapters: {
       [CORE_DAO_ADAPTERS.onboarding]: {
         friendlyName: 'onboarding',
