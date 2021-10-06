@@ -71,10 +71,10 @@ jobs:
       - name: Update and commit new dev image tag
         run: |
           ls
-          cd k8s/dev/deployments
+          cd k8s/deployments/dev
           export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
           echo $TAG
-          ./../kustomize edit set image "${{ env.IMAGE_NAME }}:$TAG"
+          ./../../../kustomize edit set image "${{ env.IMAGE_NAME }}:$TAG"
           git config --local user.email ${{ env.GIT_COMMITTER_EMAIL }}
           git config --local user.name ${{ env.GIT_COMMITTER_NAME }}
           git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"
@@ -84,4 +84,4 @@ jobs:
       #   uses: ad-m/github-push-action@master
       #   with:
       #     repository: openlawteam/lao-backends
-      #     github_token: ${{ secrets.PAT_OLBOT_REPO_RW }}
+      #     github_token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
