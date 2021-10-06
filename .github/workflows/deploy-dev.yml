@@ -33,8 +33,8 @@ jobs:
       - name: Set up Google Cloud Platform SDK and authenticate
         uses: google-github-actions/setup-gcloud@master
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GPC_THELAO_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_THELAO_SA_KEY }}
           export_default_credentials: true
 
       # Configure Docker to use the gcloud command-line tool as a credential
