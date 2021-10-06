@@ -43,10 +43,10 @@ RUN npm ci --production
 # @see https://github.com/GoogleContainerTools/distroless#why-should-i-use-distroless-images
 ##
 FROM gcr.io/distroless/nodejs:16
-WORKDIR /app
 # Copy `node_modules` from the `only-npm-dependencies` step
 COPY --from=only-npm-dependencies /app/node_modules /app/node_modules
 # Copy the compiled `dist` directory from the `build` step
 COPY --from=build /app/dist /app/dist
+WORKDIR /app
 # Run any DB migrations and start the app
 ENTRYPOINT ["npm", "run", "start:deployed"]
