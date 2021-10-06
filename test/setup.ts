@@ -38,7 +38,7 @@ export const mockWeb3Provider = new FakeHttpProvider();
  *
  * @see https://jestjs.io/docs/jest-object#jestmockmodulename-factory-options
  */
-jest.mock('../src/alchemyWeb3Instance', () => {
+jest.mock('../src/singletons/alchemyWeb3Instance', () => {
   return {
     __esModule: true,
     web3: new Web3(mockWeb3Provider as any) as any,
