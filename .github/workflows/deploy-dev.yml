@@ -2,7 +2,7 @@ name: GKE Development Deployment
 on:
   push:
     branches:
-      - main
+      - "*"
 
 env:
   REGISTRY_HOSTNAME: gcr.io
@@ -16,7 +16,7 @@ jobs:
     name: Build and deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Check available environment variables
+      - name: Checkout tribute-discord-service
         uses: actions/checkout@v2
 
       - name: Inject slug/short variables
@@ -37,10 +37,10 @@ jobs:
 
       # Configure Docker to use the gcloud command-line tool as a credential
       # helper for authentication. Needed if pushing images to GCR.io, etc.
-      - name: Configure Docker for GCP credential helper
+      - name: Configure Docker for GCP credential
         run: gcloud --quiet auth configure-docker
 
-      - name: Build and Publish Docker Image to GCR.io
+      - name: Build and Publish Docker Image to gcr.io
         run: |
           export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
           echo $TAG
@@ -49,25 +49,27 @@ jobs:
           docker tag "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG" "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:main
           docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:main
           
-      - name: Checkout openlawteam/lao-backends repo
+      - name: Checkout openlawteam/lao-backends
         uses: actions/checkout@v2
         with: 
           repository: openlawteam/lao-backends
           token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
 
-      - name: Update and commit new dev image tag
+      - name: Update image tag in openlawteam/lao-backends
         run: |
           cd k8s/deployments/dev
           export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
           echo $TAG
-          'sed -i 's/${{ env.IMAGE_NAME }}:main-.*/${{ env.IMAGE_NAME }}:$TAG/g' tribute-discord-deployment.yaml'
+          ls
+          sed -i "s|${{ env.IMAGE_NAME }}:main-.*|${{ env.IMAGE_NAME }}:$TAG|g" tribute-discord-deployment.yaml
           git config --local user.email ${{ env.GIT_COMMITTER_EMAIL }}
           git config --local user.name ${{ env.GIT_COMMITTER_NAME }}
-          'git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"'
+          git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"
           git show
-
+     
       - name: Push changes to openlawteam/lao-backends
         uses: ad-m/github-push-action@master
         with:
+          branch: master
           repository: openlawteam/lao-backends
           github_token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
