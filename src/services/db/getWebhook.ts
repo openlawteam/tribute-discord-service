@@ -1,4 +1,4 @@
-import prisma from '../../prismaClientInstance';
+import {prisma} from '../../singletons';
 
 export async function getWebhookByWebhookID(webhookID: string) {
   try {

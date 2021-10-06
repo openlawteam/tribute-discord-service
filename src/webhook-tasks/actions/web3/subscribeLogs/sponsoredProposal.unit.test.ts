@@ -12,7 +12,7 @@ import {mockWeb3Provider} from '../../../../../test/setup';
 import {prismaMock} from '../../../../../test/prismaMock';
 import {rest, server} from '../../../../../test/msw/server';
 import {sponsoredProposalActionSubscribeLogs} from './sponsoredProposal';
-import {web3} from '../../../../alchemyWeb3Instance';
+import {web3} from '../../../../singletons';
 
 type MockHelperReturn = Promise<{
   cleanup: () => void;
