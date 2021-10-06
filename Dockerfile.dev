@@ -2,7 +2,9 @@
 # `Dockerfile` for local development using Docker Compose.
 ##
 
-FROM node:16
+FROM node:16-alpine
+# Add `bash` to alpine to run our shell scripts
+RUN apk add --no-cache bash
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
