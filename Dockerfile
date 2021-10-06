@@ -5,7 +5,13 @@
 # @see https://docs.docker.com/develop/develop-images/multistage-build/
 ##
 
-FROM node:16 as build
+##
+# Alpine Linux is much smaller than most distribution base images (~5MB),
+# and thus leads to much slimmer images in general.
+#
+# @see https://hub.docker.com/_/node/
+##
+FROM node:16-alpine as build
 ##
 # Set to `development` temporarily for npm to install all
 # `dependencies` and `devDependencies` for compilation.
@@ -35,14 +41,6 @@ ENV NODE_ENV=production
 # Install `dependencies`
 RUN npm ci --production
 
-##
-# For the production image, the Google "distroless" container is used,
-# which does not contain extra things which increase the attack
-# surface. The final image is essentially the node binary,
-# OS support (i.e. SSL certs, tzdata files, etc), and the compiled JS files.
-#
-# @see https://github.com/GoogleContainerTools/distroless#why-should-i-use-distroless-images
-##
 FROM node:16-alpine
 # Copy `node_modules` from the `only-npm-dependencies` step
 COPY --from=only-npm-dependencies /app/node_modules /app/node_modules
