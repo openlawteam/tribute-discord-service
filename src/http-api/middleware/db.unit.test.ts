@@ -3,10 +3,19 @@ import fetch from 'node-fetch';
 
 import {HTTP_API_BASE_PATH} from '../config';
 import {httpServer} from '../httpServer';
+import {prismaMock} from '../../../test/prismaMock';
 
 describe('db unit tests', () => {
+  const server = httpServer({noLog: true, useAnyAvailablePort: true});
+
+  afterAll(async () => {
+    await server?.close();
+  });
+
   test('should return response when `GET /db`', async () => {
-    const server = httpServer({noLog: true, useAnyAvailablePort: true});
+    // Mock result
+    prismaMock.discordWebhook.count.mockResolvedValue(7);
+
     const {port} = server?.address() as AddressInfo;
 
     // Temporarily hide warnings from `msw`
@@ -21,9 +30,6 @@ describe('db unit tests', () => {
     ).toMatch(/^Database is up and running\./i);
 
     // Cleanup
-
     consoleWarnSpy.mockRestore();
-
-    await server?.close();
   });
 });

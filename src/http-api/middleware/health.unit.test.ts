@@ -5,8 +5,13 @@ import {HTTP_API_BASE_PATH} from '../config';
 import {httpServer} from '../httpServer';
 
 describe('health unit tests', () => {
+  const server = httpServer({noLog: true, useAnyAvailablePort: true});
+
+  afterAll(async () => {
+    await server?.close();
+  });
+
   test('should return response when `GET /health`', async () => {
-    const server = httpServer({noLog: true, useAnyAvailablePort: true});
     const {port} = server?.address() as AddressInfo;
 
     // Temporarily hide warnings from `msw`
@@ -21,9 +26,6 @@ describe('health unit tests', () => {
     ).toMatch(/^HTTP API is up and running\./i);
 
     // Cleanup
-
     consoleWarnSpy.mockRestore();
-
-    await server?.close();
   });
 });

@@ -3,12 +3,13 @@ import {Server} from 'http';
 import {httpServer} from './httpServer';
 
 describe('httpServer unit tests', () => {
-  test('should start server and return Koa app', async () => {
-    const server = httpServer({noLog: true, useAnyAvailablePort: true});
+  const server = httpServer({noLog: true, useAnyAvailablePort: true});
 
-    expect(server).toBeInstanceOf(Server);
-
-    // Cleanup
+  afterAll(async () => {
     await server?.close();
+  });
+
+  test('should start server and return Koa app', async () => {
+    expect(server).toBeInstanceOf(Server);
   });
 });
