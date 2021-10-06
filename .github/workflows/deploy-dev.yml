@@ -7,8 +7,6 @@ on:
 env:
   REGISTRY_HOSTNAME: gcr.io
   IMAGE_NAME: thelao/tribute-discord-service
-  # https://github.com/kubernetes-sigs/kustomize/releases
-  KUSTOMIZE_VERSION: 'v4.4.0'
   GIT_COMMITTER_NAME: 'Pizza Dog'
   GIT_COMMITTER_EMAIL: 'dev@openlaw.io'
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -57,17 +55,6 @@ jobs:
           repository: openlawteam/lao-backends
           token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
 
-      - name: Download Kustomize
-        uses: wei/curl@v1
-        with:
-            args: -sfLo kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${{ env.KUSTOMIZE_VERSION }}/kustomize_${{ env.KUSTOMIZE_VERSION }}_linux_amd64.tar.gz 
-      
-      - name: Install Kustomize
-        run: |
-          tar -zxvf kustomize.tar.gz
-          chmod +x kustomize
-          ./kustomize version
-      
       - name: Update and commit new dev image tag
         run: |
           ls
