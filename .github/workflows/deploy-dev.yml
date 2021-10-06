@@ -2,7 +2,7 @@ name: GKE Development Deployment
 on:
   push:
     branches:
-      - "*"
+      - main
 
 env:
   REGISTRY_HOSTNAME: gcr.io
@@ -65,8 +65,8 @@ jobs:
           git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"
           git show
 
-      # - name: Push changes to openlawteam/lao-backends
-      #   uses: ad-m/github-push-action@master
-      #   with:
-      #     repository: openlawteam/lao-backends
-      #     github_token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
+      - name: Push changes to openlawteam/lao-backends
+        uses: ad-m/github-push-action@master
+        with:
+          repository: openlawteam/lao-backends
+          github_token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
