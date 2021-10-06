@@ -1,8 +1,8 @@
-import {getDaos} from './services/dao/getDaos';
-import {getEnv} from './helpers';
-import {runners} from './webhook-tasks/runners';
+import {getDaos} from '../services/dao/getDaos';
+import {getEnv} from '../helpers';
+import {runners} from './runners';
 
-export async function start() {
+export async function startWebhookTasks() {
   const daos = await getDaos();
 
   if (!daos) {

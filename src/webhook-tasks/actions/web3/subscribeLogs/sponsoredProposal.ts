@@ -25,7 +25,7 @@ import {getDiscordWebhookClient} from '../../../../services/discord';
 import {getProposalAdapterID} from '../../../../services';
 import {MessageEmbedOptions, MessageOptions} from 'discord.js';
 import {SponsoredProposal} from '../../../../../abi-types/DaoRegistry';
-import {web3} from '../../../../alchemyWeb3Instance';
+import {web3} from '../../../../singletons';
 
 type DiscordMessageEmbeds = MessageOptions['embeds'];
 

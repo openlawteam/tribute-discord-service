@@ -1,7 +1,7 @@
 import {Log, LogsOptions} from 'web3-core/types';
 import {Subscription} from 'web3-core-subscriptions';
 
-import {web3} from '../../../../alchemyWeb3Instance';
+import {web3} from '../../../../singletons';
 
 /**
  * subscribeLogs

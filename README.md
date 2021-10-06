@@ -5,7 +5,7 @@
 **Dependencies:**
 
 - Docker
-- NPM `^7.0.0` (if changing `package.json` packages)
+- NPM `^7.0.0` (if updating `package.json` packages)
 
 ### Running the local development environment
 

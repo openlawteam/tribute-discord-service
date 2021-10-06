@@ -2,7 +2,7 @@ import {AbiItem} from 'web3-utils/types';
 
 import {DaoRegistry} from '../../../abi-types/DaoRegistry';
 import {getLazyDefaultImport} from '../../helpers';
-import {web3} from '../../alchemyWeb3Instance';
+import {web3} from '../../singletons';
 
 export async function getProposalAdapterID(
   proposalID: string,
