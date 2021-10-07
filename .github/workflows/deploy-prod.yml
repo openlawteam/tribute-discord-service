@@ -44,7 +44,7 @@ jobs:
 
       - name: Build and Publish Docker Image to GCR.io
         run: |
-          export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
+          export TAG=${{ env.GITHUB_REF_SLUG }}
           echo $TAG
           docker build -t "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG" .
           docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG"
@@ -60,7 +60,7 @@ jobs:
       - name: Update the prod image tag
         run: |
           cd k8s/deployments/prod
-          export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
+          export TAG=${{ env.GITHUB_REF_SLUG }}
           echo $TAG
           ls
           sed -i "s|${{ env.IMAGE_NAME }}:main-.*|${{ env.IMAGE_NAME }}:$TAG|g" tribute-discord-deployment.yaml
