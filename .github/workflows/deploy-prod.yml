@@ -1,9 +1,9 @@
-name: GKE Development Deployment
+name: GKE Production Deployment
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - v*
 
 env:
   REGISTRY_HOSTNAME: gcr.io
@@ -57,16 +57,16 @@ jobs:
           repository: ${{ env.INFRA_REPO }}
           token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
 
-      - name: Update the dev image tag
+      - name: Update the prod image tag
         run: |
-          cd k8s/deployments/dev
+          cd k8s/deployments/prod
           export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
           echo $TAG
           ls
           sed -i "s|${{ env.IMAGE_NAME }}:main-.*|${{ env.IMAGE_NAME }}:$TAG|g" tribute-discord-deployment.yaml
           git config --local user.email ${{ env.GIT_COMMITTER_EMAIL }}
           git config --local user.name ${{ env.GIT_COMMITTER_NAME }}
-          git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"
+          git commit -am "auto-release(prod): ${{ env.IMAGE_NAME }}:$TAG"
           git show
 
       - name: Push changes to openlawteam/lao-backends repo
