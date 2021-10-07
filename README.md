@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/openlawteam/tribute-discord-service/branch/main/graph/badge.svg?token=1SM8FCMIQ6)](https://codecov.io/gh/openlawteam/tribute-discord-service)
+
 # Tribute Discord Service
 
 ## Development
