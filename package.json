@@ -15,7 +15,7 @@
     "docker:up": "docker-compose -f docker-compose.dev.yml up --build --remove-orphans",
     "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/**/*.json'",
     "migrate:dev": "dotenv -e .env.dev -- prisma migrate dev",
-    "release": "np",
+    "release": "np --no-publish --no-yarn",
     "start:deployed": "npx prisma generate && prisma migrate deploy && node dist/index.js",
     "start": "npx prisma generate --watch & npm run generate-abi-types && npm run docker:up",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
