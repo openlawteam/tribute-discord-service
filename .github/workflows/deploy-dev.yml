@@ -10,6 +10,7 @@ env:
   GIT_COMMITTER_NAME: 'Pizza Dog'
   GIT_COMMITTER_EMAIL: 'dev@openlaw.io'
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  INFRA_REPO: openlawteam/lao-backends
 
 jobs:
   deploy:
@@ -52,22 +53,25 @@ jobs:
       - name: Checkout openlawteam/lao-backends repo
         uses: actions/checkout@v2
         with: 
-          repository: openlawteam/lao-backends
+          repository: ${{ env.INFRA_REPO }}
           token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
 
-      - name: Update and commit new dev image tag
+      - name: Update the dev image tag
         run: |
           cd k8s/deployments/dev
           export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
           echo $TAG
-          'sed -i 's/${{ env.IMAGE_NAME }}:main-.*/${{ env.IMAGE_NAME }}:$TAG/g' tribute-discord-deployment.yaml'
+          ls
+          sed -i "s|${{ env.IMAGE_NAME }}:main-.*|${{ env.IMAGE_NAME }}:$TAG|g" tribute-discord-deployment.yaml
           git config --local user.email ${{ env.GIT_COMMITTER_EMAIL }}
           git config --local user.name ${{ env.GIT_COMMITTER_NAME }}
-          'git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"'
+          git commit -am "auto-release(dev): ${{ env.IMAGE_NAME }}:$TAG"
           git show
 
-      - name: Push changes to openlawteam/lao-backends
+      - name: Push changes to openlawteam/lao-backends repo
         uses: ad-m/github-push-action@master
         with:
-          repository: openlawteam/lao-backends
+          repository: ${{ env.INFRA_REPO }}
           github_token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
+          branch: master
+            
