@@ -42,6 +42,8 @@ ENV NODE_ENV=production
 RUN npm ci --production
 
 FROM node:16-alpine
+# Get latest `npm` 7.x
+RUN npm i -g npm@^7
 # Copy `node_modules` from the `only-npm-dependencies` step
 COPY --from=only-npm-dependencies /app/node_modules /app/node_modules
 # Copy the TS-compiled `dist` directory from the `build` step to run the app
