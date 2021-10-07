@@ -1,4 +1,4 @@
-name: Code Coverage
+name: Unit Tests / Code Coverage
 
 on: [push]
 
