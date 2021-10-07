@@ -63,7 +63,7 @@ jobs:
           export TAG=${{ env.GITHUB_REF_SLUG }}
           echo $TAG
           ls
-          sed -i "s|${{ env.IMAGE_NAME }}:main-.*|${{ env.IMAGE_NAME }}:$TAG|g" tribute-discord-deployment.yaml
+          sed -i "s|${{ env.IMAGE_NAME }}:v.*|${{ env.IMAGE_NAME }}:$TAG|g" tribute-discord-deployment.yaml
           git config --local user.email ${{ env.GIT_COMMITTER_EMAIL }}
           git config --local user.name ${{ env.GIT_COMMITTER_NAME }}
           git commit -am "auto-release(prod): ${{ env.IMAGE_NAME }}:$TAG"
