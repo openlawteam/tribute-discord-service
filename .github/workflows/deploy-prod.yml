@@ -75,4 +75,3 @@ jobs:
           repository: ${{ env.INFRA_REPO }}
           github_token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
           branch: master
-            
