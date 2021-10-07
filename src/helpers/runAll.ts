@@ -18,7 +18,9 @@ export function runAll(functions: AnyArgsFunction[]): AnyArgsFunction {
       } catch (error) {
         if (error instanceof Error) {
           console.error(
-            `\`runAll\`: There was an error while running a function: "${f.name}".\n${error.stack}`
+            `\`runAll\`: There was an error while running a function: "${
+              f.name
+            }".\n${error.stack || error}`
           );
         }
       }
