@@ -1,6 +1,6 @@
 {
   "name": "tribute-discord-service",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "A Discord service to interact with curated TributeDAOs' Discord servers.",
   "main": "dist/index.js",
