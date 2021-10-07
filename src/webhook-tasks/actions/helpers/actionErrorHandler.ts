@@ -11,6 +11,8 @@ export function actionErrorHandler({
   error: Error;
 }): void {
   console.error(
-    `Error while executing ${actionName} action for ${event.name} event.\n${error.stack}`
+    `Error while executing ${actionName} action for ${event.name} event.\n${
+      error.stack || error
+    }`
   );
 }
