@@ -2,6 +2,8 @@ name: GKE Development Deployment
 
 on:
   push:
+    tags-ignore:
+      - 'v*'
     branches:
       - main
 
