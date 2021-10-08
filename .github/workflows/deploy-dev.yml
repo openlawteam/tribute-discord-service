@@ -17,7 +17,7 @@ env:
 
 jobs:
   deploy:
-    if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+    if: ${{ startsWith(env.GITHUB_REF_SLUG, 'v') != true }}
     name: Build and deploy
     runs-on: ubuntu-latest
     steps:
