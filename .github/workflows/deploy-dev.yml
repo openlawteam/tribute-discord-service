@@ -35,7 +35,7 @@ jobs:
         # @see https://stackoverflow.com/a/58869470
         ##
         run: |
-          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo ::set-output name=has-release-tag::true
           fi
 
