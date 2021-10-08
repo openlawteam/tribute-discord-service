@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    tags-ignore:
-      - "*"
+    tags:
+      - "!v*"
 
 env:
   REGISTRY_HOSTNAME: gcr.io
@@ -17,7 +17,6 @@ env:
 
 jobs:
   deploy:
-    if: ${{ startsWith(env.GITHUB_REF_SLUG, 'v') != true }}
     name: Build and deploy
     runs-on: ubuntu-latest
     steps:
@@ -25,6 +24,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Inject slug/short variables
+        if: ${{ startsWith(github.ref, 'refs/tags/') != true }}
         uses: rlespinasse/github-slug-action@v2.x
 
       # Use the GCP official setup action to auth, note that while mentioned in
@@ -34,6 +34,7 @@ jobs:
       # Also the GCP_SA_KEY should be a base64 encoding of the JSON key file
       # obtained for a service account with appropriate permissions.
       - name: Set up Google Cloud Platform SDK and authenticate
+        if: ${{ startsWith(github.ref, 'refs/tags/') != true }}
         uses: google-github-actions/setup-gcloud@master
         with:
           project_id: ${{ secrets.GPC_THELAO_PROJECT_ID }}
@@ -43,9 +44,11 @@ jobs:
       # Configure Docker to use the gcloud command-line tool as a credential
       # helper for authentication. Needed if pushing images to GCR.io, etc.
       - name: Configure Docker for GCP credential helper
+        if: ${{ startsWith(github.ref, 'refs/tags/') != true }}
         run: gcloud --quiet auth configure-docker
 
       - name: Build and Publish Docker Image to GCR.io
+        if: ${{ startsWith(github.ref, 'refs/tags/') != true }}
         run: |
           export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
           echo $TAG
@@ -55,12 +58,14 @@ jobs:
           docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:main
           
       - name: Checkout openlawteam/lao-backends repo
+        if: ${{ startsWith(github.ref, 'refs/tags/') != true }}
         uses: actions/checkout@v2
         with: 
           repository: ${{ env.INFRA_REPO }}
           token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
 
       - name: Update the dev image tag
+        if: ${{ startsWith(github.ref, 'refs/tags/') != true }}
         run: |
           cd k8s/deployments/dev
           export TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
@@ -73,6 +78,7 @@ jobs:
           git show
 
       - name: Push changes to openlawteam/lao-backends repo
+        if: ${{ startsWith(github.ref, 'refs/tags/') != true }}
         uses: ad-m/github-push-action@master
         with:
           repository: ${{ env.INFRA_REPO }}
