@@ -66,3 +66,15 @@ Running the app with debugging enabled enhances logged output, where implemented
 ```
 DEBUG=true
 ```
+
+## Deployment
+
+### Development
+
+Any merge, or push, to `main` will run a development environment release on Tribute Labs' Google Cloud->Kubernetes Engine. The GitHub `deploy-dev.yml` Action will run and, if successful, will push a commit to `lao-backends`, which will complete the deployment (NOTE: this will change in the future as we improve our deployments).
+
+### Production
+
+It is recommended to use [`bump`](https://github.com/mroth/bump) locally to deploy a production release; the formatting is nice! Bump will determine the next semantic version and open a page to create a new GitHub release. The tag will be created once the GitHub release is published, not when `bump` is run.
+
+Once the release has been published, the GitHub `deploy-prod.yml` Action will run and, if successful, will push a commit to `lao-backends`, which will complete the deployment to Tribute Labs' Google Cloud->Kubernetes Engine (NOTE: this will change in the future as we improve our deployments).
