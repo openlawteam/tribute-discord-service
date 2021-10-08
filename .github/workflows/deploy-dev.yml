@@ -41,7 +41,7 @@ jobs:
 
   deploy:
     needs: ref-has-release-tag
-    if: steps.check-ref-has-release-tag.outputs.has-release-tag === 'false'
+    if: ${{ steps.check-ref-has-release-tag.outputs.has-release-tag === 'false' }}
 
     name: Build and deploy
     runs-on: ubuntu-latest
