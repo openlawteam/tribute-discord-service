@@ -16,9 +16,36 @@ env:
   INFRA_REPO: openlawteam/lao-backends
 
 jobs:
+  ##
+  # Check if the ref has a release tag, and if so, we should not run later jobs.
+  #
+  # @see https://stackoverflow.com/questions/60589373/how-to-force-to-exit-in-github-actions-step
+  ##
+  ref-has-release-tag:
+    name: Ref Has Release Tag?
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if ref has release tag format
+        id: check-ref-has-release-tag
+        ##
+        # Check if the ref has a tag which matches v.x.x
+        # and set an output in this Action
+        #
+        # @see https://stackoverflow.com/a/58869470
+        ##
+        run: |
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=has-release-tag::true
+          fi
+
   deploy:
+    needs: ref-has-release-tag
+    if: steps.check-ref-has-release-tag.outputs.has-release-tag === 'false'
+
     name: Build and deploy
     runs-on: ubuntu-latest
+
     steps:
       - name: Check available environment variables
         uses: actions/checkout@v2
