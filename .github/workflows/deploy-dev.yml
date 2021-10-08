@@ -41,7 +41,7 @@ jobs:
 
   deploy:
     needs: ref-has-release-tag
-    if: ${{ needs.check-ref-has-release-tag.outputs.has-release-tag == 'false' }}
+    if: ${{ needs.check-ref-has-release-tag.outputs.has-release-tag != 'true' }}
 
     name: Build and deploy
     runs-on: ubuntu-latest
