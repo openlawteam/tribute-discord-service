@@ -38,21 +38,6 @@
     "url": "https://github.com/openlawteam/tribute-discord-service/issues"
   },
   "homepage": "https://github.com/openlawteam/tribute-discord-service#readme",
-  "prettier": {
-    "overrides": [
-      {
-        "files": [
-          "{pages,prisma,src,styles,test}/**/*.{js,jsx,ts,tsx,json}"
-        ],
-        "options": {
-          "singleQuote": true,
-          "bracketSpacing": false,
-          "jsxBracketSameLine": true,
-          "tabWidth": 2
-        }
-      }
-    ]
-  },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.2",
     "@typechain/web3-v1": "^3.0.0",
