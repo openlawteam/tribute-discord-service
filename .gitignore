@@ -12,3 +12,7 @@ abi-types
 # Code config
 
 daosLocalhost.ts
+
+# Jest, Codecov
+
+coverage
