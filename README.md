@@ -12,7 +12,6 @@
 - [Alchemy](https://www.alchemy.com) API key (i.e. sign up for their free tier)
 - Add `ALCHEMY_API_KEY` to `<project>/.env`: `echo ALCHEMY_API_KEY=your_key >> .env`
 - Create `src/config/daos/daosLocalhost.ts` from copying `daosLocalhost.example.ts`
-- Add webhook entries to the database's `discord_webhooks` table.
 
 ### Running the local development environment
 
@@ -20,6 +19,7 @@
 npm ci
 npm start
 ```
+Once the environment is started, webhooks may be added to the database's `discord_webhooks` table.
 
 ### Stopping the development environment
 
