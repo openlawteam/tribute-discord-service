@@ -19,16 +19,19 @@
 npm ci
 npm start
 ```
-Once the environment is started, webhooks may be added to the database's `discord_webhooks` table.
 
-### Stopping the development environment
+#### Webhook database entries
+
+Once the environment is started, webhooks may be inserted into the database's `discord_webhooks` table.
+
+### Stopping the local development environment
 
 ```sh
 # Runs `docker-compose down` to stop and remove any containers, networks
 npm run docker:down
 ```
 
-### Resetting the development environment
+### Resetting the local development environment
 
 ```sh
 # Runs `docker-compose down` and removes data volumes
