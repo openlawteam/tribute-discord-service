@@ -8,8 +8,11 @@
  * ----------------------------------------
  */
 
-// import {CORE_DAO_ADAPTERS} from './daoAdapters';
-// import {DaoData} from './types';
+/*
+import {CORE_DAO_ADAPTERS} from './daoAdapters';
+import {DaoData} from '../types';
+import {legacyTributeProposalResolver} from '../../services/snapshotHub';
+*/
 
 /**
  * A LOCALHOST configuration mapping for DAO's this app recognises.
