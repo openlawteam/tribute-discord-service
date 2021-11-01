@@ -4,17 +4,18 @@
 
 ## Development
 
-**Dependencies:**
+### Dependencies:
 
 - Docker
-- NPM `^7.0.0` (if updating `package.json` packages)
+- Node `^16.6.0`. It is a dependency for `discord.js`.
+- NPM `>=7`
+- [Alchemy](https://www.alchemy.com) API key (i.e. sign up for their free tier)
+- Add `ALCHEMY_API_KEY` to `<project>/.env`: `echo ALCHEMY_API_KEY=your_key >> .env`
+- Create `src/config/daos/daosLocalhost.ts` from copying `daosLocalhost.example.ts`
+- Add webhook entries to the database's `discord_webhooks` table. Example:
+  - `INSERT INTO discord_webhooks ("name", "webhookID", "webhookToken") VALUES ('Captain Hook', 'abc123', 'ssSshhh')`
 
 ### Running the local development environment
-
-**Dependencies**
-
-- Get an Alchemy API Key (i.e. sign up for their free tier)
-- Add `ALCHEMY_API_KEY=your_key` to `.env`
 
 ```sh
 npm ci
