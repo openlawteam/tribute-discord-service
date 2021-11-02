@@ -18,6 +18,12 @@ services:
 
   # App
   app:
+    ##
+    # Run an init inside the container that forwards signals (e.g. `SIGINT`) and reaps processes.
+    #
+    # @see https://docs.docker.com/compose/compose-file/compose-file-v3/#init
+    ##
+    init: true
     build:
       context: .
       dockerfile: ./Dockerfile.dev
@@ -26,15 +32,12 @@ services:
       - .env.dev
       # Adding as well, as we require API key(s) for dev. Not in source control.
       - .env
-    command:
-      # Wait for `db` to be available at port, then run the `dev-start` script
-      ["./scripts/wait-for-it.sh", "db:5432", "--", "./scripts/dev-start.sh"]
     ports:
       # Optional: override the `HTTP_API_PORT` port in `.env`; defaults to `3000`
       - "${HTTP_API_PORT:-3000}:3000"
     volumes:
-      - ./src:/app/src
-      - ./prisma:/app/prisma
+      - ./src:/home/node/app/src
+      - ./prisma:/home/node/app/prisma
     depends_on:
       # Starts the `db` service first.
       # Does not wait for Postgres itself to be ready.

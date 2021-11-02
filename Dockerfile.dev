@@ -5,15 +5,24 @@
 FROM node:16-alpine
 # Add `bash` to alpine to run our shell scripts
 RUN apk add --no-cache bash
-WORKDIR /app
-COPY package*.json ./
+RUN mkdir /home/node/app/ && chown -R node:node /home/node/app
+WORKDIR /home/node/app
+##
+# Set the user to use when running this image
+#
+# @see https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md#non-root-user
+##
+USER node
+COPY  --chown=node:node package*.json ./
 RUN npm ci
-COPY tsconfig.json ./
-COPY scripts scripts
-COPY prisma prisma
-COPY src src
-COPY abi-types abi-types
-# Make `wait-for-it` executable by the container
-RUN ["chmod", "+x", "./scripts/wait-for-it.sh"]
-# Make `dev-start` executable by the container
-RUN ["chmod", "+x", "./scripts/dev-start.sh"]
+COPY --chown=node:node tsconfig.json ./
+COPY --chown=node:node scripts scripts
+COPY --chown=node:node prisma prisma
+COPY --chown=node:node src src
+COPY --chown=node:node abi-types abi-types
+# Make `wait-for-it` executable by the container's user
+RUN ["chmod", "u+x", "./scripts/wait-for-it.sh"]
+# Wait for `db` to be available at port, then run the start commands
+CMD ./scripts/wait-for-it.sh db:5432 --\
+    npm run migrate:dev && \
+    npx nodemon --signal SIGTERM --watch 'src/**/*.{ts,js,json}' --exec 'ts-node' src/index.ts
