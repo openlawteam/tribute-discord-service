@@ -2,7 +2,9 @@ import {ACTIONS} from './actions';
 import {EVENTS} from './events';
 import {SnapshotHubProposalBase} from '../services/snapshotHub/types';
 
-export type DaoDataEvent = {name: typeof EVENTS[number]; active?: boolean};
+export type EventNames = typeof EVENTS[number];
+
+export type DaoDataEvent = {name: EventNames; active?: boolean};
 
 export type DaoDataAction = {
   name: typeof ACTIONS[number];

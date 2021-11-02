@@ -44,7 +44,9 @@ export function sponsoredProposalRunnerSubscribeLogs(
     .on('error', subscribeErrorHandler(SPONSORED_PROPOSAL_WEB3_LOGS));
 
   const stop = async () => {
-    await subscription.unsubscribe(subscribeUnsubscribeHandler(eventName));
+    await subscription.unsubscribe(
+      subscribeUnsubscribeHandler(SPONSORED_PROPOSAL_WEB3_LOGS)
+    );
   };
 
   return {
