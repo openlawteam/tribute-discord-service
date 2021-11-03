@@ -1,3 +1,5 @@
+import {Log} from 'web3-core/types';
+
 import {
   subscribeConnectedHandler,
   subscribeErrorHandler,
@@ -44,8 +46,9 @@ export function sponsoredProposalRunnerSubscribeLogs(
     .on('error', subscribeErrorHandler(SPONSORED_PROPOSAL_WEB3_LOGS));
 
   const stop = async () => {
-    await subscription.unsubscribe(
-      subscribeUnsubscribeHandler(SPONSORED_PROPOSAL_WEB3_LOGS)
+    await subscribeUnsubscribeHandler<Log>(
+      subscription,
+      SPONSORED_PROPOSAL_WEB3_LOGS
     );
   };
 
