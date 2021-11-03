@@ -1,4 +1,4 @@
-import {CORE_DAO_ADAPTERS, DaoData} from '../../../config';
+import {CORE_DAO_ADAPTERS, DaoData} from '../config';
 import {filterDaosByActiveEvent} from './filterDaosByActiveEvent';
 
 describe('filterDaosByActiveEvent unit tests', () => {
