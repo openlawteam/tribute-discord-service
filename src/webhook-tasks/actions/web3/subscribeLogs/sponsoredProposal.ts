@@ -45,7 +45,9 @@ export function sponsoredProposalActionSubscribeLogs(
 ): (d: Log) => Promise<void> {
   return async (eventData) => {
     try {
-      const dao = getDaoDataByAddress(eventData?.address, daos);
+      if (!eventData) return;
+
+      const dao = getDaoDataByAddress(eventData.address, daos);
       const daoAction = getDaoAction('SPONSORED_PROPOSAL_WEBHOOK', dao);
 
       if (

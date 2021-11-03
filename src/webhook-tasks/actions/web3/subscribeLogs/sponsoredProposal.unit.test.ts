@@ -244,12 +244,8 @@ describe('sponsoredProposal unit tests', () => {
 
     // Assert no `WebhookClient.send` called
     expect(sendSpy?.mock.calls.length).toBe(0);
-    expect(getDaoDataByAddressSpy?.mock.calls.length).toBe(1);
-
-    expect(getDaoDataByAddressSpy?.mock.calls[0]).toEqual([
-      'SPONSORED_PROPOSAL_WEBHOOK',
-      undefined,
-    ]);
+    // Assert exit early
+    expect(getDaoDataByAddressSpy?.mock.calls.length).toBe(0);
 
     cleanup();
     getDaoDataByAddressSpy.mockRestore();
