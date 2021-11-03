@@ -1,4 +1,4 @@
-import {DaoData, EventNames} from '../../../../config/types';
+import {DaoData, EventNames} from '../config/types';
 
 export function filterDaosByActiveEvent(
   daos: Record<string, DaoData> | undefined = {},
@@ -8,7 +8,9 @@ export function filterDaosByActiveEvent(
     Object.entries(daos).filter(([_, daoData]) => {
       const event = daoData.events.find((e) => e.name === eventName);
 
-      return event?.active !== false;
+      if (!event) return false;
+
+      return event.active !== false;
     })
   );
 }

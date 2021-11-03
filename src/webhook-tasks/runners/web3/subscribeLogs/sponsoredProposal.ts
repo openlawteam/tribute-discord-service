@@ -6,8 +6,7 @@ import {
   subscribeLogs,
 } from '../helpers';
 import {Daos} from '../../../../config/types';
-import {filterDaosByActiveEvent} from '../helpers/filterDaosByActiveEvent';
-import {runAll} from '../../../../helpers';
+import {filterDaosByActiveEvent, runAll} from '../../../../helpers';
 import {RunnerReturn} from '../../types';
 import {SPONSORED_PROPOSAL_WEB3_LOGS} from '../../../events';
 import {sponsoredProposalActionSubscribeLogs} from '../../../actions';
