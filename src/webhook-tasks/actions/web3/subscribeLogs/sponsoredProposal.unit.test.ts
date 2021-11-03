@@ -230,4 +230,28 @@ describe('sponsoredProposal unit tests', () => {
 
     cleanup();
   });
+
+  test('should exit if no dao found', async () => {
+    const getDaoAction = await import('../../../../helpers/getDaoAction');
+    const {cleanup, sendSpy} = await mockHelper();
+
+    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+
+    await sponsoredProposalActionSubscribeLogs(
+      SPONSORED_PROPOSAL_WEB3_LOGS,
+      FAKE_DAOS_FIXTURE
+    )(undefined as any);
+
+    // Assert no `WebhookClient.send` called
+    expect(sendSpy?.mock.calls.length).toBe(0);
+    expect(getDaoDataByAddressSpy?.mock.calls.length).toBe(1);
+
+    expect(getDaoDataByAddressSpy?.mock.calls[0]).toEqual([
+      'SPONSORED_PROPOSAL_WEBHOOK',
+      undefined,
+    ]);
+
+    cleanup();
+    getDaoDataByAddressSpy.mockRestore();
+  });
 });
