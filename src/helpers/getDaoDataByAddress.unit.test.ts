@@ -1,22 +1,19 @@
-import {DAOS_DEVELOPMENT} from '../config/daos';
+import {ETH_ADDRESS_FIXTURE, FAKE_DAOS_FIXTURE} from '../../test/fixtures';
 import {getDAODataByAddress} from './getDaoDataByAddress';
-import {getDaos} from '../services/dao/getDaos';
-import {getEnv} from './getEnv';
 
 describe('getDaoDataByAddress unit tests', () => {
   test("should return a dao's data", async () => {
-    const originalAppEnv = getEnv('APP_ENV');
+    expect(getDAODataByAddress(ETH_ADDRESS_FIXTURE, FAKE_DAOS_FIXTURE)).toEqual(
+      FAKE_DAOS_FIXTURE.test
+    );
+  });
 
-    process.env.APP_ENV = 'development';
-
+  test('should return `undefined`', async () => {
     expect(
       getDAODataByAddress(
         '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
-        await getDaos()
+        FAKE_DAOS_FIXTURE
       )
-    ).toEqual(DAOS_DEVELOPMENT.tribute);
-
-    // Cleanup
-    process.env.APP_ENV = originalAppEnv;
+    ).toEqual(undefined);
   });
 });

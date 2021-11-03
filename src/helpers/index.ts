@@ -3,6 +3,7 @@ export * from './fetchGetJSON';
 export * from './filterDaosByActiveEvent';
 export * from './getDaoAction';
 export * from './getDaoDataByAddress';
+export * from './getDaoDataBySnapshotSpace';
 export * from './getEnv';
 export * from './getEtherscanURL';
 export * from './getLazyDefaultImport';
