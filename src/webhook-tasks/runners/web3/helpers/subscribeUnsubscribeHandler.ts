@@ -1,20 +1,22 @@
-import {Log} from 'web3-core/types';
 import {Subscription} from 'web3-core-subscriptions';
 
 import {EventBase} from '../../../events';
 
-export function subscribeUnsubscribeHandler({
-  name,
-}: EventBase): Parameters<Subscription<Log>['unsubscribe']>[0] {
-  return (error, result) => {
-    if (error) {
-      console.error(
-        `Error while unsubscribing from ${name} event: "${error.message}"`
-      );
-    }
+export async function subscribeUnsubscribeHandler<T>(
+  subscription: Subscription<T>,
+  {name}: EventBase
+): Promise<ReturnType<Subscription<T>['unsubscribe']>> {
+  try {
+    const result = await subscription.unsubscribe();
 
-    if (result) {
-      console.log(`Successfully unsubscribed from ${name} event.`);
-    }
-  };
+    console.log(`Successfully unsubscribed from ${name} event.`);
+
+    return result;
+  } catch (error) {
+    console.error(
+      `Error while unsubscribing from ${name} event: "${
+        (error as Error).message
+      }"`
+    );
+  }
 }
