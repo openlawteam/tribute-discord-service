@@ -32,7 +32,7 @@ export async function snapshotProposalEventRunner(
 
   if (!actions) return;
 
-  runAll(actions);
+  runAll(actions)(payload);
 }
 
 /**
