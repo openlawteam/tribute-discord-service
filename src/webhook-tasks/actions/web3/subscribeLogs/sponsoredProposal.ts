@@ -150,7 +150,7 @@ export function sponsoredProposalActionSubscribeLogs(
     } catch (error) {
       if (error instanceof Error) {
         actionErrorHandler({
-          actionName: 'sponsoredProposalSubscribeLogs',
+          actionName: 'SPONSORED_PROPOSAL_WEBHOOK',
           error,
           event,
         });
