@@ -8,7 +8,10 @@
  * Some runners rely on listening to external events (e.g. Ethereum logs),
  * so they are good cases for when a runner should be automatically started.
  *
- * Runners should meet the signature of: `(daos: Daos | undefined) => RunnerReturn`
+ * Runners should meet the signature of one of the following:
+ *  - `(daos: Daos | undefined) => RunnerReturn`
+ *  - `(daos: Daos | undefined) => Promise<RunnerReturn>`
+ *
  */
 
 export {sponsoredProposalRunnerSubscribeLogs} from './web3/subscribeLogs';
