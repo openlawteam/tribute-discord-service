@@ -3,6 +3,7 @@ import Application from 'koa';
 import {HTTP_API_BASE_PATH} from '../config';
 import {HTTPMethod} from '../types';
 import {normalizeString} from '../../helpers';
+import {snapshotProposalEventRunner} from '../../webhook-tasks/runners/snapshotHub';
 
 const PATH: string = 'snapshot-webhook';
 
@@ -16,5 +17,10 @@ export function snapshotWebhookHandler(): Application.Middleware {
     }
 
     ctx.status = 202;
+
+    // `koa-bodyparser` returns an empty object if no `body`
+    if (!Object.keys(ctx.request.body).length) return;
+
+    snapshotProposalEventRunner(ctx.request.body);
   };
 }
