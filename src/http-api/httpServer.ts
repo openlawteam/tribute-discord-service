@@ -1,5 +1,6 @@
 import {AddressInfo} from 'node:net';
 import {Server} from 'http';
+import bodyParser from 'koa-bodyparser';
 import Koa from 'koa';
 
 import {errorHandler} from './middleware/error';
@@ -25,6 +26,13 @@ export function httpServer(options?: HTTPServerOptions): Server | undefined {
 
     const port: number | undefined =
       Number(getEnv('HTTP_API_PORT')) || undefined;
+
+    /**
+     * Handle parsing the request `body`
+     *
+     * @see https://www.npmjs.com/package/koa-bodyparser
+     */
+    app.use(bodyParser());
 
     // Handle middlware errors
     app.use(errorHandler());
