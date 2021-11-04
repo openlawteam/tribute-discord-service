@@ -28,14 +28,14 @@ describe('actionErrorHandler unit tests', () => {
 
     expect(
       actionErrorHandler({
-        actionName: 'sponsoredProposalSubscribeLogs',
+        actionName: 'SPONSORED_PROPOSAL_WEBHOOK',
         error,
         event: {name: 'SPONSORED_PROPOSAL'},
       })
     ).toBe(undefined);
 
     expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
-      /^error while executing sponsoredproposalsubscribelogs action for sponsored_proposal event/i
+      /^error while executing SPONSORED_PROPOSAL_WEBHOOK action for sponsored_proposal event/i
     );
 
     expect(consoleErrorSpy.mock.calls[0][0]).toContain(
