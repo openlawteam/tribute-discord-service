@@ -1,1 +1,1 @@
-export * from './proposalCreated';
+export * from './proposalEventRunner';
