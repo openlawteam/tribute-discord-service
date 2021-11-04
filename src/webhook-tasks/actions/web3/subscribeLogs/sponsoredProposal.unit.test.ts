@@ -7,6 +7,7 @@ import {
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
 } from '../../../../../test';
+import {ActionNames} from '../../../../config';
 import {EventBase, SPONSORED_PROPOSAL_WEB3_LOGS} from '../../../events';
 import {mockWeb3Provider} from '../../../../../test/setup';
 import {prismaMock} from '../../../../../test/prismaMock';
@@ -21,7 +22,7 @@ type MockHelperReturn = Promise<{
     void,
     [
       {
-        actionName: 'sponsoredProposalSubscribeLogs';
+        actionName: ActionNames;
         event: EventBase;
         error: Error;
       }
