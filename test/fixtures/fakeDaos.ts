@@ -28,4 +28,33 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
       space: 'tribute',
     },
   },
+
+  test1: {
+    actions: [
+      {
+        name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
+        webhookID: '776974872622729189',
+      },
+    ],
+    adapters: {
+      [EMPTY_BYTES32_FIXTURE]: {
+        friendlyName: 'onboarding',
+        baseURLPath: 'membership',
+      },
+    },
+    baseURL: 'http://localhost:3000',
+    events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
+    friendlyName: 'Mingo DAO [Test]',
+    registryContractAddress: ETH_ADDRESS_FIXTURE,
+    snapshotHub: {
+      proposalResolver: async (proposalID, space) =>
+        await legacyTributeProposalResolver({
+          // @see `docker-host` in `docker-compose.dev.yml`
+          apiBaseURL: 'http://docker-host:8081/api',
+          proposalID,
+          space,
+        }),
+      space: 'mingo',
+    },
+  },
 };
