@@ -27,13 +27,15 @@ export async function startWebhookTasks() {
   }
 
   // Execute all registered runners
-  Object.values(runners).forEach((r) => {
-    // Start runner
-    const runnerResult = r(daos);
+  await Promise.allSettled(
+    Object.values(runners).map(async (r) => {
+      // Start runner
+      const runnerResult = await r(daos);
 
-    // Save runner results to stop them later
-    stopRunners.push(runnerResult);
-  });
+      // Save runner results to stop them later
+      stopRunners.push(runnerResult);
+    })
+  );
 
   // Handle a graceful exit
   process.on('SIGINT', handleExit(stopRunners));
