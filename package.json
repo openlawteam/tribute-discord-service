@@ -46,6 +46,7 @@
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
     "koa": "^2.13.3",
+    "koa-bodyparser": "^4.3.0",
     "node-fetch": "^2.6.2",
     "prisma": "^2.29.1"
   },
@@ -54,6 +55,7 @@
     "@typechain/web3-v1": "^3.0.0",
     "@types/jest": "^27.0.1",
     "@types/koa": "^2.13.4",
+    "@types/koa-bodyparser": "^4.3.4",
     "@types/node": "^16.7.1",
     "@types/node-fetch": "^2.5.12",
     "dotenv-cli": "^4.0.0",
