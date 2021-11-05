@@ -45,6 +45,7 @@
     "abi-decoder": "^2.4.0",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
+    "http-terminator": "^3.0.3",
     "koa": "^2.13.3",
     "koa-bodyparser": "^4.3.0",
     "node-fetch": "^2.6.2",
