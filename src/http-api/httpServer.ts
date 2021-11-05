@@ -20,7 +20,7 @@ type HTTPServerOptions =
     }
   | undefined;
 
-export function httpServer(options?: HTTPServerOptions): Server | undefined {
+export function httpServer(options?: HTTPServerOptions): Server {
   try {
     const app = new Koa();
 
@@ -60,7 +60,7 @@ export function httpServer(options?: HTTPServerOptions): Server | undefined {
 
     return server;
   } catch (error) {
-    console.error(
+    throw new Error(
       `Something went wrong while starting the HTTP server.\n${error}`
     );
   }
