@@ -11,7 +11,13 @@ export function dbHandler(): Application.Middleware {
       return await next();
     }
 
-    await prisma.discordWebhook.count();
+    await prisma.discordWebhook.findFirst({
+      where: {
+        id: {
+          not: undefined,
+        },
+      },
+    });
 
     ctx.body = 'Database is up and running.';
   };
