@@ -26,7 +26,7 @@ export const DAOS_PRODUCTION: Record<
         baseURLPath: 'curation',
       },
     },
-    baseURL: 'https://demo.tributedao.com',
+    baseURL: 'https://muse0.xyz',
     events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Muse0',
     registryContractAddress: '0x7c8B281C56f7ef9b8099D3F491AF24DC2C2e3ee0',
