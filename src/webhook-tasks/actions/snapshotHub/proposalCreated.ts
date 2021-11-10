@@ -3,6 +3,7 @@ import {
   getDaoDataBySnapshotSpace,
   isDaoActionActive,
   isDebug,
+  normalizeString,
 } from '../../../helpers';
 import {
   compileSimpleTemplate,
@@ -19,10 +20,24 @@ import {getDiscordWebhookClient} from '../../../services/discord';
 import {MessageEmbedOptions, MessageOptions} from 'discord.js';
 import {SnapshotHubEventPayload, SnapshotHubEvents} from './types';
 import {takeSnapshotProposalID} from './helpers';
+import {getProposalAdapterID} from '../../../services';
+import {SnapshotHubProposalBase} from '../../../services/snapshotHub';
 
 type DiscordMessageEmbeds = MessageOptions['embeds'];
 
+interface LegacyTributeSnapshotHubProposal extends SnapshotHubProposalBase {
+  /**
+   * ETH address of the adapter
+   *
+   * (e.g. 0x0000000... for governance)
+   */
+  actionId: string;
+}
+
 const EMPTY_EMBED: MessageEmbedOptions[] = [];
+
+const GOVERNANCE_ACTION_ID: string =
+  '0x0000000000000000000000000000000000000000';
 
 /**
  * Posts to a Discord channel when a proposal is created on a Snapshot Hub.
@@ -66,18 +81,26 @@ export function snapshotProposalCreatedWebhookAction(
         },
       } = dao;
 
-      const proposalId: string = takeSnapshotProposalID(snapshotEvent.id);
+      const proposalID: string = takeSnapshotProposalID(snapshotEvent.id);
 
-      const client = await getDiscordWebhookClient(daoAction.webhookID);
+      const proposal =
+        await snapshotProposalResolver<LegacyTributeSnapshotHubProposal>({
+          proposalID,
+          queryString: '?searchUniqueDraftId=true',
+          space: snapshotSpace,
+        });
+
+      // Exit if not governance
+      if (
+        normalizeString(proposal?.actionId) ===
+        normalizeString(GOVERNANCE_ACTION_ID)
+      ) {
+        return;
+      }
 
       const adapterID = 123;
 
-      const proposalURL: string = `${baseURL}/${adapters?.[adapterID].baseURLPath}/${proposalId}`;
-
-      const proposal = await snapshotProposalResolver(
-        proposalId,
-        snapshotSpace
-      );
+      const proposalURL: string = `${baseURL}/${adapters?.[adapterID].baseURLPath}/${proposalID}`;
 
       const content: string =
         compileSimpleTemplate<SponsoredProposalTemplateData>(
@@ -105,6 +128,8 @@ export function snapshotProposalCreatedWebhookAction(
 
       // Merge any embeds
       const embeds: DiscordMessageEmbeds = [...embedBody];
+
+      const client = await getDiscordWebhookClient(daoAction.webhookID);
 
       const response = await client.send({
         content,

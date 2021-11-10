@@ -99,10 +99,11 @@ export function sponsoredProposalActionSubscribeLogs(
       const proposalURL: string = `${baseURL}/${adapters?.[adapterID].baseURLPath}/${proposalId}`;
       const txURL: string = `${getEtherscanURL()}/tx/${transactionHash}`;
 
-      const proposal = await snapshotProposalResolver(
-        proposalId,
-        snapshotSpace
-      );
+      const proposal = await snapshotProposalResolver({
+        proposalID: proposalId,
+        queryString: '?searchUniqueDraftId=true',
+        space: snapshotSpace,
+      });
 
       const content: string =
         compileSimpleTemplate<SponsoredProposalTemplateData>(

@@ -1,6 +1,9 @@
 import {ACTIONS} from './actions';
 import {EVENTS} from './events';
-import {SnapshotHubProposalBase} from '../services/snapshotHub/types';
+import {
+  SnapshotHubProposalBase,
+  SnapshotHubProposalResolverArgs,
+} from '../services/snapshotHub/types';
 
 export type ActionNames = typeof ACTIONS[number];
 export type EventNames = typeof EVENTS[number];
@@ -92,10 +95,12 @@ export type DaoDataSnapshotHub = {
    *
    * i.e. GraphQL for recent core Snapshot Hub; custom API from Tribute team.
    */
-  proposalResolver: (
-    proposalID: string,
-    space: string
-  ) => Promise<SnapshotHubProposalBase | undefined>;
+  /* proposalResolver: <T extends SnapshotHubProposalBase = any>(
+    args: SnapshotHubProposalResolverArgs
+  ) => Promise<T | undefined>; */
+  proposalResolver: <T extends SnapshotHubProposalBase>(
+    args: SnapshotHubProposalResolverArgs
+  ) => Promise<T | undefined>;
   /**
    * Snapshot Hub `space` name
    */

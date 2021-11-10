@@ -20,6 +20,29 @@ export interface SnapshotHubProposalBase {
   title: string;
 }
 
+export type SnapshotHubProposalResolverArgs = {
+  /**
+   * e.g. https://some-snapshot-hub.xyz/api
+   */
+  apiBaseURL?: string;
+  /**
+   * Proposal ID in Snapshot Hub
+   */
+  proposalID: string;
+  /**
+   * Query string for the legacy Tribute Snapshot Hub API
+   *
+   * e.g. `searchUniqueDraftId=true&...`
+   */
+  queryString?: `?${string}`;
+  /**
+   * Unique Snapshot Hub space name
+   *
+   * e.g. `tribute`
+   */
+  space: string;
+};
+
 export type SnapshotHubLegacyProposalEntry = Record<
   SnapshotProposalID,
   SnapshotHubLegacyProposal

@@ -31,10 +31,16 @@ export const DAOS_DEVELOPMENT: Record<
     friendlyName: 'Tribute DAO [DEV]',
     registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
     snapshotHub: {
-      proposalResolver: async (proposalID, space) =>
+      proposalResolver: async ({
+        apiBaseURL = 'https://snapshot-hub-erc712.dev.thelao.io/api',
+        proposalID,
+        queryString,
+        space,
+      }) =>
         await legacyTributeProposalResolver({
-          apiBaseURL: 'https://snapshot-hub-erc712.dev.thelao.io/api',
+          apiBaseURL,
           proposalID,
+          queryString,
           space,
         }),
       space: 'tribute',
