@@ -1,4 +1,4 @@
-import {EMPTY_BYTES32_FIXTURE, ETH_ADDRESS_FIXTURE} from '../../../test';
+import {BYTES32_FIXTURE, ETH_ADDRESS_FIXTURE} from '../../../test';
 import {getProposalAdapterID} from './getProposalAdapterID';
 import {mockWeb3Provider} from '../../../test/setup';
 import {web3} from '../../singletons';
@@ -17,7 +17,7 @@ describe('getProposalAdapterID unit tests', () => {
     mockWeb3Provider.injectResult(
       web3.eth.abi.encodeParameters(
         ['bytes32', 'uint256'],
-        [EMPTY_BYTES32_FIXTURE, 1]
+        [BYTES32_FIXTURE, 1]
       )
     );
 
@@ -26,7 +26,7 @@ describe('getProposalAdapterID unit tests', () => {
         '0x0000000000000000000000000000000000000000000000000000000000000000',
         '0x0000000000000000000000000000000000000000'
       )
-    ).toBe(EMPTY_BYTES32_FIXTURE);
+    ).toBe(BYTES32_FIXTURE);
   });
 
   test('should throw an error when call fails', async () => {

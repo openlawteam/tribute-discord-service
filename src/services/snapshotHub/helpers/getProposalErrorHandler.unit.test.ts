@@ -1,4 +1,4 @@
-import {EMPTY_BYTES32_FIXTURE} from '../../../../test';
+import {BYTES32_FIXTURE} from '../../../../test';
 import {getProposalErrorHandler} from './getProposalErrorHandler';
 
 type MockHelperReturn = {
@@ -30,7 +30,7 @@ describe('getProposalErrorHandler unit tests', () => {
     expect(
       getProposalErrorHandler({
         error,
-        proposalID: EMPTY_BYTES32_FIXTURE,
+        proposalID: BYTES32_FIXTURE,
       })
     ).toBe(undefined);
 

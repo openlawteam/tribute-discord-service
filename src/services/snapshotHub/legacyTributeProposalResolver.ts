@@ -1,4 +1,5 @@
 import {
+  SnapshotHubLegacyTributeProposal,
   SnapshotHubLegacyTributeProposalEntry,
   SnapshotHubProposalBase,
   SnapshotHubProposalResolverArgs,
@@ -12,13 +13,15 @@ import {getProposalErrorHandler} from './helpers';
  * @param data `LegacyTributeProposalResolverData`
  * @returns `Promise<SnapshotHubProposalBase | undefined>`
  */
-export async function legacyTributeProposalResolver<T>({
+export async function legacyTributeProposalResolver<
+  R = SnapshotHubLegacyTributeProposal
+>({
   apiBaseURL,
   proposalID,
   queryString,
   space,
 }: SnapshotHubProposalResolverArgs): Promise<
-  T extends SnapshotHubProposalBase ? any : SnapshotHubProposalBase | undefined
+  SnapshotHubProposalBase<R> | undefined
 > {
   try {
     const proposal = await fetchGetJSON<SnapshotHubLegacyTributeProposalEntry>(
@@ -29,17 +32,26 @@ export async function legacyTributeProposalResolver<T>({
       return undefined;
     }
 
+    const raw = Object.entries(proposal)[0][1];
+
     const {
       msg: {
         payload: {name, body},
       },
       data: {erc712DraftHash},
-    } = Object.entries(proposal)[0][1];
+    } = raw;
 
     return {
+      /**
+       * Helper
+       */
       body,
       id: erc712DraftHash,
       title: name,
+      /**
+       * Raw response
+       */
+      raw: raw as any as R,
     };
   } catch (error) {
     if (error instanceof Error) {

@@ -1,4 +1,6 @@
 import {
+  BURN_ADDRESS,
+  DISCORD_EMPTY_EMBED,
   getDaoAction,
   getDaoDataBySnapshotSpace,
   isDaoActionActive,
@@ -15,29 +17,12 @@ import {
 } from '../../templates';
 import {actionErrorHandler} from '../helpers/actionErrorHandler';
 import {DaoData} from '../../../config/types';
+import {DiscordMessageEmbeds} from '..';
 import {EventSnapshotProposalWebhook} from '../../events/snapshotHub';
 import {getDiscordWebhookClient} from '../../../services/discord';
-import {MessageEmbedOptions, MessageOptions} from 'discord.js';
-import {SnapshotHubEventPayload, SnapshotHubEvents} from './types';
+import {SnapshotHubEventPayload} from './types';
+import {SnapshotHubLegacyTributeProposal} from '../../../services/snapshotHub';
 import {takeSnapshotProposalID} from './helpers';
-import {getProposalAdapterID} from '../../../services';
-import {SnapshotHubProposalBase} from '../../../services/snapshotHub';
-
-type DiscordMessageEmbeds = MessageOptions['embeds'];
-
-interface LegacyTributeSnapshotHubProposal extends SnapshotHubProposalBase {
-  /**
-   * ETH address of the adapter
-   *
-   * (e.g. 0x0000000... for governance)
-   */
-  actionId: string;
-}
-
-const EMPTY_EMBED: MessageEmbedOptions[] = [];
-
-const GOVERNANCE_ACTION_ID: string =
-  '0x0000000000000000000000000000000000000000';
 
 /**
  * Posts to a Discord channel when a proposal is created on a Snapshot Hub.
@@ -47,15 +32,17 @@ const GOVERNANCE_ACTION_ID: string =
  *
  * @see https://web3js.readthedocs.io/en/v1.5.2/web3-eth-subscribe.html#subscribe-logs
  */
-export function snapshotProposalCreatedWebhookAction(
+export function legacyTributeGovernanceProposalCreatedWebhookAction(
   event: EventSnapshotProposalWebhook,
   daos: Record<string, DaoData> | undefined
 ): (s: SnapshotHubEventPayload) => Promise<void> {
   return async (snapshotEvent) => {
     try {
-      if (!snapshotEvent) return;
+      if (!snapshotEvent || snapshotEvent.event !== event.snapshotEventName) {
+        return;
+      }
 
-      const {event: snapshotEventName, space} = snapshotEvent;
+      const {space} = snapshotEvent;
 
       const dao = getDaoDataBySnapshotSpace(space, daos);
       const daoAction = getDaoAction('SNAPSHOT_PROPOSAL_CREATED_WEBHOOK', dao);
@@ -65,7 +52,6 @@ export function snapshotProposalCreatedWebhookAction(
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
         !isDaoActionActive(daoAction) ||
-        snapshotEventName !== event.snapshotEventName ||
         space !== dao.snapshotHub.space
       ) {
         return;
@@ -84,23 +70,26 @@ export function snapshotProposalCreatedWebhookAction(
       const proposalID: string = takeSnapshotProposalID(snapshotEvent.id);
 
       const proposal =
-        await snapshotProposalResolver<LegacyTributeSnapshotHubProposal>({
+        await snapshotProposalResolver<SnapshotHubLegacyTributeProposal>({
           proposalID,
           queryString: '?searchUniqueDraftId=true',
+          resolver: 'LEGACY_TRIBUTE',
           space: snapshotSpace,
         });
 
+      const proposalRaw = proposal?.raw;
+
       // Exit if not governance
       if (
-        normalizeString(proposal?.actionId) ===
-        normalizeString(GOVERNANCE_ACTION_ID)
+        !proposalRaw?.actionId ||
+        normalizeString(proposalRaw?.actionId) === normalizeString(BURN_ADDRESS)
       ) {
         return;
       }
 
-      const adapterID = 123;
-
-      const proposalURL: string = `${baseURL}/${adapters?.[adapterID].baseURLPath}/${proposalID}`;
+      const proposalURL: string = `${baseURL}/${
+        adapters?.[proposalRaw?.actionId].baseURLPath
+      }/${proposalID}`;
 
       const content: string =
         compileSimpleTemplate<SponsoredProposalTemplateData>(
@@ -124,7 +113,7 @@ export function snapshotProposalCreatedWebhookAction(
               description: embedDescription,
             },
           ]
-        : EMPTY_EMBED;
+        : DISCORD_EMPTY_EMBED;
 
       // Merge any embeds
       const embeds: DiscordMessageEmbeds = [...embedBody];

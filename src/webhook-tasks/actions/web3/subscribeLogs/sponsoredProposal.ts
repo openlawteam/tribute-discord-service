@@ -5,6 +5,7 @@ import {
   SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH,
 } from '../../../events';
 import {
+  DISCORD_EMPTY_EMBED,
   getDaoAction,
   getDaoDataByAddress,
   getEtherscanURL,
@@ -13,23 +14,19 @@ import {
 } from '../../../../helpers';
 import {
   compileSimpleTemplate,
+  SPONSORED_PROPOSAL_EMBED_TEMPLATE,
+  SPONSORED_PROPOSAL_FALLBACK_TEMPLATE,
   SPONSORED_PROPOSAL_TEMPLATE,
   SponsoredProposalEmbedTemplateData,
   SponsoredProposalTemplateData,
-  SPONSORED_PROPOSAL_FALLBACK_TEMPLATE,
-  SPONSORED_PROPOSAL_EMBED_TEMPLATE,
 } from '../../../templates';
 import {actionErrorHandler} from '../../helpers/actionErrorHandler';
 import {DaoData} from '../../../../config/types';
+import {DiscordMessageEmbeds} from '../..';
 import {getDiscordWebhookClient} from '../../../../services/discord';
 import {getProposalAdapterID} from '../../../../services';
-import {MessageEmbedOptions, MessageOptions} from 'discord.js';
 import {SponsoredProposal} from '../../../../../abi-types/DaoRegistry';
 import {web3} from '../../../../singletons';
-
-type DiscordMessageEmbeds = MessageOptions['embeds'];
-
-const EMPTY_EMBED: MessageEmbedOptions[] = [];
 
 /**
  * Posts to a Discord channel when a DAO Registry's `SponsoredProposal` event is received.
@@ -129,7 +126,7 @@ export function sponsoredProposalActionSubscribeLogs(
               description: embedDescription,
             },
           ]
-        : EMPTY_EMBED;
+        : DISCORD_EMPTY_EMBED;
 
       // Merge any embeds
       const embeds: DiscordMessageEmbeds = [...embedBody];

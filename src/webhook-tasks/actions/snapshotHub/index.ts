@@ -1,3 +1,3 @@
 export * from './helpers';
-export * from './proposalCreated';
+export * from './legacyTributeGovernanceProposalCreatedWebhook';
 export * from './types';

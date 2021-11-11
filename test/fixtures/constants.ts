@@ -1,5 +1,5 @@
 export const ETH_ADDRESS_FIXTURE: string =
   '0x04028Df0Cea639E97fDD3fC01bA5CC172613211D';
 
-export const EMPTY_BYTES32_FIXTURE: string =
+export const BYTES32_FIXTURE: string =
   '0xfe837a5e727dacac34d8070a94918f13335f255f9bbf958d876718aac64b299d';

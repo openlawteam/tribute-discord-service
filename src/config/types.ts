@@ -1,9 +1,9 @@
-import {ACTIONS} from './actions';
-import {EVENTS} from './events';
 import {
   SnapshotHubProposalBase,
   SnapshotHubProposalResolverArgs,
 } from '../services/snapshotHub/types';
+import {ACTIONS} from './actions';
+import {EVENTS} from './events';
 
 export type ActionNames = typeof ACTIONS[number];
 export type EventNames = typeof EVENTS[number];
@@ -79,7 +79,9 @@ export type DaoDataAdapter = {
 /**
  * bytes32 ID string
  *
- * keccak256 hash of the Adapter's readable ID.
+ * keccak256 hash of the Adapter's readable ID,
+ * or an Ethereum address.
+ *
  * i.e. `sha3('onboarding')` = "0x68c...5d89"
  *
  * @see `tribute-contracts`->`DaoFactory.sol`->`struct Adapter`
@@ -98,9 +100,9 @@ export type DaoDataSnapshotHub = {
   /* proposalResolver: <T extends SnapshotHubProposalBase = any>(
     args: SnapshotHubProposalResolverArgs
   ) => Promise<T | undefined>; */
-  proposalResolver: <T extends SnapshotHubProposalBase>(
+  proposalResolver: <T = any>(
     args: SnapshotHubProposalResolverArgs
-  ) => Promise<T | undefined>;
+  ) => Promise<SnapshotHubProposalBase<T> | undefined>;
   /**
    * Snapshot Hub `space` name
    */

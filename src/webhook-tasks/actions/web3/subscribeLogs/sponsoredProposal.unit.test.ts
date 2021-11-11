@@ -3,7 +3,7 @@ import {WebhookClient} from 'discord.js';
 
 import {
   DISCORD_WEBHOOK_POST_FIXTURE,
-  EMPTY_BYTES32_FIXTURE,
+  BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
 } from '../../../../../test';
@@ -104,10 +104,7 @@ async function mockHelper(
 
   // Mock respsonse for `inverseAdapters`
   mockWeb3Provider.injectResult(
-    web3.eth.abi.encodeParameters(
-      ['bytes32', 'uint256'],
-      [EMPTY_BYTES32_FIXTURE, 1]
-    )
+    web3.eth.abi.encodeParameters(['bytes32', 'uint256'], [BYTES32_FIXTURE, 1])
   );
 
   return {
