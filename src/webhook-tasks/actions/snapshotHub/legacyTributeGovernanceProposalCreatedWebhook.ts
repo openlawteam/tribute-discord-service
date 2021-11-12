@@ -9,11 +9,12 @@ import {
 } from '../../../helpers';
 import {
   compileSimpleTemplate,
-  SPONSORED_PROPOSAL_EMBED_TEMPLATE,
-  SPONSORED_PROPOSAL_FALLBACK_TEMPLATE,
-  SPONSORED_PROPOSAL_TEMPLATE,
-  SponsoredProposalEmbedTemplateData,
-  SponsoredProposalTemplateData,
+  SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE,
+  SNAPSHOT_PROPOSAL_CREATED_EMBED_TEMPLATE,
+  SNAPSHOT_PROPOSAL_CREATED_FALLBACK_TEMPLATE,
+  SnapshotProposalCreatedEmbedTemplateData,
+  SnapshotProposalCreatedFallbackTemplateData,
+  SnapshotProposalCreatedTemplateData,
 } from '../../templates';
 import {actionErrorHandler} from '../helpers/actionErrorHandler';
 import {DaoData} from '../../../config/types';
@@ -25,7 +26,8 @@ import {SnapshotHubLegacyTributeProposal} from '../../../services/snapshotHub';
 import {takeSnapshotProposalID} from './helpers';
 
 /**
- * Posts to a Discord channel when a proposal is created on a Snapshot Hub.
+ * Posts to a Discord channel when a legacy Tribute
+ * governance proposal is created on a Snapshot Hub.
  *
  * @param data `Log` Web3.js subscription log data
  * @returns `(d: Log) => Promise<void>`
@@ -43,7 +45,6 @@ export function legacyTributeGovernanceProposalCreatedWebhookAction(
       }
 
       const {space} = snapshotEvent;
-
       const dao = getDaoDataBySnapshotSpace(space, daos);
       const daoAction = getDaoAction('SNAPSHOT_PROPOSAL_CREATED_WEBHOOK', dao);
 
@@ -79,10 +80,10 @@ export function legacyTributeGovernanceProposalCreatedWebhookAction(
 
       const proposalRaw = proposal?.raw;
 
-      // Exit if not governance
+      // Exit if fetched proposal is not governance
       if (
         !proposalRaw?.actionId ||
-        normalizeString(proposalRaw?.actionId) === normalizeString(BURN_ADDRESS)
+        normalizeString(proposalRaw?.actionId) !== normalizeString(BURN_ADDRESS)
       ) {
         return;
       }
@@ -91,26 +92,26 @@ export function legacyTributeGovernanceProposalCreatedWebhookAction(
         adapters?.[proposalRaw?.actionId].baseURLPath
       }/${proposalID}`;
 
-      const content: string =
-        compileSimpleTemplate<SponsoredProposalTemplateData>(
-          proposal
-            ? SPONSORED_PROPOSAL_TEMPLATE
-            : SPONSORED_PROPOSAL_FALLBACK_TEMPLATE,
-          proposal ? {title: proposal.title, proposalURL} : {proposalURL}
-        );
-
-      const embedDescription: string =
-        compileSimpleTemplate<SponsoredProposalEmbedTemplateData>(
-          SPONSORED_PROPOSAL_EMBED_TEMPLATE,
-          {body: proposal?.body}
-        );
+      const content: string = proposal
+        ? compileSimpleTemplate<SnapshotProposalCreatedTemplateData>(
+            SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE,
+            {title: proposal.title, proposalURL}
+          )
+        : compileSimpleTemplate<SnapshotProposalCreatedFallbackTemplateData>(
+            SNAPSHOT_PROPOSAL_CREATED_FALLBACK_TEMPLATE,
+            {baseURL, friendlyName}
+          );
 
       // Falls back to empty embed if no proposal
       const embedBody: DiscordMessageEmbeds = proposal
         ? [
             {
               color: 'DEFAULT',
-              description: embedDescription,
+              description:
+                compileSimpleTemplate<SnapshotProposalCreatedEmbedTemplateData>(
+                  SNAPSHOT_PROPOSAL_CREATED_EMBED_TEMPLATE,
+                  {body: proposal?.body}
+                ),
             },
           ]
         : DISCORD_EMPTY_EMBED;

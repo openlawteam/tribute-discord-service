@@ -138,7 +138,7 @@ describe('sponsoredProposal unit tests', () => {
     const consoleDebugOriginal = console.debug;
     const consoleDebugSpy = (console.debug = jest.fn());
 
-    // Don't mock the client
+    // Don't mock the client so we can inspect the response
     const {cleanup} = await mockHelper(false);
 
     const isDebugSpy = jest
