@@ -4,7 +4,7 @@ import {
 } from '../../../test';
 import {legacyTributeProposalResolver} from './legacyTributeProposalResolver';
 import {rest, server} from '../../../test/msw/server';
-import { SnapshotHubLegacyTributeProposalEntry } from '.';
+import {SnapshotHubLegacyTributeProposalEntry} from '.';
 
 describe('legacyTributeProposalResolver unit tests', () => {
   const proposalData = Object.entries(
@@ -26,15 +26,12 @@ describe('legacyTributeProposalResolver unit tests', () => {
       title: proposalData.msg.payload.name,
     });
   });
-  
+
   test('should return `undefined` if response is empty', async () => {
     server.use(
       rest.get<undefined, SnapshotHubLegacyTributeProposalEntry>(
         'http://*/api/*/proposal/*',
-        (_req, res, ctx) =>
-          res(
-            ctx.status(404)
-          )
+        (_req, res, ctx) => res(ctx.status(404))
       )
     );
 
@@ -50,10 +47,7 @@ describe('legacyTributeProposalResolver unit tests', () => {
     server.use(
       rest.get<undefined, SnapshotHubLegacyTributeProposalEntry>(
         'http://*/api/*/proposal/*',
-        (_req, res, ctx) =>
-          res(
-            ctx.json({})
-          )
+        (_req, res, ctx) => res(ctx.json({}))
       )
     );
 
