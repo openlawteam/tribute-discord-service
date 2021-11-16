@@ -194,6 +194,10 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
           title:
             LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE[BYTES32_FIXTURE].msg
               .payload.name,
+          voteEndsDateLocaleString: new Date(
+            (LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE[BYTES32_FIXTURE].msg
+              .payload.end || 0) * 1000
+          ).toLocaleDateString(),
         }
       )
     );

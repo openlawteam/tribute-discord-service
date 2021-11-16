@@ -21,7 +21,7 @@ export type SnapshotProposalCreatedEmbedTemplateData = {
  * Main content for a created proposal
  */
 export const SNAPSHOT_PROPOSAL_CREATED_TEMPLATE: string = `
-*{{title}}* is up for vote.
+*{{title}}* is up for vote. Voting ends: {{voteEndsDateLocaleString}}
 
 [Vote]({{proposalURL}})`;
 

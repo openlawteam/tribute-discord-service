@@ -71,7 +71,19 @@ export interface SnapshotHubLegacyProposal {
   msg: {
     payload: {
       body: string;
+      /**
+       * Voting end time in seconds
+       */
+      end: number;
       name: string;
+      /**
+       * Ethereum block number
+       */
+      snapshot: number;
+      /**
+       * Voting start time in seconds
+       */
+      start: number;
     };
   };
 }

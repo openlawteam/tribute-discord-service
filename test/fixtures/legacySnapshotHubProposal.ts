@@ -9,8 +9,11 @@ export const LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE: SnapshotHubLegacyTrib
       data: {erc712DraftHash: BYTES32_FIXTURE},
       msg: {
         payload: {
-          name: 'Test Proposal',
           body: 'Wow, what a cool submission!',
+          end: 1637071441,
+          name: 'Test Proposal',
+          snapshot: 123,
+          start: 1637071321,
         },
       },
     },
