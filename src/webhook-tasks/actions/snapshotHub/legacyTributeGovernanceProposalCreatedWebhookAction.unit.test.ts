@@ -19,6 +19,15 @@ import {web3} from '../../../singletons';
 import {rest, server} from '../../../../test/msw/server';
 import {SnapshotHubLegacyTributeProposalEntry} from '../../../services/snapshotHub';
 import {BURN_ADDRESS} from '../../../helpers';
+import {
+  compileSimpleTemplate,
+  SnapshotProposalCreatedEmbedTemplateData,
+  SnapshotProposalCreatedFallbackTemplateData,
+  SnapshotProposalCreatedTemplateData,
+  SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE,
+  SNAPSHOT_PROPOSAL_CREATED_EMBED_TEMPLATE,
+  SNAPSHOT_PROPOSAL_CREATED_FALLBACK_TEMPLATE,
+} from '../../templates';
 
 type MockHelperReturn = Promise<{
   cleanup: () => void;
@@ -176,6 +185,73 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
 
     // Assert OK and `WebhookClient.send` called
     expect(sendSpy?.mock.calls.length).toBe(1);
+
+    expect(sendSpy?.mock.calls[0][0]?.content).toBe(
+      compileSimpleTemplate<SnapshotProposalCreatedTemplateData>(
+        SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE,
+        {
+          proposalURL: `http://localhost:3000/governance/${BYTES32_FIXTURE}`,
+          title:
+            LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE[BYTES32_FIXTURE].msg
+              .payload.name,
+        }
+      )
+    );
+
+    expect(sendSpy?.mock.calls[0][0]?.embeds).toEqual([
+      {
+        color: 'DEFAULT',
+        description:
+          compileSimpleTemplate<SnapshotProposalCreatedEmbedTemplateData>(
+            SNAPSHOT_PROPOSAL_CREATED_EMBED_TEMPLATE,
+            {
+              body: LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE[
+                BYTES32_FIXTURE
+              ].msg.payload.body,
+            }
+          ),
+      },
+    ]);
+
+    expect(sendSpy?.mock.calls[0][0]?.username).toEqual(
+      FAKE_DAOS_FIXTURE.test.friendlyName
+    );
+
+    cleanup();
+  });
+
+  test('should send Discord webhook fallback message', async () => {
+    server.use(
+      rest.get<undefined, SnapshotHubLegacyTributeProposalEntry>(
+        'http://*/api/*/proposal/*',
+        (_req, res, ctx) => res(ctx.json({}))
+      )
+    );
+
+    const {cleanup, sendSpy} = await mockHelper();
+
+    await legacyTributeGovernanceProposalCreatedWebhookAction(
+      SNAPSHOT_PROPOSAL_CREATED_EVENT,
+      FAKE_DAOS_FIXTURE_GOVERNANCE
+    )(EVENT_DATA);
+
+    // Assert OK and `WebhookClient.send` called
+    expect(sendSpy?.mock.calls.length).toBe(1);
+
+    expect(sendSpy?.mock.calls[0][0]?.content).toBe(
+      compileSimpleTemplate<SnapshotProposalCreatedFallbackTemplateData>(
+        SNAPSHOT_PROPOSAL_CREATED_FALLBACK_TEMPLATE,
+        {
+          baseURL: FAKE_DAOS_FIXTURE.test.baseURL,
+          friendlyName: FAKE_DAOS_FIXTURE.test.friendlyName,
+        }
+      )
+    );
+
+    expect(sendSpy?.mock.calls[0][0]?.embeds).toEqual([]);
+    expect(sendSpy?.mock.calls[0][0]?.username).toEqual(
+      FAKE_DAOS_FIXTURE.test.friendlyName
+    );
 
     cleanup();
   });

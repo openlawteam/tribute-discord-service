@@ -82,14 +82,14 @@ export function legacyTributeGovernanceProposalCreatedWebhookAction(
 
       // Exit if fetched proposal is not governance
       if (
-        !proposalRaw?.actionId ||
+        proposalRaw &&
         normalizeString(proposalRaw?.actionId) !== normalizeString(BURN_ADDRESS)
       ) {
         return;
       }
 
       const proposalURL: string = `${baseURL}/${
-        adapters?.[proposalRaw?.actionId].baseURLPath
+        adapters?.[proposalRaw?.actionId || '']?.baseURLPath
       }/${proposalID}`;
 
       const content: string = proposal

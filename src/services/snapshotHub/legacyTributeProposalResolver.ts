@@ -32,7 +32,11 @@ export async function legacyTributeProposalResolver<
       return undefined;
     }
 
-    const raw = Object.entries(proposal)[0][1];
+    const raw = Object.entries(proposal)[0]?.[1];
+
+    if (!raw) {
+      return undefined;
+    }
 
     const {
       msg: {
