@@ -4,6 +4,7 @@ import {
 } from '../../../test';
 import {legacyTributeProposalResolver} from './legacyTributeProposalResolver';
 import {rest, server} from '../../../test/msw/server';
+import { SnapshotHubLegacyTributeProposalEntry } from '.';
 
 describe('legacyTributeProposalResolver unit tests', () => {
   const proposalData = Object.entries(
@@ -24,6 +25,46 @@ describe('legacyTributeProposalResolver unit tests', () => {
       raw: proposalData,
       title: proposalData.msg.payload.name,
     });
+  });
+  
+  test('should return `undefined` if response is empty', async () => {
+    server.use(
+      rest.get<undefined, SnapshotHubLegacyTributeProposalEntry>(
+        'http://*/api/*/proposal/*',
+        (_req, res, ctx) =>
+          res(
+            ctx.status(404)
+          )
+      )
+    );
+
+    expect(
+      await legacyTributeProposalResolver({
+        // @see `docker-host` in `docker-compose.dev.yml`
+        apiBaseURL: 'http://docker-host:8081/api',
+        proposalID: BYTES32_FIXTURE,
+        space: 'tribute',
+      })
+    ).toBe(undefined);
+
+    server.use(
+      rest.get<undefined, SnapshotHubLegacyTributeProposalEntry>(
+        'http://*/api/*/proposal/*',
+        (_req, res, ctx) =>
+          res(
+            ctx.json({})
+          )
+      )
+    );
+
+    expect(
+      await legacyTributeProposalResolver({
+        // @see `docker-host` in `docker-compose.dev.yml`
+        apiBaseURL: 'http://docker-host:8081/api',
+        proposalID: BYTES32_FIXTURE,
+        space: 'tribute',
+      })
+    ).toBe(undefined);
   });
 
   test('should not throw when error; returns `undefined`', async () => {
