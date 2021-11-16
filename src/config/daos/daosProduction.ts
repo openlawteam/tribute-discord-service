@@ -18,7 +18,10 @@ export const DAOS_PRODUCTION: Record<
 > = {
   muse0: {
     actions: [
-      {name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: '888443179039354941'},
+      {
+        name: 'SPONSORED_PROPOSAL_WEBHOOK',
+        webhookID: '888443179039354941',
+      },
     ],
     adapters: {
       [CORE_DAO_ADAPTERS['tribute-nft']]: {

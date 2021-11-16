@@ -293,11 +293,55 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
   });
 
   test('should exit if proposal is not governance', async () => {
+    // Let the default, non-governance msw mock run for a snapshot hub propsosal
+
     const {cleanup, sendSpy} = await mockHelper();
 
     await legacyTributeGovernanceProposalCreatedWebhookAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       FAKE_DAOS_FIXTURE_GOVERNANCE
+    )(EVENT_DATA);
+
+    // Assert OK and `WebhookClient.send` called
+    expect(sendSpy?.mock.calls.length).toBe(0);
+
+    cleanup();
+  });
+
+  test('should exit if action is not active', async () => {
+    const FAKE_DAOS_NO_ACTION: Record<string, DaoData> = {
+      ...FAKE_DAOS_FIXTURE,
+      test: {
+        ...FAKE_DAOS_FIXTURE.test,
+        actions: [
+          ...FAKE_DAOS_FIXTURE.test.actions,
+          // Not the correct action
+          {
+            name: 'SNAPSHOT_PROPOSAL_END_WEBHOOK',
+            webhookID: 'abc123',
+          },
+        ],
+        adapters: {
+          ...FAKE_DAOS_FIXTURE.test.adapters,
+          [BURN_ADDRESS]: {
+            friendlyName: 'Governance',
+            baseURLPath: 'governance',
+          },
+        },
+        events: [
+          ...FAKE_DAOS_FIXTURE.test.events,
+          {name: 'SNAPSHOT_PROPOSAL_CREATED'},
+        ],
+      },
+    };
+
+    mockGovernanceProposalResponse();
+
+    const {cleanup, sendSpy} = await mockHelper();
+
+    await legacyTributeGovernanceProposalCreatedWebhookAction(
+      SNAPSHOT_PROPOSAL_CREATED_EVENT,
+      FAKE_DAOS_NO_ACTION
     )(EVENT_DATA);
 
     // Assert OK and `WebhookClient.send` called

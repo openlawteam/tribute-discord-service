@@ -5,7 +5,10 @@ import {legacyTributeProposalResolver} from '../../src/services/snapshotHub';
 export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
   test: {
     actions: [
-      {name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: '886976872611729439'},
+      {
+        name: 'SPONSORED_PROPOSAL_WEBHOOK',
+        webhookID: '886976872611729439',
+      },
     ],
     adapters: {
       [BYTES32_FIXTURE]: {

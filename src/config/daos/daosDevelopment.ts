@@ -18,7 +18,10 @@ export const DAOS_DEVELOPMENT: Record<
 > = {
   tribute: {
     actions: [
-      {name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: '886976872611729439'},
+      {
+        name: 'SPONSORED_PROPOSAL_WEBHOOK',
+        webhookID: '886976872611729439',
+      },
     ],
     adapters: {
       [CORE_DAO_ADAPTERS.onboarding]: {
