@@ -21,6 +21,12 @@ export const {
 
 export const NODE_ENV = process.env.NODE_ENV as NodeEnv;
 export const APP_ENV = process.env.APP_ENV as AppEnv;
+/**
+ * Port for the HTTP server to run on inside the container.
+ *
+ * If running locally on docker-compose be sure to change the container port mapping.
+ */
+export const HTTP_API_PORT: number = 3000;
 
 /**
  * Environment variable keys used in the app.
@@ -33,7 +39,6 @@ export const ENVIRONMENT_VARIABLE_KEYS = [
   'DATABASE_URL',
   'DEBUG',
   'ETH_NETWORK_NAME',
-  'HTTP_API_PORT',
   'NODE_ENV',
   'POSTGRES_DB',
   'POSTGRES_PASSWORD',

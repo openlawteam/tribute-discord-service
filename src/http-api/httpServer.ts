@@ -4,7 +4,7 @@ import bodyParser from 'koa-bodyparser';
 import Koa from 'koa';
 
 import {errorHandler} from './middleware/error';
-import {getEnv} from '../helpers';
+import {HTTP_API_PORT} from '../config';
 import {middlewares} from '.';
 
 type HTTPServerOptions =
@@ -23,9 +23,6 @@ type HTTPServerOptions =
 export function httpServer(options?: HTTPServerOptions): Server {
   try {
     const app = new Koa();
-
-    const port: number | undefined =
-      Number(getEnv('HTTP_API_PORT')) || undefined;
 
     /**
      * Handle parsing the request `body`
@@ -48,11 +45,13 @@ export function httpServer(options?: HTTPServerOptions): Server {
     });
 
     // Start listening
-    const server = app.listen(options?.useAnyAvailablePort ? undefined : port);
+    const server = app.listen(
+      options?.useAnyAvailablePort ? undefined : HTTP_API_PORT
+    );
 
     if (!options?.noLog) {
       console.log(
-        `⚡︎ HTTP server running on port ${
+        `⚡︎ HTTP server running on container port ${
           (server.address() as AddressInfo).port
         }.`
       );
