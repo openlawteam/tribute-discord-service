@@ -21,6 +21,7 @@ export function snapshotWebhookHandler(): Application.Middleware {
     // `koa-bodyparser` returns an empty object if no `body`
     if (!Object.keys(ctx.request.body).length) return;
 
-    snapshotProposalEventRunner(ctx.request.body);
+    await snapshotProposalEventRunner(ctx.request.body);
+
   };
 }
