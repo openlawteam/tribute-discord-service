@@ -97,9 +97,6 @@ export type DaoDataSnapshotHub = {
    *
    * i.e. GraphQL for recent core Snapshot Hub; custom API from Tribute team.
    */
-  /* proposalResolver: <T extends SnapshotHubProposalBase = any>(
-    args: SnapshotHubProposalResolverArgs
-  ) => Promise<T | undefined>; */
   proposalResolver: <T = any>(
     args: SnapshotHubProposalResolverArgs
   ) => Promise<SnapshotHubProposalBase<T> | undefined>;
