@@ -22,6 +22,5 @@ export function snapshotWebhookHandler(): Application.Middleware {
     if (!Object.keys(ctx.request.body).length) return;
 
     await snapshotProposalEventRunner(ctx.request.body);
-
   };
 }

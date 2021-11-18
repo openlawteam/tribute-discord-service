@@ -32,17 +32,19 @@ describe('snapshotWebhook unit tests', () => {
     // Cleanup
     consoleWarnSpy.mockRestore();
   });
-  
+
   test('should return 500 error code', async () => {
     const {port} = server?.address() as AddressInfo;
-    
-    const proposalEventRunner =  await import('../../webhook-tasks/runners/snapshotHub/proposalEventRunner')
+
+    const proposalEventRunner = await import(
+      '../../webhook-tasks/runners/snapshotHub/proposalEventRunner'
+    );
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
       .mockImplementation(() => {});
-      
+
     // Temporarily hide warnings from `msw`
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
@@ -50,15 +52,21 @@ describe('snapshotWebhook unit tests', () => {
 
     const proposalEventRunnerSpy = jest
       .spyOn(proposalEventRunner, 'snapshotProposalEventRunner')
-      .mockImplementation(async () => {throw new Error('Some bad error.');});
+      .mockImplementation(async () => {
+        throw new Error('Some bad error.');
+      });
 
     expect(
       await (
         await fetch(
           `http://localhost:${port}${HTTP_API_BASE_PATH}/snapshot-webhook`,
-          {method: HTTPMethod.POST, body: JSON.stringify({test: 'cool'}), headers: {
-            'Content-Type': "application/json"
-          }}
+          {
+            method: HTTPMethod.POST,
+            body: JSON.stringify({test: 'cool'}),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
         )
       ).status
     ).toBe(500);
