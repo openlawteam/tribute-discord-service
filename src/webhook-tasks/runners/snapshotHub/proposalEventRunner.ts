@@ -16,7 +16,7 @@ type SnapshotHubEventActions = ((
 export async function snapshotProposalEventRunner(
   payload: SnapshotHubEventPayload
 ): Promise<void> {
-  let actions: SnapshotHubEventActions;
+  let actions: SnapshotHubEventActions | undefined;
 
   const daos = await getDaos();
 
@@ -25,9 +25,7 @@ export async function snapshotProposalEventRunner(
       actions = getProposalCreatedActions(daos);
       break;
     default:
-      throw new Error(
-        `No actions were found to run for Snapshot Hub event ${payload.event}.`
-      );
+      actions = undefined;
   }
 
   if (!actions) return;
