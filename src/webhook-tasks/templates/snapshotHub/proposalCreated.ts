@@ -3,7 +3,7 @@
 export type SnapshotProposalCreatedTemplateData = {
   proposalURL?: string;
   title?: string;
-  voteEndsDateLocaleString?: string;
+  voteEndsDateUTCString?: string;
 };
 
 export type SnapshotProposalCreatedFallbackTemplateData = {
@@ -21,15 +21,14 @@ export type SnapshotProposalCreatedEmbedTemplateData = {
  * Main content for a created proposal
  */
 export const SNAPSHOT_PROPOSAL_CREATED_TEMPLATE: string = `
-*{{title}}* is up for vote. Voting ends: {{voteEndsDateLocaleString}}
-
-[Vote]({{proposalURL}})`;
+*{{title}}* is up for [vote]({{proposalURL}}). Voting ends {{voteEndsDateUTCString}}`;
 
 /**
  * Governance proposal
  */
 export const SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE: string = `
-Governance ⚖️: ${SNAPSHOT_PROPOSAL_CREATED_TEMPLATE}`;
+Governance ⚖️
+${SNAPSHOT_PROPOSAL_CREATED_TEMPLATE}`;
 
 /**
  * Fallback template in case the Snapshot Hub proposal
