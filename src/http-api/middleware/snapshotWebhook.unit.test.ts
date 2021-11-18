@@ -42,6 +42,7 @@ describe('snapshotWebhook unit tests', () => {
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
       .mockImplementation(() => {});
+      
     // Temporarily hide warnings from `msw`
     const consoleErrorSpy = jest
       .spyOn(console, 'error')

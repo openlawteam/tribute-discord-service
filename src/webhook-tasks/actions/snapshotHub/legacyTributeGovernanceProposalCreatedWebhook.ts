@@ -92,9 +92,9 @@ export function legacyTributeGovernanceProposalCreatedWebhookAction(
         adapters?.[proposalRaw?.actionId || '']?.baseURLPath
       }/${proposalID}`;
 
-      const voteEndsDateLocaleString = new Date(
+      const voteEndsDateUTCString = new Date(
         (proposalRaw?.msg?.payload?.end || 0) * 1000
-      ).toLocaleDateString();
+      ).toUTCString();
 
       const content: string = proposal
         ? compileSimpleTemplate<SnapshotProposalCreatedTemplateData>(
@@ -102,7 +102,7 @@ export function legacyTributeGovernanceProposalCreatedWebhookAction(
             {
               title: proposal.title,
               proposalURL,
-              voteEndsDateLocaleString,
+              voteEndsDateUTCString,
             }
           )
         : compileSimpleTemplate<SnapshotProposalCreatedFallbackTemplateData>(
