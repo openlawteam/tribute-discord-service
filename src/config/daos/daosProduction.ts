@@ -1,7 +1,10 @@
 import {BURN_ADDRESS} from '../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
 import {DaoData} from '../types';
-import {legacyTributeProposalResolver, SnapshotHubProposalResolverArgs} from '../../services/snapshotHub';
+import {
+  legacyTributeProposalResolver,
+  SnapshotHubProposalResolverArgs,
+} from '../../services/snapshotHub';
 
 /**
  * A PRODUCTION configuration mapping for DAO's this app recognises.
