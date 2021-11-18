@@ -1,6 +1,7 @@
+import {BURN_ADDRESS} from '../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
 import {DaoData} from '../types';
-import {legacyTributeProposalResolver} from '../../services/snapshotHub';
+import {legacyTributeProposalResolver, SnapshotHubProposalResolverArgs} from '../../services/snapshotHub';
 
 /**
  * A DEVELOPMENT configuration mapping for DAO's this app recognises.
@@ -22,30 +23,44 @@ export const DAOS_DEVELOPMENT: Record<
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
         webhookID: '886976872611729439',
       },
+      {
+        name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
+        webhookID: '886976872611729439',
+      },
     ],
     adapters: {
       [CORE_DAO_ADAPTERS.onboarding]: {
         friendlyName: 'onboarding',
         baseURLPath: 'membership',
       },
+      [BURN_ADDRESS]: {
+        friendlyName: 'Governance',
+        baseURLPath: 'governance',
+      },
     },
     baseURL: 'https://demo.tributedao.com',
-    events: [{name: 'SPONSORED_PROPOSAL'}],
+    events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Tribute DAO [DEV]',
     registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
     snapshotHub: {
-      proposalResolver: async ({
-        apiBaseURL = 'https://snapshot-hub-erc712.dev.thelao.io/api',
-        proposalID,
-        queryString,
-        space,
-      }) =>
-        await legacyTributeProposalResolver({
-          apiBaseURL,
-          proposalID,
-          queryString,
-          space,
-        }),
+      proposalResolver: async <R = any>(
+        args: SnapshotHubProposalResolverArgs
+      ) => {
+        const {resolver} = args;
+
+        const DEFAULT_ARGS = {
+          ...args,
+          apiBaseURL: 'https://snapshot-hub-erc712.dev.thelao.io/api',
+        };
+
+        switch (resolver) {
+          case 'LEGACY_TRIBUTE':
+            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
+
+          default:
+            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
+        }
+      },
       space: 'tribute',
     },
   },
