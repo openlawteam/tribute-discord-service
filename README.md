@@ -4,31 +4,34 @@
 
 ## Development
 
-**Dependencies:**
+### Dependencies:
 
 - Docker
-- NPM `^7.0.0` (if updating `package.json` packages)
+- Node `^16.6.0`. It is a dependency for `discord.js`.
+- NPM `>=7`
+- [Alchemy](https://www.alchemy.com) API key (i.e. sign up for their free tier)
+- Add `ALCHEMY_API_KEY` to `<project>/.env`: `echo ALCHEMY_API_KEY=your_key >> .env`
+- Create `src/config/daos/daosLocalhost.ts` from copying `daosLocalhost.example.ts`
 
 ### Running the local development environment
-
-**Dependencies**
-
-- Get an Alchemy API Key (i.e. sign up for their free tier)
-- Add `ALCHEMY_API_KEY=your_key` to `.env`
 
 ```sh
 npm ci
 npm start
 ```
 
-### Stopping the development environment
+#### Webhook database entries
+
+Once the environment is started, webhooks may be inserted into the database's `discord_webhooks` table.
+
+### Stopping the local development environment
 
 ```sh
 # Runs `docker-compose down` to stop and remove any containers, networks
 npm run docker:down
 ```
 
-### Resetting the development environment
+### Resetting the local development environment
 
 ```sh
 # Runs `docker-compose down` and removes data volumes

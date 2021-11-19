@@ -1,8 +1,14 @@
+import {
+  SnapshotHubProposalBase,
+  SnapshotHubProposalResolverArgs,
+} from '../services/snapshotHub/types';
 import {ACTIONS} from './actions';
 import {EVENTS} from './events';
-import {SnapshotHubProposalBase} from '../services/snapshotHub/types';
 
-export type DaoDataEvent = {name: typeof EVENTS[number]; active?: boolean};
+export type ActionNames = typeof ACTIONS[number];
+export type EventNames = typeof EVENTS[number];
+
+export type DaoDataEvent = {name: EventNames; active?: boolean};
 
 export type DaoDataAction = {
   name: typeof ACTIONS[number];
@@ -73,7 +79,9 @@ export type DaoDataAdapter = {
 /**
  * bytes32 ID string
  *
- * keccak256 hash of the Adapter's readable ID.
+ * keccak256 hash of the Adapter's readable ID,
+ * or an Ethereum address.
+ *
  * i.e. `sha3('onboarding')` = "0x68c...5d89"
  *
  * @see `tribute-contracts`->`DaoFactory.sol`->`struct Adapter`
@@ -89,10 +97,9 @@ export type DaoDataSnapshotHub = {
    *
    * i.e. GraphQL for recent core Snapshot Hub; custom API from Tribute team.
    */
-  proposalResolver: (
-    proposalID: string,
-    space: string
-  ) => Promise<SnapshotHubProposalBase | undefined>;
+  proposalResolver: <T = any>(
+    args: SnapshotHubProposalResolverArgs
+  ) => Promise<SnapshotHubProposalBase<T> | undefined>;
   /**
    * Snapshot Hub `space` name
    */

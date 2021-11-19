@@ -1,9 +1,10 @@
 import {AddressInfo} from 'node:net';
 import {Server} from 'http';
+import bodyParser from 'koa-bodyparser';
 import Koa from 'koa';
 
 import {errorHandler} from './middleware/error';
-import {getEnv} from '../helpers';
+import {HTTP_API_PORT} from '../config';
 import {middlewares} from '.';
 
 type HTTPServerOptions =
@@ -19,12 +20,16 @@ type HTTPServerOptions =
     }
   | undefined;
 
-export function httpServer(options?: HTTPServerOptions): Server | undefined {
+export function httpServer(options?: HTTPServerOptions): Server {
   try {
     const app = new Koa();
 
-    const port: number | undefined =
-      Number(getEnv('HTTP_API_PORT')) || undefined;
+    /**
+     * Handle parsing the request `body`
+     *
+     * @see https://www.npmjs.com/package/koa-bodyparser
+     */
+    app.use(bodyParser());
 
     // Handle middlware errors
     app.use(errorHandler());
@@ -40,11 +45,13 @@ export function httpServer(options?: HTTPServerOptions): Server | undefined {
     });
 
     // Start listening
-    const server = app.listen(options?.useAnyAvailablePort ? undefined : port);
+    const server = app.listen(
+      options?.useAnyAvailablePort ? undefined : HTTP_API_PORT
+    );
 
     if (!options?.noLog) {
       console.log(
-        `⚡︎ HTTP server running on port ${
+        `⚡︎ HTTP server running on container port ${
           (server.address() as AddressInfo).port
         }.`
       );
@@ -52,7 +59,7 @@ export function httpServer(options?: HTTPServerOptions): Server | undefined {
 
     return server;
   } catch (error) {
-    console.error(
+    throw new Error(
       `Something went wrong while starting the HTTP server.\n${error}`
     );
   }

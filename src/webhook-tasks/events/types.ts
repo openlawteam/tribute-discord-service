@@ -1,5 +1,5 @@
-import {EVENTS} from '../../config/events';
+import {EventNames} from '../../config';
 
 export interface EventBase {
-  name: typeof EVENTS[number];
+  name: EventNames;
 }

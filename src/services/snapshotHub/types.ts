@@ -1,3 +1,5 @@
+import {SNAPSHOT_HUB_RESOLVERS} from '../../config';
+
 export type SnapshotProposalID = string;
 
 /**
@@ -5,7 +7,7 @@ export type SnapshotProposalID = string;
  *
  * Used as a way to unify different results from different API's.
  */
-export interface SnapshotHubProposalBase {
+export type SnapshotHubProposalBase<T = any> = {
   /**
    * Body content of the Snapshot Hub Proposal
    */
@@ -18,7 +20,38 @@ export interface SnapshotHubProposalBase {
    * Title of the Snapshot Hub Proposal
    */
   title: string;
-}
+  /**
+   *
+   */
+  raw: T;
+};
+
+export type SnapshotHubProposalResolverArgs = {
+  /**
+   * e.g. https://some-snapshot-hub.xyz/api
+   */
+  apiBaseURL?: string;
+  /**
+   * Proposal ID in Snapshot Hub
+   */
+  proposalID: string;
+  /**
+   * Query string for the legacy Tribute Snapshot Hub API
+   *
+   * e.g. `searchUniqueDraftId=true&...`
+   */
+  queryString?: `?${string}`;
+  /**
+   * Resolver to use (may not be available depending on DAO configs)
+   */
+  resolver?: typeof SNAPSHOT_HUB_RESOLVERS[number];
+  /**
+   * Unique Snapshot Hub space name
+   *
+   * e.g. `tribute`
+   */
+  space: string;
+};
 
 export type SnapshotHubLegacyProposalEntry = Record<
   SnapshotProposalID,
@@ -38,13 +71,29 @@ export interface SnapshotHubLegacyProposal {
   msg: {
     payload: {
       body: string;
+      /**
+       * Voting end time in seconds
+       */
+      end: number;
       name: string;
+      /**
+       * Ethereum block number
+       */
+      snapshot: number;
+      /**
+       * Voting start time in seconds
+       */
+      start: number;
     };
   };
 }
 
 export interface SnapshotHubLegacyTributeProposal
   extends SnapshotHubLegacyProposal {
+  /**
+   * Proposal's Tribute DAO Adapter ID
+   */
+  actionId: string;
   /**
    * Partial type of legacy Tribute Snapshot Hub response
    * customised for erc712 signatures

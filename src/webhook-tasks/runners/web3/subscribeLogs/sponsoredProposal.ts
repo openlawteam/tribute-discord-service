@@ -1,11 +1,12 @@
+import {Log} from 'web3-core/types';
+
 import {
   subscribeConnectedHandler,
   subscribeErrorHandler,
   subscribeLogs,
 } from '../helpers';
 import {Daos} from '../../../../config/types';
-import {filterDaosByActiveEvent} from '../helpers/filterDaosByActiveEvent';
-import {runAll} from '../../../../helpers';
+import {filterDaosByActiveEvent, runAll} from '../../../../helpers';
 import {RunnerReturn} from '../../types';
 import {SPONSORED_PROPOSAL_WEB3_LOGS} from '../../../events';
 import {sponsoredProposalActionSubscribeLogs} from '../../../actions';
@@ -44,7 +45,10 @@ export function sponsoredProposalRunnerSubscribeLogs(
     .on('error', subscribeErrorHandler(SPONSORED_PROPOSAL_WEB3_LOGS));
 
   const stop = async () => {
-    await subscription.unsubscribe(subscribeUnsubscribeHandler(eventName));
+    await subscribeUnsubscribeHandler<Log>(
+      subscription,
+      SPONSORED_PROPOSAL_WEB3_LOGS
+    );
   };
 
   return {

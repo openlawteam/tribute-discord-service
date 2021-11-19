@@ -3,13 +3,21 @@ import Application from 'koa';
 import {HTTP_API_BASE_PATH} from '../config';
 import {prisma} from '../../singletons';
 
+const PATH: string = 'db';
+
 export function dbHandler(): Application.Middleware {
   return async (ctx, next): Promise<void> => {
-    if (ctx.path !== `${HTTP_API_BASE_PATH}/db`) {
+    if (ctx.path !== `${HTTP_API_BASE_PATH}/${PATH}`) {
       return await next();
     }
 
-    await prisma.discordWebhook.count();
+    await prisma.discordWebhook.findFirst({
+      where: {
+        id: {
+          not: undefined,
+        },
+      },
+    });
 
     ctx.body = 'Database is up and running.';
   };

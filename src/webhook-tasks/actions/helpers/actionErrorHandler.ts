@@ -1,4 +1,4 @@
-import {ActionNames} from '../types';
+import {ActionNames} from '../../../config';
 import {EventBase} from '../../events';
 
 export function actionErrorHandler({

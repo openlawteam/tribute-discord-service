@@ -3,10 +3,11 @@ import {WebhookClient} from 'discord.js';
 
 import {
   DISCORD_WEBHOOK_POST_FIXTURE,
-  EMPTY_BYTES32_FIXTURE,
+  BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
 } from '../../../../../test';
+import {ActionNames} from '../../../../config';
 import {EventBase, SPONSORED_PROPOSAL_WEB3_LOGS} from '../../../events';
 import {mockWeb3Provider} from '../../../../../test/setup';
 import {prismaMock} from '../../../../../test/prismaMock';
@@ -21,7 +22,7 @@ type MockHelperReturn = Promise<{
     void,
     [
       {
-        actionName: 'sponsoredProposalSubscribeLogs';
+        actionName: ActionNames;
         event: EventBase;
         error: Error;
       }
@@ -103,10 +104,7 @@ async function mockHelper(
 
   // Mock respsonse for `inverseAdapters`
   mockWeb3Provider.injectResult(
-    web3.eth.abi.encodeParameters(
-      ['bytes32', 'uint256'],
-      [EMPTY_BYTES32_FIXTURE, 1]
-    )
+    web3.eth.abi.encodeParameters(['bytes32', 'uint256'], [BYTES32_FIXTURE, 1])
   );
 
   return {
@@ -140,7 +138,7 @@ describe('sponsoredProposal unit tests', () => {
     const consoleDebugOriginal = console.debug;
     const consoleDebugSpy = (console.debug = jest.fn());
 
-    // Don't mock the client
+    // Don't mock the client so we can inspect the response
     const {cleanup} = await mockHelper(false);
 
     const isDebugSpy = jest
@@ -229,5 +227,25 @@ describe('sponsoredProposal unit tests', () => {
     expect(assertError).not.toBeDefined();
 
     cleanup();
+  });
+
+  test('should exit if no dao found', async () => {
+    const getDaoAction = await import('../../../../helpers/getDaoAction');
+    const {cleanup, sendSpy} = await mockHelper();
+
+    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+
+    await sponsoredProposalActionSubscribeLogs(
+      SPONSORED_PROPOSAL_WEB3_LOGS,
+      FAKE_DAOS_FIXTURE
+    )(undefined as any);
+
+    // Assert no `WebhookClient.send` called
+    expect(sendSpy?.mock.calls.length).toBe(0);
+    // Assert exit early
+    expect(getDaoDataByAddressSpy?.mock.calls.length).toBe(0);
+
+    cleanup();
+    getDaoDataByAddressSpy.mockRestore();
   });
 });

@@ -1,8 +1,17 @@
 /**
- * Export any individual runners which will be executed
- * when the app is run.
+ * Runner Registry
  *
- * Comment-out, or remove, any individual runners not to be run.
+ * Export any individual runners which will be automatically
+ * started (via `startWebhookTasks`) when the app is run.
+ *
+ * Comment-out, or remove, any individual runners not to be automatically run.
+ * Some runners rely on listening to external events (e.g. Ethereum logs),
+ * so they are good cases for when a runner should be automatically started.
+ *
+ * Runners should meet the signature of one of the following:
+ *  - `(daos: Daos | undefined) => RunnerReturn`
+ *  - `(daos: Daos | undefined) => Promise<RunnerReturn>`
+ *
  */
 
-export * from './web3/registry';
+export {sponsoredProposalRunnerSubscribeLogs} from './web3/subscribeLogs';

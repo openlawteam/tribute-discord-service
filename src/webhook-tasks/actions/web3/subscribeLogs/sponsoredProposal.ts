@@ -5,31 +5,28 @@ import {
   SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH,
 } from '../../../events';
 import {
+  DISCORD_EMPTY_EMBED,
   getDaoAction,
-  getDAODataByAddress,
+  getDaoDataByAddress,
   getEtherscanURL,
   isDaoActionActive,
   isDebug,
 } from '../../../../helpers';
 import {
   compileSimpleTemplate,
+  SPONSORED_PROPOSAL_EMBED_TEMPLATE,
+  SPONSORED_PROPOSAL_FALLBACK_TEMPLATE,
   SPONSORED_PROPOSAL_TEMPLATE,
   SponsoredProposalEmbedTemplateData,
   SponsoredProposalTemplateData,
-  SPONSORED_PROPOSAL_FALLBACK_TEMPLATE,
-  SPONSORED_PROPOSAL_EMBED_TEMPLATE,
 } from '../../../templates';
 import {actionErrorHandler} from '../../helpers/actionErrorHandler';
 import {DaoData} from '../../../../config/types';
+import {DiscordMessageEmbeds} from '../..';
 import {getDiscordWebhookClient} from '../../../../services/discord';
 import {getProposalAdapterID} from '../../../../services';
-import {MessageEmbedOptions, MessageOptions} from 'discord.js';
 import {SponsoredProposal} from '../../../../../abi-types/DaoRegistry';
 import {web3} from '../../../../singletons';
-
-type DiscordMessageEmbeds = MessageOptions['embeds'];
-
-const EMPTY_EMBED: MessageEmbedOptions[] = [];
 
 /**
  * Posts to a Discord channel when a DAO Registry's `SponsoredProposal` event is received.
@@ -45,7 +42,9 @@ export function sponsoredProposalActionSubscribeLogs(
 ): (d: Log) => Promise<void> {
   return async (eventData) => {
     try {
-      const dao = getDAODataByAddress(eventData.address, daos);
+      if (!eventData) return;
+
+      const dao = getDaoDataByAddress(eventData.address, daos);
       const daoAction = getDaoAction('SPONSORED_PROPOSAL_WEBHOOK', dao);
 
       if (
@@ -97,10 +96,11 @@ export function sponsoredProposalActionSubscribeLogs(
       const proposalURL: string = `${baseURL}/${adapters?.[adapterID].baseURLPath}/${proposalId}`;
       const txURL: string = `${getEtherscanURL()}/tx/${transactionHash}`;
 
-      const proposal = await snapshotProposalResolver(
-        proposalId,
-        snapshotSpace
-      );
+      const proposal = await snapshotProposalResolver({
+        proposalID: proposalId,
+        queryString: '?searchUniqueDraftId=true',
+        space: snapshotSpace,
+      });
 
       const content: string =
         compileSimpleTemplate<SponsoredProposalTemplateData>(
@@ -126,7 +126,7 @@ export function sponsoredProposalActionSubscribeLogs(
               description: embedDescription,
             },
           ]
-        : EMPTY_EMBED;
+        : DISCORD_EMPTY_EMBED;
 
       // Merge any embeds
       const embeds: DiscordMessageEmbeds = [...embedBody];
@@ -148,7 +148,7 @@ export function sponsoredProposalActionSubscribeLogs(
     } catch (error) {
       if (error instanceof Error) {
         actionErrorHandler({
-          actionName: 'sponsoredProposalSubscribeLogs',
+          actionName: 'SPONSORED_PROPOSAL_WEBHOOK',
           error,
           event,
         });

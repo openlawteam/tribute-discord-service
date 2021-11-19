@@ -1,7 +1,7 @@
 import {DaoData, Daos} from '../config/types';
 import {normalizeString} from './normalizeString';
 
-export function getDAODataByAddress(
+export function getDaoDataByAddress(
   address: string,
   daos: Daos | undefined
 ): DaoData | undefined {

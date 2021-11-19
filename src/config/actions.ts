@@ -1,4 +1,15 @@
 /**
  * Register unique action names
  */
-export const ACTIONS = ['SPONSORED_PROPOSAL_WEBHOOK'] as const;
+export const ACTIONS = [
+  /**
+   * Snapshot Hub
+   */
+  'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
+  'SNAPSHOT_PROPOSAL_END_WEBHOOK',
+  'SNAPSHOT_PROPOSAL_START_WEBHOOK',
+  /**
+   * Tribute DAO
+   */
+  'SPONSORED_PROPOSAL_WEBHOOK',
+] as const;
