@@ -10,7 +10,7 @@ import {
 } from '../../../../test';
 import {ActionNames, DaoData} from '../../../config';
 import {EventBase} from '../../events';
-import {legacyTributeGovernanceProposalCreatedWebhookAction} from './legacyTributeGovernanceProposalCreatedWebhook';
+import {legacyTributeGovernanceProposalCreatedAction} from './legacyTributeGovernanceProposalCreated';
 import {mockWeb3Provider} from '../../../../test/setup';
 import {prismaMock} from '../../../../test/prismaMock';
 import {SNAPSHOT_PROPOSAL_CREATED_EVENT} from '../../events/snapshotHub';
@@ -172,13 +172,13 @@ const FAKE_DAOS_FIXTURE_GOVERNANCE: Record<string, DaoData> = {
   },
 };
 
-describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () => {
+describe('legacyTributeGovernanceProposalCreatedAction unit tests', () => {
   test('should send Discord webhook message', async () => {
     mockGovernanceProposalResponse();
 
     const {cleanup, sendSpy} = await mockHelper();
 
-    await legacyTributeGovernanceProposalCreatedWebhookAction(
+    await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       FAKE_DAOS_FIXTURE_GOVERNANCE
     )(EVENT_DATA);
@@ -234,7 +234,7 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
 
     const {cleanup, sendSpy} = await mockHelper();
 
-    await legacyTributeGovernanceProposalCreatedWebhookAction(
+    await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       FAKE_DAOS_FIXTURE_GOVERNANCE
     )(EVENT_DATA);
@@ -273,7 +273,7 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
       .spyOn(await import('../../../helpers/isDebug'), 'isDebug')
       .mockImplementation(() => true);
 
-    await legacyTributeGovernanceProposalCreatedWebhookAction(
+    await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       FAKE_DAOS_FIXTURE_GOVERNANCE
     )(EVENT_DATA);
@@ -312,7 +312,7 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
     let assertError;
 
     try {
-      await legacyTributeGovernanceProposalCreatedWebhookAction(
+      await legacyTributeGovernanceProposalCreatedAction(
         SNAPSHOT_PROPOSAL_CREATED_EVENT,
         FAKE_DAOS_FIXTURE_GOVERNANCE
       )(EVENT_DATA);
@@ -338,7 +338,7 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
 
     const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
 
-    await legacyTributeGovernanceProposalCreatedWebhookAction(
+    await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       FAKE_DAOS_FIXTURE_GOVERNANCE
     )(undefined as any);
@@ -358,7 +358,7 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
 
     const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
 
-    await legacyTributeGovernanceProposalCreatedWebhookAction(
+    await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       FAKE_DAOS_FIXTURE_GOVERNANCE
     )({...EVENT_DATA, event: SnapshotHubEvents.PROPOSAL_END});
@@ -377,7 +377,7 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
 
     const {cleanup, sendSpy} = await mockHelper();
 
-    await legacyTributeGovernanceProposalCreatedWebhookAction(
+    await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       FAKE_DAOS_FIXTURE_GOVERNANCE
     )(EVENT_DATA);
@@ -419,7 +419,7 @@ describe('legacyTributeGovernanceProposalCreatedWebhookAction unit tests', () =>
 
     const {cleanup, sendSpy} = await mockHelper();
 
-    await legacyTributeGovernanceProposalCreatedWebhookAction(
+    await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       FAKE_DAOS_NO_ACTION
     )(EVENT_DATA);

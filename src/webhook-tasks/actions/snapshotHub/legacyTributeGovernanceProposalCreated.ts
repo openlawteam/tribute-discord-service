@@ -29,12 +29,12 @@ import {takeSnapshotProposalID} from './helpers';
  * Posts to a Discord channel when a legacy Tribute
  * governance proposal is created on a Snapshot Hub.
  *
- * @param data `Log` Web3.js subscription log data
- * @returns `(d: Log) => Promise<void>`
+ * @param event `EventSnapshotProposalWebhook`
+ * @param daos `Record<string, DaoData> | undefined` Web3.js subscription log data
  *
- * @see https://web3js.readthedocs.io/en/v1.5.2/web3-eth-subscribe.html#subscribe-logs
+ * @returns `(d: SnapshotHubEventPayload) => Promise<void>`
  */
-export function legacyTributeGovernanceProposalCreatedWebhookAction(
+export function legacyTributeGovernanceProposalCreatedAction(
   event: EventSnapshotProposalWebhook,
   daos: Record<string, DaoData> | undefined
 ): (s: SnapshotHubEventPayload) => Promise<void> {
