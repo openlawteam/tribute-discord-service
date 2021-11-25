@@ -8,7 +8,7 @@ import {fetchGetJSON} from '../../helpers';
 import {getProposalErrorHandler} from './helpers';
 
 /**
- * Resolves a legacy Snapshot proposal from a custom Tribute implementation.
+ * Resolves a legacy Snapshot proposal from a custom Tribute ERC-712 implementation.
  *
  * @param data `LegacyTributeProposalResolverData`
  * @returns `Promise<SnapshotHubProposalBase | undefined>`
