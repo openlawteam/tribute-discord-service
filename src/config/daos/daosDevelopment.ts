@@ -82,7 +82,7 @@ export const DAOS_DEVELOPMENT: Record<
         baseURLPath: 'governance',
       },
     },
-    baseURL: 'https://muse0.xyz',
+    baseURL: 'https://develop--muse0.netlify.app',
     events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Muse0 [DEV]',
     registryContractAddress: '0x00637869d068a5A5fB6fa42d7c025d1dCbd14f99',
