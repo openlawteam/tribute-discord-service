@@ -5,15 +5,23 @@ import {snapshotProposalEventRunner} from './proposalEventRunner';
 
 describe('proposalEventRunner unit tests', () => {
   test('should call actions for `SnapshotHubEvents.PROPOSAL_CREATED`', async () => {
-    const legacyTributeGovernanceProposalCreatedWebhook = await import(
+    const legacyTributeGovernanceProposalCreated = await import(
       '../../actions/snapshotHub/legacyTributeGovernanceProposalCreated'
     );
 
-    const actionSpy = jest
+    const legacyTributeDraftCreated = await import(
+      '../../actions/snapshotHub/legacyTributeDraftCreated'
+    );
+
+    const legacyTributeGovernanceProposalCreatedSpy = jest
       .spyOn(
-        legacyTributeGovernanceProposalCreatedWebhook,
+        legacyTributeGovernanceProposalCreated,
         'legacyTributeGovernanceProposalCreatedAction'
       )
+      .mockImplementation(() => async () => undefined);
+
+    const legacyTributeDraftCreatedSpy = jest
+      .spyOn(legacyTributeDraftCreated, 'legacyTributeDraftCreatedAction')
       .mockImplementation(() => async () => undefined);
 
     await snapshotProposalEventRunner({
@@ -23,25 +31,52 @@ describe('proposalEventRunner unit tests', () => {
       space: 'test',
     });
 
-    expect(actionSpy.mock.calls.length).toBe(1);
-    expect(actionSpy.mock.calls[0][0]).toEqual(SNAPSHOT_PROPOSAL_CREATED_EVENT);
-    expect(actionSpy.mock.calls[0][1]).toEqual(await getDaos());
+    // Assert `legacyTributeGovernanceProposalCreated` called
+    expect(legacyTributeGovernanceProposalCreatedSpy.mock.calls.length).toBe(1);
+
+    expect(legacyTributeGovernanceProposalCreatedSpy.mock.calls[0][0]).toEqual(
+      SNAPSHOT_PROPOSAL_CREATED_EVENT
+    );
+
+    expect(legacyTributeGovernanceProposalCreatedSpy.mock.calls[0][1]).toEqual(
+      await getDaos()
+    );
+
+    // Assert `legacyTributeDraftCreated` called
+    expect(legacyTributeDraftCreatedSpy.mock.calls.length).toBe(1);
+
+    expect(legacyTributeDraftCreatedSpy.mock.calls[0][0]).toEqual(
+      SNAPSHOT_PROPOSAL_CREATED_EVENT
+    );
+
+    expect(legacyTributeDraftCreatedSpy.mock.calls[0][1]).toEqual(
+      await getDaos()
+    );
 
     // Cleanup
 
-    actionSpy.mockRestore();
+    legacyTributeGovernanceProposalCreatedSpy.mockRestore();
+    legacyTributeDraftCreatedSpy.mockRestore();
   });
 
   test('should not call actions if none found', async () => {
-    const legacyTributeGovernanceProposalCreatedWebhook = await import(
+    const legacyTributeGovernanceProposalCreated = await import(
       '../../actions/snapshotHub/legacyTributeGovernanceProposalCreated'
     );
 
-    const actionSpy = jest
+    const legacyTributeDraftCreated = await import(
+      '../../actions/snapshotHub/legacyTributeDraftCreated'
+    );
+
+    const legacyTributeGovernanceProposalCreatedSpy = jest
       .spyOn(
-        legacyTributeGovernanceProposalCreatedWebhook,
+        legacyTributeGovernanceProposalCreated,
         'legacyTributeGovernanceProposalCreatedAction'
       )
+      .mockImplementation(() => async () => undefined);
+
+    const legacyTributeDraftCreatedSpy = jest
+      .spyOn(legacyTributeDraftCreated, 'legacyTributeDraftCreatedAction')
       .mockImplementation(() => async () => undefined);
 
     await snapshotProposalEventRunner({
@@ -51,10 +86,12 @@ describe('proposalEventRunner unit tests', () => {
       space: 'test',
     });
 
-    expect(actionSpy.mock.calls.length).toBe(0);
+    expect(legacyTributeGovernanceProposalCreatedSpy.mock.calls.length).toBe(0);
+    expect(legacyTributeDraftCreatedSpy.mock.calls.length).toBe(0);
 
     // Cleanup
 
-    actionSpy.mockRestore();
+    legacyTributeGovernanceProposalCreatedSpy.mockRestore();
+    legacyTributeDraftCreatedSpy.mockRestore();
   });
 });
