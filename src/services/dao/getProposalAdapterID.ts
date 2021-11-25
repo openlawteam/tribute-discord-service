@@ -1,13 +1,18 @@
 import {AbiItem} from 'web3-utils/types';
 
 import {DaoRegistry} from '../../../abi-types/DaoRegistry';
-import {getLazyDefaultImport} from '../../helpers';
+import {BURN_ADDRESS, getLazyDefaultImport} from '../../helpers';
 import {web3} from '../../singletons';
 
-export async function getProposalAdapterID(
-  proposalID: string,
-  daoAddress: string
-): Promise<string> {
+export async function getProposalAdapterID({
+  adapterAddress,
+  daoAddress,
+  proposalID,
+}: {
+  adapterAddress?: string;
+  daoAddress: string;
+  proposalID?: string;
+}): Promise<string | undefined> {
   const daoRegistryProposalsABI = await getLazyDefaultImport<AbiItem>(
     () => import('../../abis/tribute/DaoRegistry.json')
   )();
@@ -17,9 +22,27 @@ export async function getProposalAdapterID(
     daoAddress
   ) as any as DaoRegistry;
 
-  const {adapterAddress} = await contract.methods.proposals(proposalID).call();
+  let adapterAddressToUse: string = '';
 
-  const {id} = await contract.methods.inverseAdapters(adapterAddress).call();
+  if (adapterAddress) {
+    adapterAddressToUse = adapterAddress;
+  }
+
+  if (!adapterAddress && proposalID) {
+    const {adapterAddress: a} = await contract.methods
+      .proposals(proposalID)
+      .call();
+
+    if (a === BURN_ADDRESS) return undefined;
+
+    adapterAddressToUse = a;
+  }
+
+  if (!adapterAddressToUse) return undefined;
+
+  const {id} = await contract.methods
+    .inverseAdapters(adapterAddressToUse)
+    .call();
 
   return id;
 }
