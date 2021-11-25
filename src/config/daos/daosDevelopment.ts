@@ -16,6 +16,9 @@ import {DaoData} from '../types';
 
 export const DAO_NAMES_DEVELOPMENT = ['muse0', 'tribute'] as const;
 
+const SNAPSHOT_HUB_API_URL: string =
+  'https://snapshot-hub-erc712.dev.thelao.io/api';
+
 export const DAOS_DEVELOPMENT: Record<
   typeof DAO_NAMES_DEVELOPMENT[number],
   DaoData
@@ -51,7 +54,7 @@ export const DAOS_DEVELOPMENT: Record<
       ) => {
         return snapshotHubResolverSelector<R>({
           ...args,
-          apiBaseURL: 'https://snapshot-hub-erc712.dev.thelao.io/api',
+          apiBaseURL: SNAPSHOT_HUB_API_URL,
         });
       },
       space: 'tribute',
@@ -81,15 +84,15 @@ export const DAOS_DEVELOPMENT: Record<
     },
     baseURL: 'https://muse0.xyz',
     events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
-    friendlyName: 'Muse0',
-    registryContractAddress: '0x7c8B281C56f7ef9b8099D3F491AF24DC2C2e3ee0',
+    friendlyName: 'Muse0 [DEV]',
+    registryContractAddress: '0x00637869d068a5A5fB6fa42d7c025d1dCbd14f99',
     snapshotHub: {
       proposalResolver: async <R = any>(
         args: SnapshotHubProposalResolverArgs
       ) => {
         return snapshotHubResolverSelector<R>({
           ...args,
-          apiBaseURL: 'https://snapshot-hub-erc712.thelao.io/api',
+          apiBaseURL: SNAPSHOT_HUB_API_URL,
         });
       },
       space: 'museo',
