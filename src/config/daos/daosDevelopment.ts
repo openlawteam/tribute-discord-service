@@ -1,6 +1,6 @@
 import {
-  legacyTributeProposalResolver,
   SnapshotHubProposalResolverArgs,
+  snapshotHubResolverSelector,
 } from '../../services/snapshotHub';
 import {BURN_ADDRESS} from '../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
@@ -49,20 +49,10 @@ export const DAOS_DEVELOPMENT: Record<
       proposalResolver: async <R = any>(
         args: SnapshotHubProposalResolverArgs
       ) => {
-        const {resolver} = args;
-
-        const DEFAULT_ARGS = {
+        return snapshotHubResolverSelector<R>({
           ...args,
           apiBaseURL: 'https://snapshot-hub-erc712.dev.thelao.io/api',
-        };
-
-        switch (resolver) {
-          case 'LEGACY_TRIBUTE':
-            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
-
-          default:
-            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
-        }
+        });
       },
       space: 'tribute',
     },
