@@ -1,6 +1,5 @@
 import {
   BURN_ADDRESS,
-  DISCORD_EMPTY_EMBED,
   getDaoAction,
   getDaoDataBySnapshotSpace,
   isDaoActionActive,
@@ -11,18 +10,19 @@ import {
   compileSimpleTemplate,
   SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE,
   SNAPSHOT_PROPOSAL_CREATED_EMBED_TEMPLATE,
-  SNAPSHOT_PROPOSAL_CREATED_FALLBACK_TEMPLATE,
   SnapshotProposalCreatedEmbedTemplateData,
-  SnapshotProposalCreatedFallbackTemplateData,
   SnapshotProposalCreatedTemplateData,
 } from '../../templates';
+import {
+  SnapshotHubLegacyTributeProposal,
+  SnapshotHubMessageType,
+} from '../../../services/snapshotHub';
 import {actionErrorHandler} from '../helpers/actionErrorHandler';
 import {DaoData} from '../../../config/types';
 import {DiscordMessageEmbeds} from '..';
 import {EventSnapshotProposalWebhook} from '../../events/snapshotHub';
 import {getDiscordWebhookClient} from '../../../services/discord';
 import {SnapshotHubEventPayload} from './types';
-import {SnapshotHubLegacyTributeProposal} from '../../../services/snapshotHub';
 import {takeSnapshotProposalID} from './helpers';
 
 /**
@@ -52,8 +52,7 @@ export function legacyTributeGovernanceProposalCreatedAction(
         !dao ||
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
-        !isDaoActionActive(daoAction) ||
-        space !== dao.snapshotHub.space
+        !isDaoActionActive(daoAction)
       ) {
         return;
       }
@@ -78,52 +77,52 @@ export function legacyTributeGovernanceProposalCreatedAction(
           space: snapshotSpace,
         });
 
-      const proposalRaw = proposal?.raw;
+      // Exit if no proposal
+      if (!proposal) return;
+
+      const {raw: proposalRaw} = proposal;
+
+      // Exit if type is not `SnapshotHubMessageType.PROPOSAL`
+      if (proposalRaw.msg.type !== SnapshotHubMessageType.PROPOSAL) {
+        return;
+      }
 
       // Exit if fetched proposal is not governance
       if (
-        proposalRaw &&
-        normalizeString(proposalRaw?.actionId) !== normalizeString(BURN_ADDRESS)
+        normalizeString(proposalRaw.actionId) !== normalizeString(BURN_ADDRESS)
       ) {
         return;
       }
 
       const proposalURL: string = `${baseURL}/${
-        adapters?.[proposalRaw?.actionId || '']?.baseURLPath
+        adapters?.[proposalRaw.actionId]?.baseURLPath
       }/${proposalID}`;
 
       const voteEndsDateUTCString = new Date(
-        (proposalRaw?.msg?.payload?.end || 0) * 1000
+        (proposalRaw.msg.payload.end || 0) * 1000
       ).toUTCString();
 
-      const content: string = proposal
-        ? compileSimpleTemplate<SnapshotProposalCreatedTemplateData>(
-            SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE,
-            {
-              title: proposal.title,
-              proposalURL,
-              voteEndsDateUTCString,
-            }
-          )
-        : compileSimpleTemplate<SnapshotProposalCreatedFallbackTemplateData>(
-            SNAPSHOT_PROPOSAL_CREATED_FALLBACK_TEMPLATE,
-            {baseURL, friendlyName}
-          );
+      const content: string =
+        compileSimpleTemplate<SnapshotProposalCreatedTemplateData>(
+          SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE,
+          {
+            title: proposal.title,
+            proposalURL,
+            voteEndsDateUTCString,
+          }
+        );
 
       // Falls back to empty embed if no proposal
-      const embedBody: DiscordMessageEmbeds = proposal
-        ? [
-            {
-              color: 'DEFAULT',
-              description:
-                compileSimpleTemplate<SnapshotProposalCreatedEmbedTemplateData>(
-                  SNAPSHOT_PROPOSAL_CREATED_EMBED_TEMPLATE,
-                  {body: proposal?.body}
-                ),
-            },
-          ]
-        : DISCORD_EMPTY_EMBED;
-
+      const embedBody: DiscordMessageEmbeds = [
+        {
+          color: 'DEFAULT',
+          description:
+            compileSimpleTemplate<SnapshotProposalCreatedEmbedTemplateData>(
+              SNAPSHOT_PROPOSAL_CREATED_EMBED_TEMPLATE,
+              {body: proposal?.body}
+            ),
+        },
+      ];
       // Merge any embeds
       const embeds: DiscordMessageEmbeds = [...embedBody];
 
