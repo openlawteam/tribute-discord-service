@@ -2,6 +2,11 @@ import {SNAPSHOT_HUB_RESOLVERS} from '../../config';
 
 export type SnapshotProposalID = string;
 
+export enum SnapshotHubMessageType {
+  DRAFT = 'draft',
+  PROPOSAL = 'proposal',
+}
+
 /**
  * A base type for any Snapshot Hub proposal data structure
  *
@@ -63,6 +68,11 @@ export type SnapshotHubLegacyTributeProposalEntry = Record<
   SnapshotHubLegacyTributeProposal
 >;
 
+export type SnapshotHubLegacyTributeDraftEntry = Record<
+  SnapshotProposalID,
+  SnapshotHubLegacyTributeDraft
+>;
+
 /**
  * A basic Snapshot Hub proposal type for legacy
  * versions of Snapshot Hub.
@@ -85,6 +95,25 @@ export interface SnapshotHubLegacyProposal {
        */
       start: number;
     };
+    type: SnapshotHubMessageType;
+  };
+}
+
+/**
+ * A basic Snapshot Hub draft type for legacy
+ * versions of Snapshot Hub.
+ */
+export interface SnapshotHubLegacyDraft {
+  msg: {
+    payload: {
+      body: string;
+      name: string;
+    };
+    /**
+     * Created timestamp in seconds
+     */
+    timestamp: string;
+    type: SnapshotHubMessageType;
   };
 }
 
@@ -105,5 +134,22 @@ export interface SnapshotHubLegacyTributeProposal
      * proposals the actual DAO proposal's ID is the Snapshot Hub `draft` ID.
      */
     erc712DraftHash: string;
+  };
+}
+
+export interface SnapshotHubLegacyTributeDraft extends SnapshotHubLegacyDraft {
+  /**
+   * Proposal's Tribute DAO Adapter ID
+   */
+  actionId: string;
+  /**
+   * Partial type of legacy Tribute Snapshot Hub response
+   * customised for erc712 signatures
+   */
+  data: {
+    /**
+     * Has the draft been sponsored (i.e. proposal created from a draft)?
+     */
+    sponsored: boolean;
   };
 }
