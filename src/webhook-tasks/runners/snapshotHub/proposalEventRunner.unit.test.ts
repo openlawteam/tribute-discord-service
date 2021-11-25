@@ -1,22 +1,18 @@
-import {FAKE_DAOS_FIXTURE} from '../../../../test/fixtures/fakeDaos';
 import {getDaos} from '../../../services';
-import {
-  SnapshotHubEventPayload,
-  SnapshotHubEvents,
-} from '../../actions/snapshotHub/types';
 import {SNAPSHOT_PROPOSAL_CREATED_EVENT} from '../../events/snapshotHub';
+import {SnapshotHubEvents} from '../../actions/snapshotHub/types';
 import {snapshotProposalEventRunner} from './proposalEventRunner';
 
 describe('proposalEventRunner unit tests', () => {
   test('should call actions for `SnapshotHubEvents.PROPOSAL_CREATED`', async () => {
     const legacyTributeGovernanceProposalCreatedWebhook = await import(
-      '../../actions/snapshotHub/legacyTributeGovernanceProposalCreatedWebhook'
+      '../../actions/snapshotHub/legacyTributeGovernanceProposalCreated'
     );
 
     const actionSpy = jest
       .spyOn(
         legacyTributeGovernanceProposalCreatedWebhook,
-        'legacyTributeGovernanceProposalCreatedWebhookAction'
+        'legacyTributeGovernanceProposalCreatedAction'
       )
       .mockImplementation(() => async () => undefined);
 
@@ -38,13 +34,13 @@ describe('proposalEventRunner unit tests', () => {
 
   test('should not call actions if none found', async () => {
     const legacyTributeGovernanceProposalCreatedWebhook = await import(
-      '../../actions/snapshotHub/legacyTributeGovernanceProposalCreatedWebhook'
+      '../../actions/snapshotHub/legacyTributeGovernanceProposalCreated'
     );
 
     const actionSpy = jest
       .spyOn(
         legacyTributeGovernanceProposalCreatedWebhook,
-        'legacyTributeGovernanceProposalCreatedWebhookAction'
+        'legacyTributeGovernanceProposalCreatedAction'
       )
       .mockImplementation(() => async () => undefined);
 
