@@ -131,7 +131,7 @@ const FAKE_DAOS: Record<string, DaoData> = {
     ...FAKE_DAOS_FIXTURE.test,
     actions: [
       ...FAKE_DAOS_FIXTURE.test.actions,
-      {name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK', webhookID: 'abc123'},
+      {name: 'SNAPSHOT_DRAFT_CREATED_WEBHOOK', webhookID: 'abc123'},
     ],
     events: [
       ...FAKE_DAOS_FIXTURE.test.events,
