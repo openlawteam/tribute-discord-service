@@ -10,25 +10,25 @@ import {
 } from '../../../../test';
 import {
   compileSimpleTemplate,
-  SnapshotProposalCreatedEmbedTemplateData,
-  SnapshotProposalCreatedTemplateData,
   SNAPSHOT_GOVERNANCE_PROPOSAL_CREATED_TEMPLATE,
   SNAPSHOT_PROPOSAL_CREATED_EMBED_TEMPLATE,
+  SnapshotProposalCreatedEmbedTemplateData,
+  SnapshotProposalCreatedTemplateData,
 } from '../../templates';
 import {
   SnapshotHubLegacyTributeProposalEntry,
   SnapshotHubMessageType,
 } from '../../../services/snapshotHub';
 import {ActionNames, DaoData} from '../../../config';
+import {BURN_ADDRESS} from '../../../helpers';
 import {EventBase} from '../../events';
 import {legacyTributeGovernanceProposalCreatedAction} from './legacyTributeGovernanceProposalCreated';
 import {mockWeb3Provider} from '../../../../test/setup';
 import {prismaMock} from '../../../../test/prismaMock';
+import {rest, server} from '../../../../test/msw/server';
 import {SNAPSHOT_PROPOSAL_CREATED_EVENT} from '../../events/snapshotHub';
 import {SnapshotHubEventPayload, SnapshotHubEvents} from './types';
 import {web3} from '../../../singletons';
-import {rest, server} from '../../../../test/msw/server';
-import {BURN_ADDRESS} from '../../../helpers';
 
 type MockHelperReturn = Promise<{
   cleanup: () => void;
