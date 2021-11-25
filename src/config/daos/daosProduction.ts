@@ -27,6 +27,10 @@ export const DAOS_PRODUCTION: Record<
         webhookID: '888443179039354941',
       },
       {
+        name: 'SNAPSHOT_DRAFT_CREATED_WEBHOOK',
+        webhookID: '913488993767784488',
+      },
+      {
         name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
         webhookID: '888443179039354941',
       },

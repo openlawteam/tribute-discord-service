@@ -45,7 +45,7 @@ export function legacyTributeDraftCreatedAction(
 
       const {space} = snapshotEvent;
       const dao = getDaoDataBySnapshotSpace(space, daos);
-      const daoAction = getDaoAction('SNAPSHOT_PROPOSAL_CREATED_WEBHOOK', dao);
+      const daoAction = getDaoAction('SNAPSHOT_DRAFT_CREATED_WEBHOOK', dao);
 
       if (
         !dao ||
@@ -147,7 +147,7 @@ export function legacyTributeDraftCreatedAction(
     } catch (error) {
       if (error instanceof Error) {
         actionErrorHandler({
-          actionName: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
+          actionName: 'SNAPSHOT_DRAFT_CREATED_WEBHOOK',
           error,
           event,
         });
