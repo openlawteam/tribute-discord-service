@@ -248,4 +248,37 @@ describe('sponsoredProposal unit tests', () => {
     cleanup();
     getDaoDataByAddressSpy.mockRestore();
   });
+
+  test('should exit if no `adapterID` found', async () => {
+    const getProposalAdapterID = await import(
+      '../../../../services/dao/getProposalAdapterID'
+    );
+
+    const getProposalAdapterIDMock = jest
+      .spyOn(getProposalAdapterID, 'getProposalAdapterID')
+      .mockImplementation(async () => undefined);
+
+    const {cleanup, sendSpy} = await mockHelper();
+
+    let assertError;
+
+    try {
+      await sponsoredProposalActionSubscribeLogs(
+        SPONSORED_PROPOSAL_WEB3_LOGS,
+        FAKE_DAOS_FIXTURE
+      )(EVENT_DATA);
+    } catch (error) {
+      assertError = error;
+    }
+
+    // Assert no `WebhookClient.send` called
+    expect(sendSpy?.mock.calls.length).toBe(0);
+    // Assert error was not thrown
+    expect(assertError).not.toBeDefined();
+
+    // Cleanup
+
+    cleanup();
+    getProposalAdapterIDMock.mockRestore();
+  });
 });
