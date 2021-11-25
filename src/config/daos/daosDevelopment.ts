@@ -1,6 +1,6 @@
 import {
-  legacyTributeProposalResolver,
   SnapshotHubProposalResolverArgs,
+  snapshotHubResolverSelector,
 } from '../../services/snapshotHub';
 import {BURN_ADDRESS} from '../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
@@ -14,7 +14,10 @@ import {DaoData} from '../types';
  * exported mapping below.
  */
 
-export const DAO_NAMES_DEVELOPMENT = ['tribute'] as const;
+export const DAO_NAMES_DEVELOPMENT = ['muse0', 'tribute'] as const;
+
+const SNAPSHOT_HUB_API_URL: string =
+  'https://snapshot-hub-erc712.dev.thelao.io/api';
 
 export const DAOS_DEVELOPMENT: Record<
   typeof DAO_NAMES_DEVELOPMENT[number],
@@ -49,22 +52,50 @@ export const DAOS_DEVELOPMENT: Record<
       proposalResolver: async <R = any>(
         args: SnapshotHubProposalResolverArgs
       ) => {
-        const {resolver} = args;
-
-        const DEFAULT_ARGS = {
+        return snapshotHubResolverSelector<R>({
           ...args,
-          apiBaseURL: 'https://snapshot-hub-erc712.dev.thelao.io/api',
-        };
-
-        switch (resolver) {
-          case 'LEGACY_TRIBUTE':
-            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
-
-          default:
-            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
-        }
+          apiBaseURL: SNAPSHOT_HUB_API_URL,
+        });
       },
       space: 'tribute',
+    },
+  },
+
+  muse0: {
+    actions: [
+      {
+        name: 'SPONSORED_PROPOSAL_WEBHOOK',
+        webhookID: '886976872611729439',
+      },
+      {
+        name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
+        webhookID: '886976872611729439',
+      },
+    ],
+    adapters: {
+      [CORE_DAO_ADAPTERS['tribute-nft']]: {
+        friendlyName: 'tribute-nft',
+        baseURLPath: 'curation',
+      },
+      [BURN_ADDRESS]: {
+        friendlyName: 'Governance',
+        baseURLPath: 'governance',
+      },
+    },
+    baseURL: 'https://muse0.xyz',
+    events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
+    friendlyName: 'Muse0 [DEV]',
+    registryContractAddress: '0x00637869d068a5A5fB6fa42d7c025d1dCbd14f99',
+    snapshotHub: {
+      proposalResolver: async <R = any>(
+        args: SnapshotHubProposalResolverArgs
+      ) => {
+        return snapshotHubResolverSelector<R>({
+          ...args,
+          apiBaseURL: SNAPSHOT_HUB_API_URL,
+        });
+      },
+      space: 'museo',
     },
   },
 };

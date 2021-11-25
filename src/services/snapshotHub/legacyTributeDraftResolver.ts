@@ -1,6 +1,6 @@
 import {
-  SnapshotHubLegacyTributeProposal,
-  SnapshotHubLegacyTributeProposalEntry,
+  SnapshotHubLegacyTributeDraft,
+  SnapshotHubLegacyTributeDraftEntry,
   SnapshotHubProposalBase,
   SnapshotHubProposalResolverArgs,
 } from './types';
@@ -8,13 +8,13 @@ import {fetchGetJSON} from '../../helpers';
 import {getProposalErrorHandler} from './helpers';
 
 /**
- * Resolves a legacy Snapshot proposal from a custom Tribute ERC-712 implementation.
+ * Resolves a legacy Snapshot draft from a custom Tribute ERC-712 implementation.
  *
- * @param data `LegacyTributeProposalResolverData`
+ * @param data `SnapshotHubProposalResolverArgs`
  * @returns `Promise<SnapshotHubProposalBase | undefined>`
  */
-export async function legacyTributeProposalResolver<
-  R = SnapshotHubLegacyTributeProposal
+export async function legacyTributeDraftResolver<
+  R = SnapshotHubLegacyTributeDraft
 >({
   apiBaseURL,
   proposalID,
@@ -24,15 +24,15 @@ export async function legacyTributeProposalResolver<
   SnapshotHubProposalBase<R> | undefined
 > {
   try {
-    const proposal = await fetchGetJSON<SnapshotHubLegacyTributeProposalEntry>(
-      `${apiBaseURL}/${space}/proposal/${proposalID}${queryString || ''}`
+    const draft = await fetchGetJSON<SnapshotHubLegacyTributeDraftEntry>(
+      `${apiBaseURL}/${space}/draft/${proposalID}${queryString || ''}`
     );
 
-    if (!proposal) {
+    if (!draft) {
       return undefined;
     }
 
-    const raw = Object.entries(proposal)[0]?.[1];
+    const raw = Object.entries(draft)[0]?.[1];
 
     if (!raw) {
       return undefined;
@@ -42,7 +42,6 @@ export async function legacyTributeProposalResolver<
       msg: {
         payload: {name, body},
       },
-      data: {erc712DraftHash},
     } = raw;
 
     return {
@@ -50,7 +49,7 @@ export async function legacyTributeProposalResolver<
        * Helper
        */
       body,
-      id: erc712DraftHash,
+      id: proposalID,
       title: name,
       /**
        * Raw response

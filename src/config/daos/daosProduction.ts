@@ -1,10 +1,10 @@
+import {
+  SnapshotHubProposalResolverArgs,
+  snapshotHubResolverSelector,
+} from '../../services/snapshotHub';
 import {BURN_ADDRESS} from '../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
 import {DaoData} from '../types';
-import {
-  legacyTributeProposalResolver,
-  SnapshotHubProposalResolverArgs,
-} from '../../services/snapshotHub';
 
 /**
  * A PRODUCTION configuration mapping for DAO's this app recognises.
@@ -49,20 +49,10 @@ export const DAOS_PRODUCTION: Record<
       proposalResolver: async <R = any>(
         args: SnapshotHubProposalResolverArgs
       ) => {
-        const {resolver} = args;
-
-        const DEFAULT_ARGS = {
+        return snapshotHubResolverSelector<R>({
           ...args,
           apiBaseURL: 'https://snapshot-hub-erc712.thelao.io/api',
-        };
-
-        switch (resolver) {
-          case 'LEGACY_TRIBUTE':
-            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
-
-          default:
-            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
-        }
+        });
       },
       space: 'museo',
     },

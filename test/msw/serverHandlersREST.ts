@@ -2,10 +2,14 @@ import {APIMessage} from 'discord-api-types';
 
 import {
   DISCORD_WEBHOOK_POST_FIXTURE,
+  LEGACY_TRIBUTE_SNAPSHOT_HUB_DRAFT_FIXTURE,
   LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE,
 } from '..';
+import {
+  SnapshotHubLegacyTributeDraftEntry,
+  SnapshotHubLegacyTributeProposalEntry,
+} from '../../src/services/snapshotHub';
 import {rest} from './server';
-import {SnapshotHubLegacyTributeProposalEntry} from '../../src/services/snapshotHub';
 
 /**
  * HTTP API
@@ -47,6 +51,13 @@ const snapshotHubLegacyTributeProposalGET = rest.get<
   res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE))
 );
 
+const snapshotHubLegacyTributeDraftGET = rest.get<
+  undefined,
+  SnapshotHubLegacyTributeDraftEntry
+>('http://*/api/*/draft/*', (_req, res, ctx) =>
+  res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_DRAFT_FIXTURE))
+);
+
 /**
  * HANDLERS TO EXPORT
  */
@@ -55,5 +66,6 @@ export const handlers = [
   alchemyAPI,
   discordWebhookPOST,
   httpAPIAllGET,
+  snapshotHubLegacyTributeDraftGET,
   snapshotHubLegacyTributeProposalGET,
 ];

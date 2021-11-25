@@ -1,3 +1,4 @@
 export * from './helpers';
-export * from './legacyTributeGovernanceProposalCreatedWebhook';
+export * from './legacyTributeDraftCreated';
+export * from './legacyTributeGovernanceProposalCreated';
 export * from './types';

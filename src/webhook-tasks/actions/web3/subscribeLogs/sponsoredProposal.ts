@@ -88,12 +88,20 @@ export function sponsoredProposalActionSubscribeLogs(
 
       const client = await getDiscordWebhookClient(daoAction.webhookID);
 
-      const adapterID = await getProposalAdapterID(
-        proposalId,
-        registryContractAddress
-      );
+      const adapterID = await getProposalAdapterID({
+        proposalID: proposalId,
+        daoAddress: registryContractAddress,
+      });
 
-      const proposalURL: string = `${baseURL}/${adapters?.[adapterID].baseURLPath}/${proposalId}`;
+      // Exit if no `adapterID`
+      if (!adapterID) {
+        return;
+      }
+
+      const proposalURL: string = `${baseURL}/${
+        adapters?.[adapterID || ''].baseURLPath
+      }/${proposalId}`;
+
       const txURL: string = `${getEtherscanURL()}/tx/${transactionHash}`;
 
       const proposal = await snapshotProposalResolver({

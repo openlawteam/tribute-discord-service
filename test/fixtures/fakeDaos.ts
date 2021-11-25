@@ -1,6 +1,10 @@
+import {
+  legacyTributeDraftResolver,
+  legacyTributeProposalResolver,
+  SnapshotHubProposalResolverArgs,
+} from '../../src/services/snapshotHub';
 import {DaoData} from '../../src/config/types';
 import {BYTES32_FIXTURE, ETH_ADDRESS_FIXTURE} from './constants';
-import {legacyTributeProposalResolver} from '../../src/services/snapshotHub';
 
 export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
   test: {
@@ -21,12 +25,27 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
     friendlyName: 'Tribute DAO [Test]',
     registryContractAddress: ETH_ADDRESS_FIXTURE,
     snapshotHub: {
-      proposalResolver: async (args) =>
-        await legacyTributeProposalResolver({
+      proposalResolver: async <R = any>(
+        args: SnapshotHubProposalResolverArgs
+      ) => {
+        const {resolver} = args;
+
+        const DEFAULT_ARGS = {
           ...args,
-          // @see `docker-host` in `docker-compose.dev.yml`
           apiBaseURL: 'http://docker-host:8081/api',
-        }),
+        };
+
+        switch (resolver) {
+          case 'LEGACY_TRIBUTE':
+            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
+
+          case 'LEGACY_TRIBUTE_DRAFT':
+            return await legacyTributeDraftResolver<R>(DEFAULT_ARGS);
+
+          default:
+            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
+        }
+      },
       space: 'tribute',
     },
   },
@@ -49,12 +68,27 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
     friendlyName: 'Mingo DAO [Test]',
     registryContractAddress: ETH_ADDRESS_FIXTURE,
     snapshotHub: {
-      proposalResolver: async (args) =>
-        await legacyTributeProposalResolver({
+      proposalResolver: async <R = any>(
+        args: SnapshotHubProposalResolverArgs
+      ) => {
+        const {resolver} = args;
+
+        const DEFAULT_ARGS = {
           ...args,
-          // @see `docker-host` in `docker-compose.dev.yml`
           apiBaseURL: 'http://docker-host:8081/api',
-        }),
+        };
+
+        switch (resolver) {
+          case 'LEGACY_TRIBUTE':
+            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
+
+          case 'LEGACY_TRIBUTE_DRAFT':
+            return await legacyTributeDraftResolver<R>(DEFAULT_ARGS);
+
+          default:
+            return await legacyTributeProposalResolver<R>(DEFAULT_ARGS);
+        }
+      },
       space: 'mingo',
     },
   },

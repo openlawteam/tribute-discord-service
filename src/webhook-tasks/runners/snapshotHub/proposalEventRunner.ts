@@ -2,9 +2,12 @@ import {
   SnapshotHubEventPayload,
   SnapshotHubEvents,
 } from '../../actions/snapshotHub/types';
+import {
+  legacyTributeDraftCreatedAction,
+  legacyTributeGovernanceProposalCreatedAction,
+} from '../../actions/snapshotHub';
 import {Daos} from '../../../config';
 import {getDaos} from '../../../services';
-import {legacyTributeGovernanceProposalCreatedWebhookAction} from '../../actions/snapshotHub/legacyTributeGovernanceProposalCreatedWebhook';
 import {runAll} from '../../../helpers';
 import {SNAPSHOT_PROPOSAL_CREATED_EVENT} from '../../events/snapshotHub';
 
@@ -46,7 +49,8 @@ function getProposalCreatedActions(
   daos: Daos | undefined
 ): SnapshotHubEventActions {
   return [
-    legacyTributeGovernanceProposalCreatedWebhookAction(
+    legacyTributeDraftCreatedAction(SNAPSHOT_PROPOSAL_CREATED_EVENT, daos),
+    legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
       daos
     ),
