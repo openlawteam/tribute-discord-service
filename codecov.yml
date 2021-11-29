@@ -1,0 +1,3 @@
+ignore:
+  # ignore `test` dir and all its contents
+  - "test"
