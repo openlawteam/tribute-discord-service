@@ -14,10 +14,26 @@ import {DaoData} from '../types';
  * exported mapping below.
  */
 
-export const DAO_NAMES_DEVELOPMENT = ['muse0', 'tribute'] as const;
+export const DAO_NAMES_DEVELOPMENT = [
+  'fashion',
+  'metaverse',
+  'muse0',
+  'tribute',
+] as const;
 
 const SNAPSHOT_HUB_API_URL: string =
   'https://snapshot-hub-erc712.dev.thelao.io/api';
+
+const TRIBUTE_DISCORD_TEST_WEBHOOK_ID: string = '886976872611729439';
+
+const DEFAULT_PROPOSAL_RESOLVER = async <R = any>(
+  args: SnapshotHubProposalResolverArgs
+) => {
+  return snapshotHubResolverSelector<R>({
+    ...args,
+    apiBaseURL: SNAPSHOT_HUB_API_URL,
+  });
+};
 
 export const DAOS_DEVELOPMENT: Record<
   typeof DAO_NAMES_DEVELOPMENT[number],
@@ -27,11 +43,11 @@ export const DAOS_DEVELOPMENT: Record<
     actions: [
       {
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
-        webhookID: '886976872611729439',
+        webhookID: TRIBUTE_DISCORD_TEST_WEBHOOK_ID,
       },
       {
         name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
-        webhookID: '886976872611729439',
+        webhookID: TRIBUTE_DISCORD_TEST_WEBHOOK_ID,
       },
     ],
     adapters: {
@@ -49,14 +65,7 @@ export const DAOS_DEVELOPMENT: Record<
     friendlyName: 'Tribute DAO [DEV]',
     registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
     snapshotHub: {
-      proposalResolver: async <R = any>(
-        args: SnapshotHubProposalResolverArgs
-      ) => {
-        return snapshotHubResolverSelector<R>({
-          ...args,
-          apiBaseURL: SNAPSHOT_HUB_API_URL,
-        });
-      },
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
       space: 'tribute',
     },
   },
@@ -65,15 +74,15 @@ export const DAOS_DEVELOPMENT: Record<
     actions: [
       {
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
-        webhookID: '886976872611729439',
+        webhookID: TRIBUTE_DISCORD_TEST_WEBHOOK_ID,
       },
       {
         name: 'SNAPSHOT_DRAFT_CREATED_WEBHOOK',
-        webhookID: '886976872611729439',
+        webhookID: TRIBUTE_DISCORD_TEST_WEBHOOK_ID,
       },
       {
         name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
-        webhookID: '886976872611729439',
+        webhookID: TRIBUTE_DISCORD_TEST_WEBHOOK_ID,
       },
     ],
     adapters: {
@@ -91,15 +100,54 @@ export const DAOS_DEVELOPMENT: Record<
     friendlyName: 'Muse0 [DEV]',
     registryContractAddress: '0x00637869d068a5A5fB6fa42d7c025d1dCbd14f99',
     snapshotHub: {
-      proposalResolver: async <R = any>(
-        args: SnapshotHubProposalResolverArgs
-      ) => {
-        return snapshotHubResolverSelector<R>({
-          ...args,
-          apiBaseURL: SNAPSHOT_HUB_API_URL,
-        });
-      },
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
       space: 'museo',
+    },
+  },
+
+  fashion: {
+    actions: [
+      {
+        name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
+        webhookID: TRIBUTE_DISCORD_TEST_WEBHOOK_ID,
+      },
+    ],
+    adapters: {
+      [BURN_ADDRESS]: {
+        friendlyName: 'Governance',
+        baseURLPath: 'governance',
+      },
+    },
+    baseURL: 'https://develop--reddao.netlify.app',
+    events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
+    friendlyName: 'Red DAO [DEV]',
+    registryContractAddress: '0xeE2873D8E5380405eAF079491f7A6322fd35Db1f',
+    snapshotHub: {
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
+      space: 'fashion',
+    },
+  },
+
+  metaverse: {
+    actions: [
+      {
+        name: 'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
+        webhookID: TRIBUTE_DISCORD_TEST_WEBHOOK_ID,
+      },
+    ],
+    adapters: {
+      [BURN_ADDRESS]: {
+        friendlyName: 'Governance',
+        baseURLPath: 'governance',
+      },
+    },
+    baseURL: 'https://develop--neondao.netlify.app',
+    events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
+    friendlyName: 'NEON DAO [DEV]',
+    registryContractAddress: '0xB9CC072170b5407d37f1d2Bd07BEf7441e1942Dc',
+    snapshotHub: {
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
+      space: 'metaverse',
     },
   },
 };
