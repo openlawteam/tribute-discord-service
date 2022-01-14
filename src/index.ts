@@ -1,6 +1,7 @@
 import {createHttpTerminator} from 'http-terminator';
 import {envCheck} from './helpers';
 import {httpServer} from './http-api';
+import {startApplications} from './applications';
 import {startWebhookTasks} from './webhook-tasks';
 
 async function main() {
@@ -8,6 +9,8 @@ async function main() {
     // Check if all environment variables are set
     envCheck();
 
+    // Start Discord applications
+    const applications = await startApplications();
     // Start listening for events and take actions
     const runners = await startWebhookTasks();
 
@@ -18,6 +21,8 @@ async function main() {
     const gracefulShutdown = async (signal: NodeJS.Signals) => {
       console.log(`☠️  Received signal to terminate: ${signal}`);
 
+      // Handles properly destroying any applications
+      await Promise.allSettled(applications.map(({stop}) => stop?.()));
       // Handles properly closing any processes started by runners
       await Promise.allSettled(runners.map(({stop}) => stop?.()));
 

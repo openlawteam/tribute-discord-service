@@ -2,10 +2,10 @@ import {
   SnapshotHubProposalBase,
   SnapshotHubProposalResolverArgs,
 } from '../services/snapshotHub/types';
-import {ACTIONS} from './actions';
-import {EVENTS} from './events';
+import {ACTIONS, EVENTS, APPLICATIONS} from '.';
 
 export type ActionNames = typeof ACTIONS[number];
+export type ApplicationNames = typeof APPLICATIONS[number];
 export type EventNames = typeof EVENTS[number];
 
 export type DaoDataEvent = {name: EventNames; active?: boolean};

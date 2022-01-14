@@ -46,6 +46,13 @@ export const ENVIRONMENT_VARIABLE_KEYS = [
 ] as const;
 
 /**
+ * Environment variable keys used for Discord Bots.
+ */
+export const ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS = [
+  'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+] as const;
+
+/**
  * Alchemy WebSocket provider URL
  */
 export const ALCHEMY_WS_URL: string = `wss://eth-${ETH_NETWORK_NAME}.alchemyapi.io/v2/${ALCHEMY_API_KEY}`;
