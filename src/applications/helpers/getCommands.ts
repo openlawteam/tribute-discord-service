@@ -1,5 +1,4 @@
 import {Collection} from 'discord.js';
-import {SlashCommandBuilder} from '@discordjs/builders';
 
 import {Command, GetCommandsReturn} from '../types';
 
@@ -7,7 +6,7 @@ export async function getCommands(
   lazyImport: () => Promise<Record<string, Command>>
 ): Promise<GetCommandsReturn> {
   const commandsCollection = new Collection<string, Command>();
-  const commandsData: SlashCommandBuilder[] = [];
+  const commandsData: GetCommandsReturn['commandsData'] = [];
 
   const commandsLazy = await lazyImport();
 
