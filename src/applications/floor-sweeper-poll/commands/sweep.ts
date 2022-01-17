@@ -65,7 +65,7 @@ export const floorSweeperPollCommand: Command = {
     .addIntegerOption(pollQuestionOption('option_h'))
     .addIntegerOption(pollQuestionOption('option_i'))
     .addIntegerOption(pollQuestionOption('option_j'))
-    // Returning last for types to remain OK
+    // Returning last for types
     .setName(NAME)
     .setDescription(DESCRIPTION),
 
