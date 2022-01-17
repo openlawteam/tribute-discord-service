@@ -29,8 +29,11 @@ const ARG_NAMES: Record<string, string> = {
 // For getting the `regional_indicator_<x>` emojis
 const REGIONAL_INDICATOR_PREFIX: 'regional_indicator_' = 'regional_indicator_';
 
-const REACTION_EMJOIS: Record<
-  `${typeof REGIONAL_INDICATOR_PREFIX}${OptionLetters}`,
+const NO_ENTRY_SIGN_EMOJI: 'no_entry_sign' = 'no_entry_sign';
+
+const REACTION_EMOJIS: Record<
+  | `${typeof REGIONAL_INDICATOR_PREFIX}${OptionLetters}`
+  | typeof NO_ENTRY_SIGN_EMOJI,
   string
 > = {
   regional_indicator_a: '🇦',
@@ -43,6 +46,7 @@ const REACTION_EMJOIS: Record<
   regional_indicator_h: '🇭',
   regional_indicator_i: '🇮',
   regional_indicator_j: '🇯',
+  no_entry_sign: '🚫',
 };
 
 const OPTION_REGEX: RegExp = /^option_/;
@@ -61,23 +65,37 @@ function pollQuestionIntegerOption(
 function buildPollReplyChoices(
   options: readonly CommandInteractionOption[]
 ): string {
-  return options.filter(optionFilter).reduce((acc, next) => {
+  let optionsValuesInclude0: boolean = false;
+
+  const setChoices = options.filter(optionFilter).reduce((acc, next) => {
     const letter = normalizeString(
       next.name.split(OPTION_REGEX)[1]
     ) as OptionLetters;
 
-    acc += `${REACTION_EMJOIS[`${REGIONAL_INDICATOR_PREFIX}${letter}`]}: ${
+    if (next.value === 0) {
+      optionsValuesInclude0 = true;
+    }
+
+    acc += `${REACTION_EMOJIS[`${REGIONAL_INDICATOR_PREFIX}${letter}`]}: ${
       next.value
     }\n`;
 
     return acc;
   }, '');
+
+  // Include additional choice for 'None' only if options don't already include
+  // `0` value to avoid redundant choices.
+  return optionsValuesInclude0
+    ? setChoices
+    : `${setChoices}${REACTION_EMOJIS[NO_ENTRY_SIGN_EMOJI]}: None\n`;
 }
 
 async function reactPollVotingEmojis(
   options: readonly CommandInteractionOption[],
   message: Message
 ): Promise<void> {
+  let optionsValuesInclude0: boolean = false;
+
   const integerOptions = options.filter(optionFilter);
 
   const reactionPromises = integerOptions.map((o) => {
@@ -85,15 +103,25 @@ async function reactPollVotingEmojis(
       o.name.split(OPTION_REGEX)[1]
     ) as OptionLetters;
 
+    if (o.value === 0) {
+      optionsValuesInclude0 = true;
+    }
+
     return async () =>
       await message.react(
-        REACTION_EMJOIS[`${REGIONAL_INDICATOR_PREFIX}${letter}`]
+        REACTION_EMOJIS[`${REGIONAL_INDICATOR_PREFIX}${letter}`]
       );
   });
 
   // Run sequentially so reactions are in order
   for (const fn of reactionPromises) {
     await fn();
+  }
+
+  // Include additional reaction for 'None' only if options don't already
+  // include `0` value to avoid redundant reactions.
+  if (!optionsValuesInclude0) {
+    await message.react(REACTION_EMOJIS[NO_ENTRY_SIGN_EMOJI]);
   }
 }
 
