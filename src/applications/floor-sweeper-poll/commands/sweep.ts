@@ -65,16 +65,10 @@ function pollQuestionIntegerOption(
 function buildPollReplyChoices(
   options: readonly CommandInteractionOption[]
 ): string {
-  let optionsValuesInclude0: boolean = false;
-
   const setChoices = options.filter(optionFilter).reduce((acc, next) => {
     const letter = normalizeString(
       next.name.split(OPTION_REGEX)[1]
     ) as OptionLetters;
-
-    if (next.value === 0) {
-      optionsValuesInclude0 = true;
-    }
 
     acc += `${REACTION_EMOJIS[`${REGIONAL_INDICATOR_PREFIX}${letter}`]}: ${
       next.value
@@ -83,9 +77,9 @@ function buildPollReplyChoices(
     return acc;
   }, '');
 
-  // Include additional choice for 'None' only if options don't already include
-  // `0` value to avoid redundant choices.
-  return optionsValuesInclude0
+  // Include additional choice for 'None' only if poll options don't already
+  // include `0` value to avoid redundant choices.
+  return integerOptionsInclude0value(options)
     ? setChoices
     : `${setChoices}${REACTION_EMOJIS[NO_ENTRY_SIGN_EMOJI]}: None\n`;
 }
@@ -94,18 +88,12 @@ async function reactPollVotingEmojis(
   options: readonly CommandInteractionOption[],
   message: Message
 ): Promise<void> {
-  let optionsValuesInclude0: boolean = false;
-
   const integerOptions = options.filter(optionFilter);
 
   const reactionPromises = integerOptions.map((o) => {
     const letter = normalizeString(
       o.name.split(OPTION_REGEX)[1]
     ) as OptionLetters;
-
-    if (o.value === 0) {
-      optionsValuesInclude0 = true;
-    }
 
     return async () =>
       await message.react(
@@ -118,15 +106,22 @@ async function reactPollVotingEmojis(
     await fn();
   }
 
-  // Include additional reaction for 'None' only if options don't already
+  // Include additional reaction for 'None' only if poll options don't already
   // include `0` value to avoid redundant reactions.
-  if (!optionsValuesInclude0) {
+  if (!integerOptionsInclude0value(options)) {
     await message.react(REACTION_EMOJIS[NO_ENTRY_SIGN_EMOJI]);
   }
 }
 
 function optionFilter(o: CommandInteractionOption) {
   return o.type === 'INTEGER' && normalizeString(o.name).startsWith(`option_`);
+}
+
+function integerOptionsInclude0value(
+  options: readonly CommandInteractionOption[]
+): boolean {
+  const integerOptions = options.filter(optionFilter);
+  return integerOptions.some((io) => io.value === 0);
 }
 
 export const floorSweeperPollCommand: Command = {
