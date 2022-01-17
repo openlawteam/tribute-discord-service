@@ -12,7 +12,7 @@ const POLL_NAMES = {
   question: 'question',
 };
 
-const NAME: string = 'floor-sweeper-poll';
+const NAME: string = 'sweep';
 
 const DESCRIPTION: string =
   "Creates a poll for sweeping an NFT collection's floor.";
