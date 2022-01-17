@@ -22,7 +22,13 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
     });
 
     // Create a new Discord client instance
-    const client = new Client({intents: [Intents.FLAGS.GUILDS]});
+    const client = new Client({
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      ],
+    });
 
     // When the Discord client is ready, run this code (only once)
     client.once('ready', () => {
