@@ -12,6 +12,7 @@ import {
 
 import {Command} from '../../types';
 import {normalizeString} from '../../../helpers';
+import dayjs from 'dayjs';
 
 type OptionLetters = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
 
@@ -124,6 +125,33 @@ function integerOptionsInclude0value(
   return integerOptions.some((io) => io.value === 0);
 }
 
+/**
+ * Parse time period from plain text to `Date` for DB storage and poll end
+ * display
+ *
+ * Day.js (small, minimalist library https://day.js.org/en/) provides easy
+ * manipulation
+ */
+function parseTimeForPollEndDate(pullDurationText: string): Date {
+  // Assumes text input is in expected form: '[AMOUNT] [UNIT]'
+  // (e.g., 20 minutes; 12 hours; 1 day; 1 week)
+  const [amount, unit] = normalizeString(pullDurationText).split(' ');
+
+  /**
+   * Assumes unit input is in expected form for Day.js manipulation
+   * (https://day.js.org/docs/en/manipulate/add). Regex replace to convert
+   * plural unit to singular.
+   *
+   * @todo Consider more robust parsing to allow for user to input abbreviated
+   * units (e.g., min, hr, wk).
+   */
+  const unitParsed = unit.replace(/s$/, '');
+
+  // Calculate poll end date using dayjs library and convert to native `Date`
+  // object
+  return dayjs().add(Number(amount), unitParsed).toDate();
+}
+
 export const floorSweeperPollCommand: Command = {
   // Command Structure
   data: new SlashCommandBuilder()
@@ -137,17 +165,21 @@ export const floorSweeperPollCommand: Command = {
         .setRequired(true)
     )
     .addStringOption((option) =>
+      // @todo Check if we can add validation to check for valid ETH address
       option
         .setName(ARG_NAMES.nftContract)
         .setDescription("Set the NFT collection's contract address, e.g. 0x...")
         .setRequired(true)
     )
-    // Time will require time period parsing from plain text to `Date` for DB storage
+    // Time will require time period parsing from plain text to `Date` for DB
+    // storage
     .addStringOption((option) =>
+      // @todo Check if we can add validation to check for valid expected input
+      // needed for time parsing '[AMOUNT] [UNIT]'
       option
         .setName(ARG_NAMES.howLong)
         .setDescription(
-          'Set how long the poll should be, e.g. 20 min; 12 hr; 1 day; 1 week'
+          'Set how long the poll should be, e.g. 20 minutes; 12 hours; 1 day; 1 week'
         )
         .setRequired(true)
     )
@@ -173,6 +205,7 @@ export const floorSweeperPollCommand: Command = {
   async execute(interaction: CommandInteraction) {
     const question = interaction.options.getString(ARG_NAMES.question);
     const {data} = interaction.options;
+    const pullDuration = interaction.options.getString(ARG_NAMES.howLong);
 
     if (!interaction.isCommand() || !question || !data?.length) {
       return;
@@ -182,7 +215,10 @@ export const floorSweeperPollCommand: Command = {
       .setDescription(
         `${buildPollReplyChoices(data)}\u200B`
       ) /* `\u200B` = zero-width space */
-      .addFields({name: '⏱ Poll ends:', value: '<todo: parse time>'});
+      .addFields({
+        name: '⏱ Poll ends:',
+        value: parseTimeForPollEndDate(pullDuration as string).toUTCString(),
+      });
 
     // Reply with user's title and options chosen
     const message = (await interaction.reply({

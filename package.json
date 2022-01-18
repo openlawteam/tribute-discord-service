@@ -43,6 +43,7 @@
     "@discordjs/rest": "^0.1.0-canary.0",
     "@prisma/client": "^2.29.1",
     "abi-decoder": "^2.4.0",
+    "dayjs": "^1.10.7",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
     "http-terminator": "^3.0.3",
