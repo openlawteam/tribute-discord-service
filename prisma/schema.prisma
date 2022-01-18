@@ -24,3 +24,18 @@ model DiscordWebhook {
 
   @@map("discord_webhooks")
 }
+
+model FloorSweeperPoll {
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime @default(now())
+  question        String   @db.VarChar(255)
+  contractAddress String   @db.VarChar(255)
+  dateEnd         DateTime @db.Timestamp(3)
+  processed       Boolean  @default(false) @db.Boolean
+  result          Int      @default(0) @db.Integer
+  guildID         String   @db.VarChar(255)
+  channelID       String   @db.VarChar(255)
+  messageID       String   @unique @db.VarChar(255)
+
+  @@map("floor_sweeper_poll")
+}
