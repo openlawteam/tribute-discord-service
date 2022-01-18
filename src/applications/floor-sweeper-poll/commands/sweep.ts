@@ -132,10 +132,10 @@ function integerOptionsInclude0value(
  * Day.js (small, minimalist library https://day.js.org/en/) provides easy
  * manipulation
  */
-function parseTimeForPollEndDate(pullDurationText: string): Date {
+function parseTimeForPollEndDate(pollDurationText: string): Date {
   // Assumes text input is in expected form: '[AMOUNT] [UNIT]'
   // (e.g., 20 minutes; 12 hours; 1 day; 1 week)
-  const [amount, unit] = normalizeString(pullDurationText).split(' ');
+  const [amount, unit] = normalizeString(pollDurationText).split(' ');
 
   /**
    * Assumes unit input is in expected form for Day.js manipulation
@@ -205,9 +205,14 @@ export const floorSweeperPollCommand: Command = {
   async execute(interaction: CommandInteraction) {
     const question = interaction.options.getString(ARG_NAMES.question);
     const {data} = interaction.options;
-    const pullDuration = interaction.options.getString(ARG_NAMES.howLong);
+    const pollDuration = interaction.options.getString(ARG_NAMES.howLong);
 
-    if (!interaction.isCommand() || !question || !data?.length) {
+    if (
+      !interaction.isCommand() ||
+      !question ||
+      !data?.length ||
+      !pollDuration
+    ) {
       return;
     }
 
@@ -217,7 +222,7 @@ export const floorSweeperPollCommand: Command = {
       ) /* `\u200B` = zero-width space */
       .addFields({
         name: '⏱ Poll ends:',
-        value: parseTimeForPollEndDate(pullDuration as string).toUTCString(),
+        value: parseTimeForPollEndDate(pollDuration).toUTCString(),
       });
 
     // Reply with user's title and options chosen
