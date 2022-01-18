@@ -15,7 +15,7 @@ import duration, {DurationUnitType} from 'dayjs/plugin/duration';
 
 import {Command} from '../../types';
 import {normalizeString} from '../../../helpers';
-import {web3} from '../../../singletons';
+import {prisma, web3} from '../../../singletons';
 
 // Add dayjs duration extension
 dayjs.extend(duration);
@@ -292,6 +292,26 @@ export const floorSweeperPollCommand: Command = {
       embeds: [pollOptionsEmbed],
       fetchReply: true,
     })) as Message;
+
+    const {guildId: guildID, channelId: channelID, id: messageID} = message;
+
+    if (!guildID) {
+      throw new Error(
+        `No \`guildId\` was found on \`Message\` ${messageID}. Channel: ${channelID}. Poll question: ${question}.`
+      );
+    }
+
+    // Store poll data in DB
+    await prisma.floorSweeperPoll.create({
+      data: {
+        channelID,
+        contractAddress: contract,
+        dateEnd,
+        guildID,
+        messageID,
+        question,
+      },
+    });
 
     try {
       // React with voting buttons as emojis, which correspond to option letters.
