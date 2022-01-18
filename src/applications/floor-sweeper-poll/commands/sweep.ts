@@ -15,6 +15,7 @@ import duration, {DurationUnitType} from 'dayjs/plugin/duration';
 
 import {Command} from '../../types';
 import {normalizeString} from '../../../helpers';
+import {web3} from '../../../singletons';
 
 // Add dayjs duration extension
 dayjs.extend(duration);
@@ -26,7 +27,7 @@ const COMMAND_NAME: string = 'sweep';
 const COMMAND_DESCRIPTION: string =
   "Creates a poll for sweeping an NFT collection's floor.";
 
-const ARG_NAMES: Record<string, string> = {
+const ARG_NAMES = {
   howLong: 'how_long',
   nftContract: 'nft_contract',
   question: 'question',
@@ -59,6 +60,9 @@ const OPTION_REGEX: RegExp = /^option_/;
 
 const DURATION_PARSE_ERROR_MESSAGE: string =
   'Invalid duration. Try something like: 20 minutes; 12 hours; 1 day; 1 week. Short: d,w,M,y,h,m,s,ms';
+
+const INVALID_ETH_ADDRESS_ERROR_MESSAGE: string =
+  'Invalid Ethereum address. Try something like: 0x000000000000000000000000000000000000bEEF.';
 
 function pollQuestionIntegerOption(
   name: `option_${OptionLetters}`,
@@ -192,21 +196,19 @@ export const floorSweeperPollCommand: Command = {
         .setRequired(true)
     )
     .addStringOption((option) =>
-      // @todo Check if we can add validation to check for valid ETH address
       option
         .setName(ARG_NAMES.nftContract)
-        .setDescription("Set the NFT collection's contract address, e.g. 0x...")
+        .setDescription(
+          "Set the NFT collection's contract address, e.g. 0x000000000000000000000000000000000000bEEF"
+        )
         .setRequired(true)
     )
-    // Time will require time period parsing from plain text to `Date` for DB
-    // storage
     .addStringOption((option) =>
-      // @todo Check if we can add validation to check for valid expected input
-      // needed for time parsing '[AMOUNT] [UNIT]'
-      //'d' | 'M' | 'y' | 'h' | 'm' | 's' | 'ms'
       option
         .setName(ARG_NAMES.howLong)
-        .setDescription(DURATION_PARSE_ERROR_MESSAGE)
+        .setDescription(
+          'Set how long the poll should be, e.g. 20 minutes; 12 hours; 1 day; 1 week'
+        )
         .setRequired(true)
     )
     /**
@@ -230,11 +232,13 @@ export const floorSweeperPollCommand: Command = {
   // Command Reply
   async execute(interaction: CommandInteraction) {
     const {data} = interaction.options;
-    const question = interaction.options.getString(ARG_NAMES.question);
+    const contract = interaction.options.getString(ARG_NAMES.nftContract);
     const pollDuration = interaction.options.getString(ARG_NAMES.howLong);
+    const question = interaction.options.getString(ARG_NAMES.question);
 
     if (
       !interaction.isCommand() ||
+      !contract ||
       !data?.length ||
       !pollDuration ||
       !question
@@ -242,13 +246,24 @@ export const floorSweeperPollCommand: Command = {
       return;
     }
 
+    // Validate contract address
+    if (!web3.utils.isAddress(normalizeString(contract))) {
+      // Reply with an error/help message that only the user can see.
+      await interaction.reply({
+        content: INVALID_ETH_ADDRESS_ERROR_MESSAGE,
+        ephemeral: true,
+      });
+
+      return;
+    }
+
     const dateEnd = parseTimeForPollEndDate(pollDuration);
 
+    // Validate date
     if (!dateEnd) {
       // Reply with an error/help message that only the user can see.
       await interaction.reply({
-        content:
-          'Not a valid time period. Try something like: 20 minutes; 12 hours; 1 day; 1 week. Short: d,w,M,y,h,m,s,ms',
+        content: DURATION_PARSE_ERROR_MESSAGE,
         ephemeral: true,
       });
 
