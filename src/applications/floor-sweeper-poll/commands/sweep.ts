@@ -2,6 +2,7 @@ import {
   bold,
   SlashCommandBuilder,
   SlashCommandIntegerOption,
+  time,
 } from '@discordjs/builders';
 import {
   CommandInteraction,
@@ -241,9 +242,9 @@ export const floorSweeperPollCommand: Command = {
       return;
     }
 
-    const dateEndUTC = parseTimeForPollEndDate(pollDuration)?.toUTCString();
+    const dateEnd = parseTimeForPollEndDate(pollDuration);
 
-    if (!dateEndUTC) {
+    if (!dateEnd) {
       // Reply with an error/help message that only the user can see.
       await interaction.reply({
         content:
@@ -260,7 +261,14 @@ export const floorSweeperPollCommand: Command = {
       ) /* `\u200B` = zero-width space */
       .addFields({
         name: '⏱ Poll ends:',
-        value: dateEndUTC,
+        /**
+         * Display time in user's timezone
+         *
+         * `F` = Tuesday, 20 April 2021 16:20
+         *
+         * @see https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
+         */
+        value: time(dateEnd, 'F'),
       });
 
     // Reply with user's title and options chosen
