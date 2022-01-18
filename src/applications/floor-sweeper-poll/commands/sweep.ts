@@ -9,10 +9,14 @@ import {
   Message,
   MessageEmbed,
 } from 'discord.js';
+import dayjs from 'dayjs';
+import duration, {DurationUnitType} from 'dayjs/plugin/duration';
 
 import {Command} from '../../types';
 import {normalizeString} from '../../../helpers';
-import dayjs from 'dayjs';
+
+// Add dayjs duration extension
+dayjs.extend(duration);
 
 type OptionLetters = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
 
@@ -51,6 +55,9 @@ const REACTION_EMOJIS: Record<
 };
 
 const OPTION_REGEX: RegExp = /^option_/;
+
+const DURATION_PARSE_ERROR_MESSAGE: string =
+  'Invalid duration. Try something like: 20 minutes; 12 hours; 1 day; 1 week. Short: d,w,M,y,h,m,s,ms';
 
 function pollQuestionIntegerOption(
   name: `option_${OptionLetters}`,
@@ -114,15 +121,27 @@ async function reactPollVotingEmojis(
   }
 }
 
+/**
+ * Take only options which are integers (eth amounts) and start with `option_`.
+ *
+ * @param o `CommandInteractionOption`
+ * @returns `CommandInteractionOption`
+ */
 function optionFilter(o: CommandInteractionOption) {
   return o.type === 'INTEGER' && normalizeString(o.name).startsWith(`option_`);
 }
 
+/**
+ * Determines if the options list should include a `0` value.
+ * It will not be included if it already exists in the user-defined options.
+ *
+ * @param options `readonly CommandInteractionOption[]`
+ * @returns `boolean`
+ */
 function integerOptionsInclude0value(
   options: readonly CommandInteractionOption[]
 ): boolean {
-  const integerOptions = options.filter(optionFilter);
-  return integerOptions.some((io) => io.value === 0);
+  return options.filter(optionFilter).some((io) => io.value === 0);
 }
 
 /**
@@ -132,24 +151,31 @@ function integerOptionsInclude0value(
  * Day.js (small, minimalist library https://day.js.org/en/) provides easy
  * manipulation
  */
-function parseTimeForPollEndDate(pollDurationText: string): Date {
-  // Assumes text input is in expected form: '[AMOUNT] [UNIT]'
-  // (e.g., 20 minutes; 12 hours; 1 day; 1 week)
-  const [amount, unit] = normalizeString(pollDurationText).split(' ');
+function parseTimeForPollEndDate(pollDurationText: string): Date | undefined {
+  /**
+   * Assumes text input is in expected form: '[AMOUNT] [UNIT]'
+   * and unit matches dayjs `OpUnitType`.
+   *
+   * (e.g., 20 minutes; 12 hours; 1 day; 1 week)
+   *
+   * We don't lowerCase the string as `m` and `M` shorthand are different.
+   */
+  const [amount, unit] = pollDurationText.split(' ');
+
+  const amountNumber: number = Number(amount);
+  const durationUnit: DurationUnitType = unit as DurationUnitType;
 
   /**
-   * Assumes unit input is in expected form for Day.js manipulation
-   * (https://day.js.org/docs/en/manipulate/add). Regex replace to convert
-   * plural unit to singular.
+   * Validate the date duration
    *
-   * @todo Consider more robust parsing to allow for user to input abbreviated
-   * units (e.g., min, hr, wk).
+   * Using `.isValid()`, `isDuration()` does not work as we need them to.
    */
-  const unitParsed = unit.replace(/s$/, '');
+  if (isNaN(dayjs.duration(amountNumber, durationUnit).asMilliseconds())) {
+    return;
+  }
 
   // Calculate poll end date using dayjs library and convert to native `Date`
-  // object
-  return dayjs().add(Number(amount), unitParsed).toDate();
+  return dayjs().add(amountNumber, unit).toDate();
 }
 
 export const floorSweeperPollCommand: Command = {
@@ -176,11 +202,10 @@ export const floorSweeperPollCommand: Command = {
     .addStringOption((option) =>
       // @todo Check if we can add validation to check for valid expected input
       // needed for time parsing '[AMOUNT] [UNIT]'
+      //'d' | 'M' | 'y' | 'h' | 'm' | 's' | 'ms'
       option
         .setName(ARG_NAMES.howLong)
-        .setDescription(
-          'Set how long the poll should be, e.g. 20 minutes; 12 hours; 1 day; 1 week'
-        )
+        .setDescription(DURATION_PARSE_ERROR_MESSAGE)
         .setRequired(true)
     )
     /**
@@ -203,16 +228,29 @@ export const floorSweeperPollCommand: Command = {
 
   // Command Reply
   async execute(interaction: CommandInteraction) {
-    const question = interaction.options.getString(ARG_NAMES.question);
     const {data} = interaction.options;
+    const question = interaction.options.getString(ARG_NAMES.question);
     const pollDuration = interaction.options.getString(ARG_NAMES.howLong);
 
     if (
       !interaction.isCommand() ||
-      !question ||
       !data?.length ||
-      !pollDuration
+      !pollDuration ||
+      !question
     ) {
+      return;
+    }
+
+    const dateEndUTC = parseTimeForPollEndDate(pollDuration)?.toUTCString();
+
+    if (!dateEndUTC) {
+      // Reply with an error/help message that only the user can see.
+      await interaction.reply({
+        content:
+          'Not a valid time period. Try something like: 20 minutes; 12 hours; 1 day; 1 week. Short: d,w,M,y,h,m,s,ms',
+        ephemeral: true,
+      });
+
       return;
     }
 
@@ -222,7 +260,7 @@ export const floorSweeperPollCommand: Command = {
       ) /* `\u200B` = zero-width space */
       .addFields({
         name: '⏱ Poll ends:',
-        value: parseTimeForPollEndDate(pollDuration).toUTCString(),
+        value: dateEndUTC,
       });
 
     // Reply with user's title and options chosen
@@ -236,7 +274,11 @@ export const floorSweeperPollCommand: Command = {
       // React with voting buttons as emojis, which correspond to option letters.
       await reactPollVotingEmojis(data, message);
     } catch (error) {
-      console.error(error);
+      // Delete the original reply as we cannot run a poll without voting buttons
+      await message.delete();
+
+      // Handle error at a higher level
+      throw error;
     }
   },
 };
