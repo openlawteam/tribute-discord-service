@@ -85,7 +85,7 @@ function buildPollReplyChoices(
 
     acc += `${REACTION_EMOJIS[`${REGIONAL_INDICATOR_PREFIX}${letter}`]}: ${
       next.value
-    }\n`;
+    } ETH\n`;
 
     return acc;
   }, '');
