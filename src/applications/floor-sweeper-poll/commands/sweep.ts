@@ -47,6 +47,9 @@ const DURATION_PARSE_ERROR_MESSAGE: string =
 const INVALID_ETH_ADDRESS_ERROR_MESSAGE: string =
   'Invalid Ethereum address. Try something like: 0x000000000000000000000000000000000000bEEF.';
 
+const DUPLICATE_OPTIONS_ERROR_MESSAGE: string =
+  'Duplicate poll options are not allowed.';
+
 function getOptionLetter(o: CommandInteractionOption): PollOptionLetters {
   return normalizeString(o.name.split(OPTION_REGEX)[1]) as PollOptionLetters;
 }
@@ -225,6 +228,23 @@ async function execute(interaction: CommandInteraction) {
     return;
   }
 
+  const options = getEmojiChoicesMap(data);
+  const optionsValues = Object.values(options);
+
+  const hasDuplicateOptions: boolean =
+    new Set(optionsValues).size !== optionsValues.length;
+
+  // Validate duplicate option values
+  if (hasDuplicateOptions) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: DUPLICATE_OPTIONS_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
   const pollOptionsEmbed = new MessageEmbed()
     .setDescription(
       `${buildPollReplyChoices(data)}\u200B`
@@ -264,7 +284,7 @@ async function execute(interaction: CommandInteraction) {
       dateEnd,
       guildID,
       messageID,
-      options: getEmojiChoicesMap(data),
+      options,
       question,
     },
   });
