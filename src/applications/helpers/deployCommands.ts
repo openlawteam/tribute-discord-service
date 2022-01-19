@@ -25,36 +25,32 @@ export async function deployCommands({
   name: ApplicationNames;
   tokenEnvVarName: typeof ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS[number];
 }): Promise<void> {
-  try {
-    const {commandsData} = commands;
+  const {commandsData} = commands;
 
-    const token = getEnv(tokenEnvVarName);
+  const token = getEnv(tokenEnvVarName);
 
-    if (!token) return;
+  if (!token) return;
 
-    /**
-     * When writing Discord applications using
-     * slash commands the guild commands are not cached, whereas
-     * global (common for production) are, and take ~1 hour to propagate.
-     *
-     * @see https://discordjs.guide/interactions/registering-slash-commands.html#global-commands
-     */
-    const route =
-      APP_ENV === 'production'
-        ? Routes.applicationCommands(applicationID)
-        : Routes.applicationGuildCommands(applicationID, DEVELOPMENT_GUILD_ID);
+  /**
+   * When writing Discord applications using
+   * slash commands the guild commands are not cached, whereas
+   * global (common for production) are, and take ~1 hour to propagate.
+   *
+   * @see https://discordjs.guide/interactions/registering-slash-commands.html#global-commands
+   */
+  const route =
+    APP_ENV === 'production'
+      ? Routes.applicationCommands(applicationID)
+      : Routes.applicationGuildCommands(applicationID, DEVELOPMENT_GUILD_ID);
 
-    const rest = new REST({version: '9'}).setToken(token);
+  const rest = new REST({version: '9'}).setToken(token);
 
-    console.log(`♻️  Started refreshing ${name} application (/) commands.`);
+  console.log(`♻️  Started refreshing ${name} application (/) commands.`);
 
-    //
-    await rest.put(route, {
-      body: commandsData,
-    });
+  // Deploy
+  await rest.put(route, {
+    body: commandsData,
+  });
 
-    console.log(`✔ Successfully reloaded ${name} application (/) commands.`);
-  } catch (error) {
-    console.error(error);
-  }
+  console.log(`✔ Successfully reloaded ${name} application (/) commands.`);
 }

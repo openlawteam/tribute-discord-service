@@ -1,4 +1,11 @@
-import {Client, Intents, TextChannel} from 'discord.js';
+import {
+  Client,
+  DiscordAPIError,
+  Intents,
+  Message,
+  TextChannel,
+} from 'discord.js';
+import {Prisma} from '@prisma/client';
 
 import {ApplicationReturn} from '../types';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers/';
@@ -17,12 +24,20 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
     const commands = await getCommands(async () => await import('./commands'));
 
     // Deploy commands
-    deployCommands({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
-      commands,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
-    });
+    try {
+      deployCommands({
+        applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+        commands,
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      });
+    } catch (error) {
+      console.error(
+        `Discord commands for FLOOR_SWEEPER_POLL_BOT could not be deployed. ${error}`
+      );
+
+      return;
+    }
 
     // Create a new Discord client instance
     const client = new Client({
@@ -34,23 +49,50 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
       partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
     });
 
+    // Login to Discord with the bot's token
+    client.login(getEnv('BOT_TOKEN_FLOOR_SWEEPER_POLL'));
+
     // When the Discord client is ready, run this code (only once)
     client.once('ready', async () => {
-      console.log('Floor sweeper bot ready!');
+      console.log('🤖  Floor sweeper bot ready');
 
       // Poll every x seconds to check for ended polls and process them
       setInterval(async () => {
+        // Get ended, unprocessed polls
         const endedPolls = await prisma.floorSweeperPoll.findMany({
           where: {dateEnd: {lt: new Date()}, processed: false},
         });
 
-        endedPolls.forEach(async ({channelID, id, messageID, processed}) => {
+        endedPolls.forEach(async ({channelID, id, messageID}) => {
           try {
             const channel = (await client.channels.fetch(
               channelID
             )) as TextChannel;
 
-            const message = await channel.messages.fetch(messageID);
+            let message: Message;
+
+            try {
+              message = await channel.messages.fetch(messageID);
+            } catch (error) {
+              const e = error as DiscordAPIError;
+
+              // Prune old db entries, if a Discord message has been deleted
+              if (e.httpStatus === 404) {
+                await prisma.floorSweeperPoll.delete({
+                  where: {
+                    messageID,
+                  },
+                });
+
+                return;
+              }
+
+              console.error(
+                `Soemthing went wrong while fetching Discord message ID ${messageID}. ${e}`
+              );
+
+              return;
+            }
 
             // @todo tally results
             // @todo logic if 0 won
@@ -62,15 +104,6 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
             // @todo result
             const result: number = 123;
 
-            // Notify poll channel that the poll has ended
-            // @todo add result
-            // @todo add DAO config for Discord `guildID` and floor sweeper config channelID
-            message.reply(
-              'The poll has ended. The result was <RESULT>. To sweep, go to #<CHANNEL>.'
-            );
-
-            // @todo Send message to configured channel
-
             // Mark the poll as `processed: true` in the db
             await prisma.floorSweeperPoll.update({
               where: {
@@ -81,6 +114,15 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
                 processed: true,
               },
             });
+
+            // Notify poll channel that the poll has ended
+            // @todo add result
+            // @todo add DAO config for Discord `guildID` and floor sweeper config channelID
+            await message.reply(
+              'The poll has ended. The result was <RESULT>. To sweep, go to #<CHANNEL>.'
+            );
+
+            // @todo Send message to configured channel
           } catch (error) {
             console.error(
               `There was an error while processing an ended poll: ${error}`
@@ -90,9 +132,7 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
       }, CHECK_POLL_ENDED_INTERVAL);
     });
 
-    // Login to Discord with the bot's token
-    client.login(getEnv('BOT_TOKEN_FLOOR_SWEEPER_POLL'));
-
+    // Listen for interactions and possibly run commands
     client.on('interactionCreate', async (interaction) => {
       if (!interaction.isCommand()) return;
 
@@ -112,43 +152,113 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
       }
     });
 
-    // Limit user to 1 reaction per message (1 vote per poll)
+    // Listen to reactions on messages and possibly handle
     client.on('messageReactionAdd', async (reaction, user) => {
       // Exit if bot added the reaction (initial reactions on poll creation)
       if (user.bot) return;
 
-      // When a reaction is received, check if the structure is partial
+      let isPartialOriginal: boolean = reaction.partial;
+
+      /**
+       * When a reaction is received, check if the structure is partial
+       * as we may need to `fetch` it, so it can be added to the cache.
+       */
       if (reaction.partial) {
-        // If the message this reaction belongs to was removed, the fetching
-        // might result in an API error which should be handled
         try {
+          // Fetch the message to add it to the cache
           await reaction.fetch();
         } catch (error) {
           console.error(
             `There was an error while fetching the message: ${error}`
           );
-          // Return as `reaction.message.author` may be undefined/null
+
           return;
         }
       }
 
-      // Now the message has been cached and is fully available
+      const pollEntry = await prisma.floorSweeperPoll.findUnique({
+        where: {
+          messageID: reaction.message.id,
+        },
+      });
 
-      // Remove user's old reaction if user subsequently selects a different
-      // reaction
-      try {
-        reaction.message.reactions.cache.map((r) => {
-          if (
-            r.emoji.name !== reaction.emoji.name &&
-            r.users.cache.has(user.id)
-          )
-            r.users.remove(user.id);
-        });
-      } catch (error) {
-        console.error(
-          `There was an error while removing user's old reaction: ${error}`
-        );
+      // Exit if this is not a poll message
+      if (!pollEntry) {
+        return;
       }
+
+      /**
+       * If it was a `partial` and it was `fetch`ed, it is not a `partial`, anymore.
+       *
+       * We `fetch` here because we may have exited the function early.
+       */
+      if (isPartialOriginal) {
+        try {
+          await Promise.all(
+            reaction.message.reactions.cache.map(
+              async (r) => await r.users.fetch()
+            )
+          );
+        } catch (error) {
+          console.error(
+            `There was an error while fetching the reactions users: ${error}`
+          );
+
+          return;
+        }
+      }
+
+      const isValidEmoji: boolean = Object.keys(
+        pollEntry.options as Prisma.JsonObject
+      ).some((name) => name === reaction.emoji.name);
+
+      // If the emoji is not from the poll entry's options, remove it.
+      if (!isValidEmoji) {
+        try {
+          await reaction.users.remove(user.id);
+
+          return;
+        } catch (error) {
+          console.error(
+            `There was an error while removing user's invalid reaction: ${error}`
+          );
+
+          return;
+        }
+      }
+
+      /**
+       * On poll end, remove any late reactins and DM the user the error/help message,
+       * as we don't have access to send channel-based ephemeral messages within this event's callback
+       */
+      if (pollEntry.dateEnd < new Date()) {
+        await reaction.users.remove(user.id);
+
+        await user.send(
+          `The poll has ended for *${pollEntry.question}*. The result was <RESULT>. To sweep, go to #<CHANNEL>.`
+        );
+
+        return;
+      }
+
+      /**
+       * Limit user to 1 reaction per message (1 vote per poll);
+       * take the current reaction from the user and remove the rest.
+       */
+      reaction.message.reactions.cache.forEach(async (r) => {
+        if (
+          r.emoji.name !== reaction.emoji.name &&
+          r.users.cache.has(user.id)
+        ) {
+          try {
+            await r.users.remove(user.id);
+          } catch (error) {
+            console.error(
+              `There was an error while removing user's old reaction: ${error}`
+            );
+          }
+        }
+      });
     });
 
     const stop = async () => {
