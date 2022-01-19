@@ -31,6 +31,7 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
       ],
+      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
     });
 
     // When the Discord client is ready, run this code (only once)
@@ -108,6 +109,45 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
           content: 'There was an error while executing this command.',
           ephemeral: true,
         });
+      }
+    });
+
+    // Limit user to 1 reaction per message (1 vote per poll)
+    client.on('messageReactionAdd', async (reaction, user) => {
+      // Exit if bot added the reaction (initial reactions on poll creation)
+      if (user.bot) return;
+
+      // When a reaction is received, check if the structure is partial
+      if (reaction.partial) {
+        // If the message this reaction belongs to was removed, the fetching
+        // might result in an API error which should be handled
+        try {
+          await reaction.fetch();
+        } catch (error) {
+          console.error(
+            `There was an error while fetching the message: ${error}`
+          );
+          // Return as `reaction.message.author` may be undefined/null
+          return;
+        }
+      }
+
+      // Now the message has been cached and is fully available
+
+      // Remove user's old reaction if user subsequently selects a different
+      // reaction
+      try {
+        reaction.message.reactions.cache.map((r) => {
+          if (
+            r.emoji.name !== reaction.emoji.name &&
+            r.users.cache.has(user.id)
+          )
+            r.users.remove(user.id);
+        });
+      } catch (error) {
+        console.error(
+          `There was an error while removing user's old reaction: ${error}`
+        );
       }
     });
 
