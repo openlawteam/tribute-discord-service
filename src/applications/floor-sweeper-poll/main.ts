@@ -88,7 +88,7 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
               }
 
               console.error(
-                `Soemthing went wrong while fetching Discord message ID ${messageID}. ${e}`
+                `Something went wrong while fetching Discord message ID ${messageID}. ${e}`
               );
 
               return;
@@ -228,7 +228,7 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
       }
 
       /**
-       * On poll end, remove any late reactins and DM the user the error/help message,
+       * On poll end, remove any late reactions and DM the user the error/help message,
        * as we don't have access to send channel-based ephemeral messages within this event's callback
        */
       if (pollEntry.dateEnd < new Date()) {
