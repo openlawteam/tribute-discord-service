@@ -31,6 +31,7 @@ model FloorSweeperPoll {
   question        String   @db.VarChar(255)
   contractAddress String   @db.VarChar(255)
   dateEnd         DateTime @db.Timestamp(3)
+  options         Json
   processed       Boolean  @default(false) @db.Boolean
   result          Int      @default(0) @db.Integer
   guildID         String   @db.VarChar(255)

@@ -5,6 +5,7 @@ CREATE TABLE "floor_sweeper_poll" (
     "question" VARCHAR(255) NOT NULL,
     "contractAddress" VARCHAR(255) NOT NULL,
     "dateEnd" TIMESTAMP(3) NOT NULL,
+    "options" JSONB NOT NULL,
     "processed" BOOLEAN NOT NULL DEFAULT false,
     "result" INTEGER NOT NULL DEFAULT 0,
     "guildID" VARCHAR(255) NOT NULL,
