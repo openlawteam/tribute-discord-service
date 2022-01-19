@@ -63,7 +63,7 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
           where: {dateEnd: {lt: new Date()}, processed: false},
         });
 
-        endedPolls.forEach(async ({channelID, id, messageID}) => {
+        endedPolls.forEach(async ({channelID, id, messageID, options}) => {
           try {
             const channel = (await client.channels.fetch(
               channelID
@@ -94,15 +94,42 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
               return;
             }
 
-            // @todo tally results
-            // @todo logic if 0 won
-            // @todo logic if results > 0 && tie, take lower amount
+            /**
+             * Tally results
+             *
+             * if tie, take choice with lower amount
+             */
+            console.log('*************************');
+            console.log(message.content);
             message.reactions.cache.forEach((m) => {
               console.log('---POLL_RESULTS---', m.emoji.name, m.count - 1);
             });
 
-            // @todo result
-            const result: number = 123;
+            const messageReactions = message.reactions.cache;
+            // Get largest count of reactions
+            const reactionsLargestCount = Math.max(
+              ...messageReactions.map((mr) => mr.count - 1)
+            );
+            // Create array of reaction emojis that had largest count
+            const reactionsWithLargestCount = messageReactions
+              .filter((mr) => mr.count - 1 === reactionsLargestCount)
+              .map((f) => f.emoji.name);
+            // Filter `options` to get only options that had largest count
+            const optionsWithLargestCount = Object.fromEntries(
+              Object.entries(options as Prisma.JsonObject).filter(([key]) =>
+                reactionsWithLargestCount.includes(key)
+              )
+            );
+            // Get values of `options` that had largest count and convert to
+            // number (if value was 'None' then convert to `0`)
+            const optionWithLargestCountValuesToCompare = Object.values(
+              optionsWithLargestCount
+            ).map((v) => (v === 'None' ? 0 : Number(v)));
+            // Get lowest value to handle tie where more than one option had the
+            // largest count
+            const result: number = Math.min(
+              ...optionWithLargestCountValuesToCompare
+            );
 
             // Mark the poll as `processed: true` in the db
             await prisma.floorSweeperPoll.update({
@@ -115,12 +142,18 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
               },
             });
 
-            // Notify poll channel that the poll has ended
-            // @todo add result
-            // @todo add DAO config for Discord `guildID` and floor sweeper config channelID
-            await message.reply(
-              'The poll has ended. The result was <RESULT>. To sweep, go to #<CHANNEL>.'
-            );
+            /**
+             * Notify poll channel that the poll has ended
+             * @todo add DAO config for Discord `guildID` and floor sweeper
+             * config channelID
+             * @todo show link to sweep channel message in poll ended message
+             */
+            const resultText =
+              result > 0
+                ? `The result was **${result} ETH**. To sweep, go to #<CHANNEL>.`
+                : 'The result was **None**.';
+
+            await message.reply(`The poll has ended. ${resultText}`);
 
             // @todo Send message to configured channel
           } catch (error) {
@@ -228,14 +261,24 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
       }
 
       /**
-       * On poll end, remove any late reactions and DM the user the error/help message,
-       * as we don't have access to send channel-based ephemeral messages within this event's callback
+       * On poll end, remove any late reactions and DM the user the error/help
+       * message, as we don't have access to send channel-based ephemeral
+       * messages within this event's callback
+       *
+       * @todo show link to sweep channel message in direct message when user
+       * tries to vote after poll ends
        */
       if (pollEntry.dateEnd < new Date()) {
         await reaction.users.remove(user.id);
 
+        const result = pollEntry.result;
+        const resultText =
+          result > 0
+            ? `The result was **${result} ETH**. To sweep, go to #<CHANNEL>.`
+            : 'The result was **None**.';
+
         await user.send(
-          `The poll has ended for *${pollEntry.question}*. The result was <RESULT>. To sweep, go to #<CHANNEL>.`
+          `The poll has ended for *${pollEntry.question}*. ${resultText}`
         );
 
         return;
