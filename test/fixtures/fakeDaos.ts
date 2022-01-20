@@ -23,6 +23,7 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
     baseURL: 'http://localhost:3000',
     events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Tribute DAO [Test]',
+    guildID: '123123123123123123',
     registryContractAddress: ETH_ADDRESS_FIXTURE,
     snapshotHub: {
       proposalResolver: async <R = any>(
@@ -66,6 +67,7 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
     baseURL: 'http://localhost:3000',
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Mingo DAO [Test]',
+    guildID: '456456456456456456',
     registryContractAddress: ETH_ADDRESS_FIXTURE,
     snapshotHub: {
       proposalResolver: async <R = any>(
