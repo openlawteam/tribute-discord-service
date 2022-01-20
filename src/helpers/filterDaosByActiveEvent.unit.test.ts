@@ -1,5 +1,6 @@
 import {CORE_DAO_ADAPTERS, DaoData} from '../config';
 import {filterDaosByActiveEvent} from './filterDaosByActiveEvent';
+import {GUILD_ID_FIXTURE} from '../../test/fixtures/constants';
 
 describe('filterDaosByActiveEvent unit tests', () => {
   const TEST_DAOS: Record<string, DaoData> = {
@@ -14,6 +15,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
       baseURL: 'https://demo.tributedao.com',
       events: [{name: 'SPONSORED_PROPOSAL'}],
       friendlyName: 'Tribute DAO [DEV]',
+      guildID: GUILD_ID_FIXTURE,
       registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
     },
 
@@ -28,6 +30,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
       baseURL: 'https://demo.tributedao.com',
       events: [{name: 'PROCESSED_PROPOSAL' as any}],
       friendlyName: 'Tribute DAO [DEV]',
+      guildID: GUILD_ID_FIXTURE,
       registryContractAddress: '0x0000000000000000000000000000000000000000',
     },
 
@@ -45,6 +48,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
         {name: 'PROCESSED_PROPOSAL' as any, active: true},
       ],
       friendlyName: 'Tribute DAO [DEV]',
+      guildID: GUILD_ID_FIXTURE,
       registryContractAddress: '0x0000000000000000000000000000000000000000',
     },
 
@@ -62,6 +66,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
         {name: 'PROCESSED_PROPOSAL' as any, active: false},
       ],
       friendlyName: 'Tribute DAO [DEV]',
+      guildID: GUILD_ID_FIXTURE,
       registryContractAddress: '0x0000000000000000000000000000000000000000',
     },
   };
