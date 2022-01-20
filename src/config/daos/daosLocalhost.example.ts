@@ -47,6 +47,7 @@ export const DAOS_LOCALHOST: Record<
     baseURL: 'https://demo.tributedao.com',
     events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Tribute DAO [DEV]',
+    guildID: '00000000000000000000000',
     registryContractAddress: '0x0000000000000000000000000000000000000000',
     snapshotHub: {
       proposalResolver: async (proposalID, space) =>

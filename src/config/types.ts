@@ -28,6 +28,10 @@ export type DaoData = {
    */
   actions: DaoDataAction[];
   /**
+   * Applications (bots)
+   */
+  applications?: Partial<DaoDataApplicationsMap>;
+  /**
    * A public, full, base URL for the DAO
    *
    * e.g. `https://muse0.xyz`
@@ -43,6 +47,10 @@ export type DaoData = {
    * E.g. `Tribute DAO`
    */
   friendlyName: string;
+  /**
+   * Discord guild (server) ID
+   */
+  guildID: string;
   /**
    * Snapshot Hub data
    */
@@ -105,3 +113,31 @@ export type DaoDataSnapshotHub = {
    */
   space: string;
 };
+
+/**
+ * Application-specific config mappings
+ */
+export type DaoDataApplicationsMap = {
+  FLOOR_SWEEPER_POLL_BOT: FloorSweeperBotApplication;
+};
+
+/**
+ * Base interface for application configs
+ */
+export interface DaoDataApplication {
+  name: typeof APPLICATIONS[number];
+}
+
+/**
+ * Floor Sweeper Poll application
+ */
+export interface FloorSweeperBotApplication extends DaoDataApplication {
+  /**
+   * Discord channel ID to send a message on poll end with the content:
+   *
+   * - poll question
+   * - poll result
+   * - sweep action button
+   */
+  resultChannelID: string;
+}
