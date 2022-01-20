@@ -97,34 +97,33 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
             /**
              * Tally results
              *
-             * if tie, take choice with lower amount
+             * If a tie occurs, take the choice with lower amount.
              */
-            console.log('*************************');
-            console.log(message.content);
-            message.reactions.cache.forEach((m) => {
-              console.log('---POLL_RESULTS---', m.emoji.name, m.count - 1);
-            });
-
             const messageReactions = message.reactions.cache;
+
             // Get largest count of reactions
             const reactionsLargestCount = Math.max(
               ...messageReactions.map((mr) => mr.count - 1)
             );
+
             // Create array of reaction emojis that had largest count
             const reactionsWithLargestCount = messageReactions
               .filter((mr) => mr.count - 1 === reactionsLargestCount)
               .map((f) => f.emoji.name);
+
             // Filter `options` to get only options that had largest count
             const optionsWithLargestCount = Object.fromEntries(
               Object.entries(options as Prisma.JsonObject).filter(([key]) =>
                 reactionsWithLargestCount.includes(key)
               )
             );
+
             // Get values of `options` that had largest count and convert to
             // number (if value was 'None' then convert to `0`)
             const optionWithLargestCountValuesToCompare = Object.values(
               optionsWithLargestCount
             ).map((v) => (v === 'None' ? 0 : Number(v)));
+
             // Get lowest value to handle tie where more than one option had the
             // largest count
             const result: number = Math.min(
@@ -271,10 +270,13 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
       if (pollEntry.dateEnd < new Date()) {
         await reaction.users.remove(user.id);
 
-        const result = pollEntry.result;
+        const {processed, result} = pollEntry;
+
         const resultText =
-          result > 0
+          result > 0 && processed
             ? `The result was **${result} ETH**. To sweep, go to #<CHANNEL>.`
+            : !result && !processed
+            ? `The result has not yet been processed.`
             : 'The result was **None**.';
 
         await user.send(
