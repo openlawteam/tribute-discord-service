@@ -160,41 +160,47 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
                 },
               });
 
-              const dao = getDaoDataByGuildID(guildID, await getDaos());
-
-              if (!dao) {
-                throw new Error(`Could not find DAO by \'guildID\' ${guildID}`);
-              }
-
-              const resultChannelID =
-                dao.applications?.FLOOR_SWEEPER_POLL_BOT?.resultChannelID;
-
-              if (!resultChannelID) {
-                throw new Error('Could not find a `resultChannelID`.');
-              }
-
-              const resultChannel = (await client.channels.fetch(
-                resultChannelID
-              )) as TextChannel;
-
-              const sweepButton = new MessageActionRow().addComponents(
-                new MessageButton()
-                  .setLabel('Sweep')
-                  .setStyle('LINK')
-                  .setURL(SWEEP_EXTERNAL_URL)
-                  .setEmoji('🧹')
-              );
-
               const pollEndMessageBase: string = `The poll "*${question}*" ended ${time(
                 dateEnd,
                 'R'
               )}.`;
 
-              // Send message to the result channel with the sweep button
-              const sweepChannelMessage = await resultChannel.send({
-                content: `${pollEndMessageBase}. The result was **${result} ETH**.`,
-                components: [sweepButton],
-              });
+              let sweepChannelMessage: Message | undefined = undefined;
+
+              if (result > 0) {
+                const dao = getDaoDataByGuildID(guildID, await getDaos());
+
+                if (!dao) {
+                  throw new Error(
+                    `Could not find DAO by \'guildID\' ${guildID}`
+                  );
+                }
+
+                const resultChannelID =
+                  dao.applications?.FLOOR_SWEEPER_POLL_BOT?.resultChannelID;
+
+                if (!resultChannelID) {
+                  throw new Error('Could not find a `resultChannelID`.');
+                }
+
+                const resultChannel = (await client.channels.fetch(
+                  resultChannelID
+                )) as TextChannel;
+
+                const sweepButton = new MessageActionRow().addComponents(
+                  new MessageButton()
+                    .setLabel('Sweep')
+                    .setStyle('LINK')
+                    .setURL(SWEEP_EXTERNAL_URL)
+                    .setEmoji('🧹')
+                );
+
+                // Send message to the result channel with the sweep button
+                sweepChannelMessage = await resultChannel.send({
+                  content: `${pollEndMessageBase}. The result was **${result} ETH**.`,
+                  components: [sweepButton],
+                });
+              }
 
               const pollResultText =
                 result > 0
@@ -203,7 +209,7 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
 
               const pollEndEmbed = new MessageEmbed()
                 .setTitle('Sweep')
-                .setURL(sweepChannelMessage.url)
+                .setURL(sweepChannelMessage?.url || '')
                 .setDescription(`${pollEndMessageBase} ${pollResultText}`);
 
               // Notify poll channel that the poll has ended
