@@ -325,32 +325,33 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
        * On poll end, remove any late reactions and DM the user the error/help
        * message, as we don't have access to send channel-based ephemeral
        * messages within this event's callback
-       *
-       * @todo show link to sweep channel message in direct message when user
-       * tries to vote after poll ends
        */
       if (pollEntry.dateEnd < new Date()) {
         await reaction.users.remove(user.id);
 
         const {processed, result} = pollEntry;
 
-        const dao = getDaoDataByGuildID(pollEntry.guildID, await getDaos());
+        let resultChannelID: string | undefined;
 
-        if (!dao) {
-          throw new Error(
-            `Could not find DAO by \'guildID\' ${pollEntry.guildID}`
-          );
-        }
+        if (result > 0) {
+          const dao = getDaoDataByGuildID(pollEntry.guildID, await getDaos());
 
-        const resultChannelID =
-          dao.applications?.FLOOR_SWEEPER_POLL_BOT?.resultChannelID;
+          if (!dao) {
+            throw new Error(
+              `Could not find DAO by \'guildID\' ${pollEntry.guildID}`
+            );
+          }
 
-        if (!resultChannelID) {
-          throw new Error('Could not find a `resultChannelID`.');
+          resultChannelID =
+            dao.applications?.FLOOR_SWEEPER_POLL_BOT?.resultChannelID;
+
+          if (!resultChannelID) {
+            throw new Error('Could not find a `resultChannelID`.');
+          }
         }
 
         const resultText =
-          result > 0 && processed
+          result > 0 && processed && resultChannelID
             ? `The result was **${result} ETH**. To sweep, go to ${channelMention(
                 resultChannelID
               )}.`
@@ -358,6 +359,7 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
             ? `The result has not yet been processed.`
             : 'The result was **None**.';
 
+        // DM the user that the poll has ended
         await user.send(
           `The poll has ended for *${pollEntry.question}*. ${resultText}`
         );
