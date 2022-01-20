@@ -23,3 +23,5 @@ export const POLL_REACTION_EMOJIS: Record<
   regional_indicator_j: '🇯',
   no_entry_sign: '🚫',
 };
+
+export const SWEEP_EXTERNAL_URL: string = 'https://tributelabs.xyz/';
