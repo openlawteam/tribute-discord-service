@@ -61,10 +61,16 @@ export const DAOS_DEVELOPMENT: Record<
         baseURLPath: 'governance',
       },
     },
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '933653038718128198',
+      },
+    },
     baseURL: 'https://demo.tributedao.com',
     events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Tribute DAO [DEV]',
-    guildID: '',
+    guildID: TRIBUTE_DISCORD_GUILD_ID,
     registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
