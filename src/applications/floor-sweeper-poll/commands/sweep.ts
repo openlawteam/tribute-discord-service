@@ -39,7 +39,7 @@ const ARG_NAMES = {
 
 const OPTION_REGEX: RegExp = /^option_/;
 
-const NONE_OPTION: 'None' = 'None';
+const NONE_OPTION: PollEmojiOptions[number] = 'None';
 
 const DURATION_PARSE_ERROR_MESSAGE: string =
   'Invalid duration. Try something like: 20 minutes; 12 hours; 1 day; 1 week. Short: d,w,M,y,h,m,s,ms';
