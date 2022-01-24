@@ -157,6 +157,8 @@ function integerOptionsInclude0value(
  * manipulation
  */
 function parseTimeForPollEndDate(pollDurationText: string): Date | undefined {
+  if (!pollDurationText) return;
+
   /**
    * Assumes text input is in expected form: '[AMOUNT] [UNIT]'
    * and unit matches dayjs `OpUnitType`.
@@ -190,17 +192,12 @@ function parseTimeForPollEndDate(pollDurationText: string): Date | undefined {
  */
 async function execute(interaction: CommandInteraction) {
   const {data} = interaction.options;
-  const contract = interaction.options.getString(ARG_NAMES.nftContract);
-  const pollDuration = interaction.options.getString(ARG_NAMES.howLong);
-  const question = interaction.options.getString(ARG_NAMES.question);
+  const {howLong, nftContract, question: questionArgName} = ARG_NAMES;
+  const contract: string = interaction.options.getString(nftContract) || '';
+  const pollDuration = interaction.options.getString(howLong) || '';
+  const question = interaction.options.getString(questionArgName) || '';
 
-  if (
-    !interaction.isCommand() ||
-    !contract ||
-    !data?.length ||
-    !pollDuration ||
-    !question
-  ) {
+  if (!interaction.isCommand() || !normalizeString(question)) {
     return;
   }
 
