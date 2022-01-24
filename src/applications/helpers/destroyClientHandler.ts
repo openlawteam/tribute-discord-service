@@ -2,7 +2,7 @@ import {Client} from 'discord.js';
 
 import {ApplicationNames} from '../../config';
 
-export async function destroyClientHandler<T>(
+export async function destroyClientHandler(
   client: Client,
   name: ApplicationNames
 ): Promise<void> {

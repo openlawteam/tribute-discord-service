@@ -1,8 +1,8 @@
 import {deployCommands, getCommands} from './';
 
 import {APP_ENV} from '../../config/common';
-import {rest, server} from '../../../test/msw/server';
 import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config/applications';
+import {rest, server} from '../../../test/msw/server';
 
 const appEnvOriginal = APP_ENV;
 
