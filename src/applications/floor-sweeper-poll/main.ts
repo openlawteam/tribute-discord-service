@@ -9,7 +9,7 @@ import {
   TextChannel,
 } from 'discord.js';
 import {Prisma} from '@prisma/client';
-import {channelMention, hyperlink, time} from '@discordjs/builders';
+import {channelMention, time} from '@discordjs/builders';
 
 import {ApplicationReturn} from '../types';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers/';
