@@ -115,7 +115,7 @@ describe('endedPollsHandler unit tests', () => {
     // Run handler
     endedPollsHandler({client, checkInterval: 1000});
 
-    jest.advanceTimersByTime(1000);
+    jest.advanceTimersByTime(2900);
 
     // Not sure exactly why this is needed, but the tests only pass using this
     jest.useRealTimers();
@@ -128,18 +128,18 @@ describe('endedPollsHandler unit tests', () => {
      */
 
     // Once at the start, and once at the end for two DB entries
-    expect(channelsFetchSpy).toHaveBeenCalledTimes(4);
+    expect(channelsFetchSpy).toHaveBeenCalledTimes(8);
 
     /**
      * Assert messages fetch
      */
 
-    expect(messagesFetchSpy).toHaveBeenCalledTimes(2);
+    expect(messagesFetchSpy).toHaveBeenCalledTimes(4);
 
     /**
      * Assert Discord result channel's message `content`
      */
-    expect(messagesSendSpy).toHaveBeenCalledTimes(2);
+    expect(messagesSendSpy).toHaveBeenCalledTimes(4);
 
     // Call 2 is the same.
     expect(messagesSendSpy.mock.calls[0][0].content).toMatch(
@@ -175,7 +175,7 @@ describe('endedPollsHandler unit tests', () => {
      * Assert message sent in poll channel
      */
 
-    expect(messagesReplySpy).toHaveBeenCalledTimes(2);
+    expect(messagesReplySpy).toHaveBeenCalledTimes(4);
 
     expect(messagesReplySpy.mock.calls[0][0].embeds[0].title).toMatch(/sweep/i);
     expect(messagesReplySpy.mock.calls[1][0].embeds[0].title).toMatch(/sweep/i);
