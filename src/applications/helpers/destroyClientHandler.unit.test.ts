@@ -4,20 +4,36 @@ import {destroyClientHandler} from '.';
 
 describe('destroyClientHandler unit tests', () => {
   test('should destroy Discord `Client`', async () => {
-    expect(
-      await destroyClientHandler(
-        new Client({
-          intents: [
-            Intents.FLAGS.GUILDS,
-            Intents.FLAGS.GUILD_MESSAGES,
-            Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-          ],
-          partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-          restSweepInterval: 0,
-        }),
-        'FLOOR_SWEEPER_POLL_BOT'
-      )
-    ).toBe(undefined);
+    const consoleLogSpy = jest
+      .spyOn(console, 'log')
+      .mockImplementation(() => {});
+
+    const client = new Client({
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      ],
+      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+      restSweepInterval: 0,
+    });
+
+    const destroySpy = jest.spyOn(client, 'destroy');
+
+    expect(await destroyClientHandler(client, 'FLOOR_SWEEPER_POLL_BOT')).toBe(
+      undefined
+    );
+
+    expect(destroySpy.mock.calls.length).toBe(1);
+
+    expect(consoleLogSpy.mock.calls[0][0]).toMatch(
+      /Successfully destroyed FLOOR_SWEEPER_POLL_BOT client instance\./i
+    );
+
+    // Cleanup
+
+    consoleLogSpy.mockRestore();
+    destroySpy.mockRestore();
   });
 
   test('should throw', async () => {
