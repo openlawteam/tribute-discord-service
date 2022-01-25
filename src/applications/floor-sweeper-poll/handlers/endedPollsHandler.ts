@@ -34,6 +34,7 @@ export function endedPollsHandler({
     endedPolls.forEach(
       async ({
         channelID,
+        contractAddress,
         dateEnd,
         guildID,
         id,
@@ -151,7 +152,9 @@ export function endedPollsHandler({
               new MessageButton()
                 .setLabel('Sweep')
                 .setStyle('LINK')
-                .setURL(SWEEP_EXTERNAL_URL)
+                .setURL(
+                  `${SWEEP_EXTERNAL_URL}/?amount=${result}&contractAddress=${contractAddress}`
+                )
                 .setEmoji('🧹')
             );
 

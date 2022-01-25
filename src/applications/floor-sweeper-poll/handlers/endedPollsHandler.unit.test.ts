@@ -107,15 +107,6 @@ describe('endedPollsHandler unit tests', () => {
           } as any)
       );
 
-    // Sweep button to assert later
-    const assertSweepButton = new MessageActionRow().addComponents(
-      new MessageButton()
-        .setLabel('Sweep')
-        .setStyle('LINK')
-        .setURL(SWEEP_EXTERNAL_URL)
-        .setEmoji('🧹')
-    );
-
     /**
      * @see https://jestjs.io/docs/timer-mocks
      */
@@ -165,11 +156,27 @@ describe('endedPollsHandler unit tests', () => {
      */
 
     expect(messagesSendSpy.mock.calls[0][0].components[0]).toEqual(
-      assertSweepButton
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setLabel('Sweep')
+          .setStyle('LINK')
+          .setURL(
+            `${SWEEP_EXTERNAL_URL}/?amount=${100}&contractAddress=${ETH_ADDRESS_FIXTURE}`
+          )
+          .setEmoji('🧹')
+      )
     );
 
     expect(messagesSendSpy.mock.calls[1][0].components[0]).toEqual(
-      assertSweepButton
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setLabel('Sweep')
+          .setStyle('LINK')
+          .setURL(
+            `${SWEEP_EXTERNAL_URL}/?amount=${200}&contractAddress=${ETH_ADDRESS_FIXTURE}`
+          )
+          .setEmoji('🧹')
+      )
     );
 
     expect(messagesSendSpy.mock.calls[0][0].components[0]).toBeInstanceOf(
