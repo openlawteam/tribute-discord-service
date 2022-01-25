@@ -9,7 +9,6 @@ import {
 import {endedPollsHandler} from './endedPollsHandler';
 import {ETH_ADDRESS_FIXTURE} from '../../../../test';
 import {prismaMock} from '../../../../test/prismaMock';
-import {rest, server} from '../../../../test/msw/server';
 import {SWEEP_EXTERNAL_URL} from '../config';
 
 const DB_ENTRY = {
@@ -49,6 +48,9 @@ describe('endedPollsHandler unit tests', () => {
   });
 
   test('should process ended poll', async () => {
+    /**
+     * @see https://jestjs.io/docs/timer-mocks
+     */
     jest.useFakeTimers();
 
     /**
@@ -120,7 +122,7 @@ describe('endedPollsHandler unit tests', () => {
     // Run handler
     endedPollsHandler({client, checkInterval: 1000});
 
-    jest.advanceTimersByTime(2000);
+    jest.advanceTimersByTime(2100);
 
     // Not sure exactly why this is needed, but the tests only pass using this
     jest.useRealTimers();
@@ -229,6 +231,9 @@ describe('endedPollsHandler unit tests', () => {
   });
 
   test('should process ended poll when result was `None`', async () => {
+    /**
+     * @see https://jestjs.io/docs/timer-mocks
+     */
     jest.useFakeTimers();
 
     /**
@@ -292,7 +297,7 @@ describe('endedPollsHandler unit tests', () => {
     // Run handler
     endedPollsHandler({client, checkInterval: 1000});
 
-    jest.advanceTimersByTime(1000);
+    jest.advanceTimersByTime(1100);
 
     // Not sure exactly why this is needed, but the tests only pass using this
     jest.useRealTimers();
