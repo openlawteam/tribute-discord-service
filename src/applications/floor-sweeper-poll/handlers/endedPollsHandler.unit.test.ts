@@ -113,7 +113,7 @@ describe('endedPollsHandler unit tests', () => {
     );
 
     // Run handler
-    endedPollsHandler({client, checkInterval: 1000});
+    endedPollsHandler({client, checkInterval: 800});
 
     jest.advanceTimersByTime(2000);
 
@@ -219,7 +219,7 @@ describe('endedPollsHandler unit tests', () => {
     messagesSendSpy.mockRestore();
   });
 
-  test.skip('should process ended poll when result was `None`', async () => {
+  test('should process ended poll when result was `None`', async () => {
     /**
      * @see https://jestjs.io/docs/timer-mocks
      */
