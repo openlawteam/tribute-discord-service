@@ -23,9 +23,9 @@ export function endedPollsHandler({
 }: {
   checkInterval?: number;
   client: Client;
-}): void {
+}): NodeJS.Timeout {
   // Poll every x seconds to check for ended polls and process them
-  setInterval(async () => {
+  return setInterval(async () => {
     // Get ended, unprocessed polls
     const endedPolls = await prisma.floorSweeperPoll.findMany({
       where: {dateEnd: {lt: new Date()}, processed: false},
