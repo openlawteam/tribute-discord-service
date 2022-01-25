@@ -122,13 +122,13 @@ describe('endedPollsHandler unit tests', () => {
     // Run handler
     endedPollsHandler({client, checkInterval: 1000});
 
-    jest.advanceTimersByTime(2100);
+    jest.advanceTimersByTime(200);
 
     // Not sure exactly why this is needed, but the tests only pass using this
     jest.useRealTimers();
 
     // Not sure exactly why this is needed, but the tests only pass using this
-    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 100));
 
     // Fast-forward until all timers have been executed
     expect(setIntervalSpy).toHaveBeenCalledTimes(1);
@@ -297,7 +297,7 @@ describe('endedPollsHandler unit tests', () => {
     // Run handler
     endedPollsHandler({client, checkInterval: 1000});
 
-    jest.advanceTimersByTime(1100);
+    jest.advanceTimersByTime(1000);
 
     // Not sure exactly why this is needed, but the tests only pass using this
     jest.useRealTimers();
