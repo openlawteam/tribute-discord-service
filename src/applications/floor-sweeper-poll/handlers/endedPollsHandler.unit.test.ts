@@ -40,6 +40,13 @@ const DB_ENTRY_1 = {
 };
 
 describe('endedPollsHandler unit tests', () => {
+  afterEach(() => {
+    /**
+     * @see https://jestjs.io/docs/timer-mocks
+     */
+    jest.useRealTimers();
+  });
+
   test('should process ended poll', async () => {
     /**
      * @see https://jestjs.io/docs/timer-mocks
@@ -68,7 +75,7 @@ describe('endedPollsHandler unit tests', () => {
     client.token = 'abc123';
 
     // Mock `setInterval`
-    const setIntervalSpy = jest.spyOn(global, 'setInterval');
+    // const setIntervalSpy = jest.spyOn(global, 'setInterval');
 
     const messagesReplySpy = jest.fn();
 
@@ -115,16 +122,13 @@ describe('endedPollsHandler unit tests', () => {
     // Run handler
     endedPollsHandler({client, checkInterval: 1000});
 
-    jest.advanceTimersByTime(200);
+    jest.advanceTimersByTime(2000);
 
     // Not sure exactly why this is needed, but the tests only pass using this
     jest.useRealTimers();
 
     // Not sure exactly why this is needed, but the tests only pass using this
-    await new Promise((r) => setTimeout(r, 100));
-
-    // Fast-forward until all timers have been executed
-    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+    await new Promise((r) => setTimeout(r, 0));
 
     /**
      * Assert channels fetch
@@ -220,7 +224,6 @@ describe('endedPollsHandler unit tests', () => {
     messagesFetchSpy.mockRestore();
     messagesReplySpy.mockRestore();
     messagesSendSpy.mockRestore();
-    setIntervalSpy.mockRestore();
   });
 
   test('should process ended poll when result was `None`', async () => {
@@ -249,9 +252,6 @@ describe('endedPollsHandler unit tests', () => {
 
     // `Client` needs a token to make a REST call
     client.token = 'abc123';
-
-    // Mock `setInterval`
-    const setIntervalSpy = jest.spyOn(global, 'setInterval');
 
     const messagesReplySpy = jest.fn();
 
@@ -298,9 +298,6 @@ describe('endedPollsHandler unit tests', () => {
     // Not sure exactly why this is needed, but the tests only pass using this
     await new Promise((r) => setTimeout(r, 0));
 
-    // Fast-forward until all timers have been executed
-    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
-
     /**
      * Assert Discord result channel's message `content`
      */
@@ -329,6 +326,5 @@ describe('endedPollsHandler unit tests', () => {
     messagesFetchSpy.mockRestore();
     messagesReplySpy.mockRestore();
     messagesSendSpy.mockRestore();
-    setIntervalSpy.mockRestore();
   });
 });
