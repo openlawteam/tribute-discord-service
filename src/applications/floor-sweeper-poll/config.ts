@@ -1,3 +1,4 @@
+import {APP_ENV} from '../../config';
 import {PollOptionLetters} from './types';
 
 // For getting the `regional_indicator_<x>` emojis
@@ -24,4 +25,7 @@ export const POLL_REACTION_EMOJIS: Record<
   no_entry_sign: '🚫',
 };
 
-export const SWEEP_EXTERNAL_URL: string = 'https://tributelabs.xyz/';
+export const SWEEP_EXTERNAL_URL: string =
+  APP_ENV === 'production'
+    ? 'https://tools.tributelabs.xyz/floor-sweeper/'
+    : 'https://develop--tools-tributelabs.netlify.app/floor-sweeper';
