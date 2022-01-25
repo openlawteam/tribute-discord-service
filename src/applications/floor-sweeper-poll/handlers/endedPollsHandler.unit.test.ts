@@ -6,8 +6,12 @@ import {
   MessageEmbed,
 } from 'discord.js';
 
+import {
+  ETH_ADDRESS_FIXTURE,
+  FAKE_DAOS_FIXTURE,
+  GUILD_ID_FIXTURE,
+} from '../../../../test';
 import {endedPollsHandler} from './endedPollsHandler';
-import {ETH_ADDRESS_FIXTURE} from '../../../../test';
 import {prismaMock} from '../../../../test/prismaMock';
 import {SWEEP_EXTERNAL_URL} from '../config';
 
@@ -16,7 +20,7 @@ const DB_ENTRY = {
   contractAddress: ETH_ADDRESS_FIXTURE,
   createdAt: new Date(0),
   dateEnd: new Date(10),
-  guildID: '722525233755717762',
+  guildID: GUILD_ID_FIXTURE,
   id: 1,
   messageID: '123456789',
   options: {'🇦': 50, '🇧': 100, '🇨': 150, '🚫': 'None'},
@@ -30,7 +34,7 @@ const DB_ENTRY_1 = {
   contractAddress: ETH_ADDRESS_FIXTURE,
   createdAt: new Date(0),
   dateEnd: new Date(15),
-  guildID: '722525233755717762',
+  guildID: GUILD_ID_FIXTURE,
   id: 2,
   messageID: '987654321',
   options: {'🇦': 150, '🇧': 200, '🇨': 250, '🚫': 'None'},
@@ -42,11 +46,6 @@ const DB_ENTRY_1 = {
 describe('endedPollsHandler unit tests', () => {
   test('should process ended poll', async () => {
     /**
-     * @see https://jestjs.io/docs/timer-mocks
-     */
-    // jest.useFakeTimers();
-
-    /**
      * Mock db fetch
      *
      * @todo fix types
@@ -54,6 +53,11 @@ describe('endedPollsHandler unit tests', () => {
     const dbFindManyMock = (
       prismaMock.floorSweeperPoll as any
     ).findMany.mockResolvedValue([DB_ENTRY, DB_ENTRY_1]);
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const client = new Client({
       intents: [
@@ -112,21 +116,21 @@ describe('endedPollsHandler unit tests', () => {
         .setEmoji('🧹')
     );
 
+    /**
+     * @see https://jestjs.io/docs/timer-mocks
+     */
+    jest.useFakeTimers();
+
     // Run handler
-    const intervalID = endedPollsHandler({client, checkInterval: 1000});
+    endedPollsHandler({client, checkInterval: 1000});
 
-    // jest.advanceTimersByTime(1000);
-    // jest.advanceTimersByTime(1000);
-    await new Promise((r) => setTimeout(r, 1000));
-    await new Promise((r) => setTimeout(r, 1000));
+    jest.advanceTimersByTime(2000);
 
     // Not sure exactly why this is needed, but the tests only pass using this
-    // jest.useRealTimers();
-
-    clearTimeout(intervalID);
+    jest.useRealTimers();
 
     // Not sure exactly why this is needed, but the tests only pass using this
-    // await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
 
     /**
      * Assert channels fetch
@@ -213,17 +217,13 @@ describe('endedPollsHandler unit tests', () => {
 
     channelsFetchSpy.mockRestore();
     dbFindManyMock.mockRestore();
+    getDaosSpy.mockRestore();
     messagesFetchSpy.mockRestore();
     messagesReplySpy.mockRestore();
     messagesSendSpy.mockRestore();
   });
 
-  test.skip('should process ended poll when result was `None`', async () => {
-    /**
-     * @see https://jestjs.io/docs/timer-mocks
-     */
-    jest.useFakeTimers();
-
+  test('should process ended poll when result was `None`', async () => {
     /**
      * Mock db fetch
      *
@@ -232,6 +232,11 @@ describe('endedPollsHandler unit tests', () => {
     const dbFindManyMock = (
       prismaMock.floorSweeperPoll as any
     ).findMany.mockResolvedValue([DB_ENTRY]);
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const client = new Client({
       intents: [
@@ -279,6 +284,11 @@ describe('endedPollsHandler unit tests', () => {
           } as any)
       );
 
+    /**
+     * @see https://jestjs.io/docs/timer-mocks
+     */
+    jest.useFakeTimers();
+
     // Run handler
     endedPollsHandler({client, checkInterval: 1000});
 
@@ -315,6 +325,7 @@ describe('endedPollsHandler unit tests', () => {
 
     channelsFetchSpy.mockRestore();
     dbFindManyMock.mockRestore();
+    getDaosSpy.mockRestore();
     messagesFetchSpy.mockRestore();
     messagesReplySpy.mockRestore();
     messagesSendSpy.mockRestore();
