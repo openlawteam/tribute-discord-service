@@ -4,7 +4,7 @@ import {Prisma} from '@prisma/client';
 
 import {ApplicationReturn} from '../types';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers/';
-import {endedPollsHandler} from './handlers';
+import {endedPollsHandler, interactionExecuteHandler} from './handlers';
 import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config';
 import {getDaoDataByGuildID, getEnv} from '../../helpers';
 import {getDaos} from '../../services';
@@ -57,22 +57,7 @@ export async function floorSweeperPollBot(): Promise<ApplicationReturn | void> {
 
     // Listen for interactions and possibly run commands
     client.on('interactionCreate', async (interaction) => {
-      if (!interaction.isCommand()) return;
-
-      const command = commands.commandsCollection.get(interaction.commandName);
-
-      if (!command) return;
-
-      try {
-        await command.execute(interaction);
-      } catch (error) {
-        console.error(error);
-
-        await interaction.followUp({
-          content: 'There was an error while executing this command.',
-          ephemeral: true,
-        });
-      }
+      await interactionExecuteHandler({commands, interaction});
     });
 
     // Listen to reactions on messages and possibly handle
