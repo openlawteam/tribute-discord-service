@@ -205,4 +205,51 @@ describe('floor-sweeper-poll/main unit tests', () => {
     destroyClientHandlerSpy.mockRestore();
     loginSpy.mockRestore();
   });
+
+  test('should handle `deployCommands` error', async () => {
+    const discord = await import('discord.js');
+
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => '');
+
+    const loginSpy = jest
+      .spyOn(discord.Client.prototype, 'login')
+      .mockImplementation(async () => '');
+
+    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+
+    const deployCommands = await import('../helpers/deployCommands');
+
+    const deployCommandsSpy = jest
+      .spyOn(deployCommands, 'deployCommands')
+      .mockImplementation(async () => {
+        throw new Error('Some bad error.');
+      });
+
+    await floorSweeperPollBot();
+
+    expect(loginSpy).toHaveBeenCalledTimes(0);
+
+    expect(deployCommandsSpy).toHaveBeenCalledTimes(1);
+
+    expect(deployCommandsSpy).toHaveBeenCalledWith({
+      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      commands: await getCommands(async () => await import('./commands')),
+      name: 'FLOOR_SWEEPER_POLL_BOT',
+      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
+      /Discord commands for FLOOR_SWEEPER_POLL_BOT could not be deployed\. Error: Some bad error\./i
+    );
+
+    // Cleanup
+
+    consoleErrorSpy.mockRestore();
+    deployCommandsSpy.mockRestore();
+    loginSpy.mockRestore();
+  });
 });
