@@ -22,7 +22,7 @@ export async function floorSweeperPollBot(): Promise<
 
     // Deploy commands
     try {
-      deployCommands({
+      await deployCommands({
         applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
         commands,
         name: 'FLOOR_SWEEPER_POLL_BOT',
