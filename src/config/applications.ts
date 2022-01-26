@@ -2,13 +2,16 @@
  * Register unique application names
  */
 
+import {APP_ENV} from '.';
+
 export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
 
 /**
  * Application Client IDs
  */
 
-export const FLOOR_SWEEPER_POLL_BOT_ID: string = '931125521645969448';
+export const FLOOR_SWEEPER_POLL_BOT_ID: string =
+  APP_ENV === 'production' ? '935866668104679464' : '931125521645969448';
 
 /**
  * Development Guild ID for faster development
