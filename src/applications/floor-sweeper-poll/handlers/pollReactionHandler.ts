@@ -85,7 +85,7 @@ export async function pollReactionHandler(
   }
 
   /**
-   * On poll end, remove any late reactions and DM the user the error/help
+   * If the poll has ended, remove any late reactions and DM the user the error/help
    * message, as we don't have access to send channel-based ephemeral
    * messages within this event's callback
    */
