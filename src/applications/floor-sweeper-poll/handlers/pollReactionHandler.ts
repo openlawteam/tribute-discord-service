@@ -11,10 +11,13 @@ import {getDaoDataByGuildID} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {prisma} from '../../../singletons';
 
-export async function pollReactionHandler(
-  reaction: MessageReaction | PartialMessageReaction,
-  user: User | PartialUser
-): Promise<void> {
+export async function pollReactionHandler({
+  reaction,
+  user,
+}: {
+  reaction: MessageReaction | PartialMessageReaction;
+  user: User | PartialUser;
+}): Promise<void> {
   // Exit if bot added the reaction (initial reactions on poll creation)
   if (user.bot) return;
 

@@ -55,7 +55,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler(REACTION, USER);
+    await pollReactionHandler({reaction: REACTION, user: USER});
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
@@ -315,7 +315,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler(REACTION, USER);
+    await pollReactionHandler({reaction: REACTION, user: USER});
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
@@ -377,7 +377,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler(REACTION, USER);
+    await pollReactionHandler({reaction: REACTION, user: USER});
 
     expect(reactionFetchSpy).toHaveBeenCalledTimes(1);
     expect(reactionUsersFetchSpy).toHaveBeenCalledTimes(1);

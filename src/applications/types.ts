@@ -1,9 +1,10 @@
-import {Collection, CommandInteraction} from 'discord.js';
+import {Client, Collection, CommandInteraction} from 'discord.js';
 import {SlashCommandBuilder} from '@discordjs/builders';
 
 import {ApplicationNames} from '../config';
 
 export type ApplicationReturn = {
+  client: Client;
   /**
    * Friendly name for the application.
    */
@@ -11,7 +12,7 @@ export type ApplicationReturn = {
   /**
    * A callback to destroy the application instance, etc.
    */
-  stop?: () => Promise<any>;
+  stop?: () => Promise<void>;
 };
 
 export type Command = {
