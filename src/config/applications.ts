@@ -1,8 +1,8 @@
+import {APP_ENV} from './common';
+
 /**
  * Register unique application names
  */
-
-import {APP_ENV} from '.';
 
 export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
 
