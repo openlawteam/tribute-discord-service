@@ -4,7 +4,11 @@ import {
   SnapshotHubProposalResolverArgs,
 } from '../../src/services/snapshotHub';
 import {DaoData} from '../../src/config/types';
-import {BYTES32_FIXTURE, ETH_ADDRESS_FIXTURE} from './constants';
+import {
+  BYTES32_FIXTURE,
+  ETH_ADDRESS_FIXTURE,
+  GUILD_ID_FIXTURE,
+} from './constants';
 
 export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
   test: {
@@ -20,9 +24,16 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
         baseURLPath: 'membership',
       },
     },
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '123123123123123123',
+      },
+    },
     baseURL: 'http://localhost:3000',
     events: [{name: 'SPONSORED_PROPOSAL'}],
     friendlyName: 'Tribute DAO [Test]',
+    guildID: GUILD_ID_FIXTURE,
     registryContractAddress: ETH_ADDRESS_FIXTURE,
     snapshotHub: {
       proposalResolver: async <R = any>(
@@ -66,6 +77,7 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
     baseURL: 'http://localhost:3000',
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Mingo DAO [Test]',
+    guildID: '456456456456456456',
     registryContractAddress: ETH_ADDRESS_FIXTURE,
     snapshotHub: {
       proposalResolver: async <R = any>(

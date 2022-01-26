@@ -60,6 +60,7 @@ export const DAOS_PRODUCTION: Record<
     baseURL: 'https://muse0.xyz',
     events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Muse0',
+    guildID: '846186721799569458',
     registryContractAddress: '0x7c8B281C56f7ef9b8099D3F491AF24DC2C2e3ee0',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
@@ -83,6 +84,7 @@ export const DAOS_PRODUCTION: Record<
     baseURL: 'https://reddao.xyz',
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Red DAO',
+    guildID: '894656334069370900',
     registryContractAddress: '0x1D96d039d384d3ECCaD6f07aAB27A49408A1Cf2B',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
@@ -106,6 +108,7 @@ export const DAOS_PRODUCTION: Record<
     baseURL: 'https://neondao.xyz',
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'NEON DAO',
+    guildID: '876601577157324840',
     registryContractAddress: '0xa9D57fB58926d498c792733ee86d3Cc8EB8bb7A0',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,

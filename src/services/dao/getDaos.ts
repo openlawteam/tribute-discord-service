@@ -30,7 +30,7 @@ export async function getDaos(): Promise<Daos | undefined> {
           return DAOS_LOCALHOST;
         } catch (error) {
           throw new Error(
-            `No DAO configuration was found at \`../config/daosLocalhost\`. Did you already copy and rename \`daosLocalhost.example.ts\`?`
+            `No DAO configuration was found at \`../config/daos/daosLocalhost\`. Did you already copy and rename \`daosLocalhost.example.ts\`?`
           );
         }
 

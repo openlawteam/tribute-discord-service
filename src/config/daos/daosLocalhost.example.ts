@@ -9,9 +9,13 @@
  */
 
 /*
+import {
+  SnapshotHubProposalResolverArgs,
+  snapshotHubResolverSelector,
+} from '../../services/snapshotHub';
+import {BURN_ADDRESS} from '../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
 import {DaoData} from '../types';
-import {legacyTributeProposalResolver} from '../../services/snapshotHub';
 */
 
 /**
@@ -43,20 +47,32 @@ export const DAOS_LOCALHOST: Record<
         friendlyName: 'onboarding',
         baseURLPath: 'membership',
       },
+      [BURN_ADDRESS]: {
+        friendlyName: 'Governance',
+        baseURLPath: 'governance',
+      },
+    },
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '933653038718128198',
+      },
     },
     baseURL: 'https://demo.tributedao.com',
-    events: [{name: 'SPONSORED_PROPOSAL'}],
+    events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Tribute DAO [DEV]',
+    guildID: '00000000000000000000000',
     registryContractAddress: '0x0000000000000000000000000000000000000000',
     snapshotHub: {
-      proposalResolver: async (proposalID, space) =>
-        await legacyTributeProposalResolver({
-          // @see `docker-host` in `docker-compose.dev.yml`
+      proposalResolver: async <R = any>(
+        args: SnapshotHubProposalResolverArgs
+      ) => {
+        return snapshotHubResolverSelector<R>({
+          ...args,
           apiBaseURL: 'http://docker-host:8081/api',
-          proposalID,
-          space,
-        }),
-      space: 'test',
+        });
+      },
+      space: 'tribute',
     },
   },
 };

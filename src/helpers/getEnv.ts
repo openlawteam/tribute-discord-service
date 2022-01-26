@@ -1,4 +1,11 @@
-import {ENVIRONMENT_VARIABLE_KEYS} from '../config';
+import {
+  ENVIRONMENT_VARIABLE_KEYS,
+  ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS,
+} from '../config';
+
+type AvailableEnv = Partial<
+  typeof ENVIRONMENT_VARIABLE_KEYS | typeof ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS
+>[number];
 
 /**
  * Returns the current environment variable value.
@@ -10,8 +17,6 @@ import {ENVIRONMENT_VARIABLE_KEYS} from '../config';
  * @param variableName `string`
  * @returns `string`
  */
-export function getEnv(
-  variableName: Partial<typeof ENVIRONMENT_VARIABLE_KEYS>[number]
-): string | undefined {
+export function getEnv(variableName: AvailableEnv): string | undefined {
   return process.env[(variableName || '').trim()];
 }

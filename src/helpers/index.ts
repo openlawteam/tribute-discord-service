@@ -4,6 +4,7 @@ export * from './fetchGetJSON';
 export * from './filterDaosByActiveEvent';
 export * from './getDaoAction';
 export * from './getDaoDataByAddress';
+export * from './getDaoDataByGuildID';
 export * from './getDaoDataBySnapshotSpace';
 export * from './getEnv';
 export * from './getEtherscanURL';
