@@ -327,4 +327,65 @@ describe('pollReactionHandler unit tests', () => {
     dbSpy.mockRestore();
     userReactionRemoveSpy.mockRestore();
   });
+
+  test('should fetch data if reaction is `partial: true`', async () => {
+    const reactionFetchSpy = jest.fn();
+    const reactionUsersFetchSpy = jest.fn();
+
+    const REACTION: MessageReaction | PartialMessageReaction = {
+      emoji: {name: '🇦'},
+      fetch: reactionFetchSpy,
+      message: {
+        id: 'abc123',
+        reactions: {
+          cache: [
+            {
+              emoji: {name: '🇦'},
+              users: {
+                cache: new Map().set('123', 'test'),
+                fetch: reactionUsersFetchSpy,
+              },
+            },
+          ],
+        },
+      },
+      partial: true,
+    } as any;
+
+    const USER: User | PartialUser = {bot: false, id: '123'} as any;
+
+    const DB_ENTRY = {
+      channelID: '886976610018934824',
+      contractAddress: ETH_ADDRESS_FIXTURE,
+      createdAt: new Date(0),
+      dateEnd: new Date(Date.now() + 10000000),
+      guildID: GUILD_ID_FIXTURE,
+      id: 1,
+      messageID: '123456789',
+      options: {'🇦': 50, '🇧': 100, '🇨': 150, '🚫': 'None'},
+      processed: false,
+      question: 'How much to sweep larvalads fam?',
+      result: 0,
+    };
+
+    /**
+     * Mock db return value
+     *
+     * @todo fix types
+     */
+    const dbSpy = (
+      prismaMock.floorSweeperPoll as any
+    ).findUnique.mockResolvedValue(DB_ENTRY);
+
+    await pollReactionHandler(REACTION, USER);
+
+    expect(reactionFetchSpy).toHaveBeenCalledTimes(1);
+    expect(reactionUsersFetchSpy).toHaveBeenCalledTimes(1);
+
+    // Cleanup
+
+    dbSpy.mockRestore();
+    reactionFetchSpy.mockRestore();
+    reactionUsersFetchSpy.mockRestore();
+  });
 });
