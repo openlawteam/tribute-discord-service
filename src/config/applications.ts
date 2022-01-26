@@ -8,10 +8,15 @@ export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
 
 /**
  * Application Client IDs
+ *
+ * To keep the Discord bots as secure as possible we do not
+ * use upstream bots locally in development.
  */
 
 export const FLOOR_SWEEPER_POLL_BOT_ID: string =
-  APP_ENV === 'production' ? '935866668104679464' : '931125521645969448';
+  APP_ENV === 'production' || APP_ENV === 'development'
+    ? '935866668104679464'
+    : '931125521645969448';
 
 /**
  * Development Guild ID for faster development
