@@ -7,7 +7,7 @@ import {
   MessageEmbed,
   TextChannel,
 } from 'discord.js';
-import {Prisma} from '.prisma/client';
+import {Prisma} from '@prisma/client';
 import {time} from '@discordjs/builders';
 
 import {getDaoDataByGuildID} from '../../../helpers';
