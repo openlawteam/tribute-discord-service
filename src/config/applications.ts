@@ -14,9 +14,11 @@ export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
  */
 
 export const FLOOR_SWEEPER_POLL_BOT_ID: string =
-  APP_ENV === 'production' || APP_ENV === 'development'
+  APP_ENV === 'production'
+    ? '936161667304267807'
+    : APP_ENV === 'development'
     ? '935866668104679464'
-    : '931125521645969448';
+    : '931125521645969448'; /* localhost development */
 
 /**
  * Development Guild ID for faster development
