@@ -81,6 +81,12 @@ export const DAOS_PRODUCTION: Record<
         baseURLPath: 'governance',
       },
     },
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '936185841204744222',
+      },
+    },
     baseURL: 'https://reddao.xyz',
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Red DAO',
@@ -103,6 +109,12 @@ export const DAOS_PRODUCTION: Record<
       [BURN_ADDRESS]: {
         friendlyName: 'Governance',
         baseURLPath: 'governance',
+      },
+    },
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '936184076107415602',
       },
     },
     baseURL: 'https://neondao.xyz',
