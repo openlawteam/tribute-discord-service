@@ -138,7 +138,7 @@ export const DAOS_PRODUCTION: Record<
     applications: {
       FLOOR_SWEEPER_POLL_BOT: {
         name: 'FLOOR_SWEEPER_POLL_BOT',
-        resultChannelID: '',
+        resultChannelID: '936433157832589402',
       },
     },
     baseURL: 'https://noisedao.xyz',
