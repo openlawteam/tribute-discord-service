@@ -14,7 +14,12 @@ import {DaoData} from '../types';
  * exported mapping below.
  */
 
-export const DAO_NAMES_PRODUCTION = ['fashion', 'metaverse', 'muse0'] as const;
+export const DAO_NAMES_PRODUCTION = [
+  'fashion',
+  'metaverse',
+  'muse0',
+  'music',
+] as const;
 
 const SNAPSHOT_HUB_API_URL: string =
   'https://snapshot-hub-erc712.thelao.io/api';
@@ -81,6 +86,12 @@ export const DAOS_PRODUCTION: Record<
         baseURLPath: 'governance',
       },
     },
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '936185841204744222',
+      },
+    },
     baseURL: 'https://reddao.xyz',
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Red DAO',
@@ -105,6 +116,12 @@ export const DAOS_PRODUCTION: Record<
         baseURLPath: 'governance',
       },
     },
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '936184076107415602',
+      },
+    },
     baseURL: 'https://neondao.xyz',
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'NEON DAO',
@@ -113,6 +130,25 @@ export const DAOS_PRODUCTION: Record<
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
       space: 'metaverse',
+    },
+  },
+
+  music: {
+    actions: [],
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '936433157832589402',
+      },
+    },
+    baseURL: 'https://noisedao.xyz',
+    events: [],
+    friendlyName: 'Noise DAO',
+    guildID: '922548287486193685',
+    registryContractAddress: '0x56138a0012A23E90a2EEE732221188881A87d684',
+    snapshotHub: {
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
+      space: 'music',
     },
   },
 };
