@@ -27,5 +27,5 @@ export const POLL_REACTION_EMOJIS: Record<
 
 export const SWEEP_EXTERNAL_URL: string =
   APP_ENV === 'production'
-    ? 'https://tools.tributelabs.xyz/floor-sweeper/'
+    ? 'https://tools.tributelabs.xyz/floor-sweeper'
     : 'https://develop--tools-tributelabs.netlify.app/floor-sweeper';
