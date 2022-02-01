@@ -7,6 +7,7 @@ import {
 import {
   CommandInteraction,
   CommandInteractionOption,
+  GuildChannelResolvable,
   Message,
   MessageEmbed,
 } from 'discord.js';
@@ -52,6 +53,9 @@ const DUPLICATE_OPTIONS_ERROR_MESSAGE: string =
 
 const POLL_SETUP_ERROR_MESSAGE: string =
   'Something went wrong while setting up the poll.';
+
+const BOT_CHANNEL_ACCESS_ERROR_MESSAGE: string =
+  'The bot does not have access to this channel. Please update the permissions.';
 
 function getOptionLetter(o: CommandInteractionOption): PollOptionLetters {
   return normalizeString(o.name.split(OPTION_REGEX)[1]) as PollOptionLetters;
@@ -201,6 +205,21 @@ async function execute(interaction: CommandInteraction) {
   const question = interaction.options.getString(questionArgName) || '';
 
   if (!interaction.isCommand() || !normalizeString(question)) {
+    return;
+  }
+
+  const canBotAccessChannel = interaction.guild?.me
+    ?.permissionsIn(interaction.channel as GuildChannelResolvable)
+    .has('VIEW_CHANNEL');
+
+  // Validate bot's access to the channel
+  if (!canBotAccessChannel) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: BOT_CHANNEL_ACCESS_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
     return;
   }
 

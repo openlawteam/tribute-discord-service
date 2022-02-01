@@ -4,6 +4,7 @@ import {
   CommandInteraction,
   Intents,
   InteractionReplyOptions,
+  Permissions,
 } from 'discord.js';
 import {GatewayInteractionCreateDispatchData} from 'discord-api-types';
 
@@ -103,6 +104,14 @@ describe('sweep unit tests', () => {
     result: 50,
   };
 
+  function setFakePermissions(
+    interaction: CommandInteraction
+  ): jest.SpyInstance {
+    return jest.spyOn(interaction, 'guild', 'get').mockReturnValue({
+      me: {permissionsIn: () => new Permissions(['VIEW_CHANNEL'])},
+    } as any);
+  }
+
   test('should run execute', async () => {
     /**
      * Mock db insert entry
@@ -115,6 +124,7 @@ describe('sweep unit tests', () => {
 
     const client = new Client(CLIENT_OPTIONS);
     const interaction = new CommandInteraction(client, INTERACTION_DATA);
+    const fakePermissionsSpy = setFakePermissions(interaction);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -150,6 +160,11 @@ describe('sweep unit tests', () => {
 
     expect(reactSpy.mock.calls.length).toBe(4);
     expect(reactSpy.mock.calls).toEqual([['🇦'], ['🇧'], ['🇨'], ['🚫']]);
+
+    // Cleanup
+
+    fakePermissionsSpy.mockRestore();
+    reactSpy.mockRestore();
   });
 
   test('should not include `🚫` option if `0` option provided', async () => {
@@ -163,6 +178,7 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
+
     const interaction = new CommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
@@ -188,6 +204,7 @@ describe('sweep unit tests', () => {
       },
     });
 
+    const fakePermissionsSpy = setFakePermissions(interaction);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -223,6 +240,12 @@ describe('sweep unit tests', () => {
 
     expect(reactSpy.mock.calls.length).toBe(4);
     expect(reactSpy.mock.calls).toEqual([['🇦'], ['🇧'], ['🇨'], ['🇩']]);
+
+    // Cleanup
+
+    fakePermissionsSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+    reactSpy.mockRestore();
   });
 
   test('should not run execute if interaction not command', async () => {
@@ -233,6 +256,7 @@ describe('sweep unit tests', () => {
       type: 1,
     });
 
+    const fakePermissionsSpy = setFakePermissions(interaction);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -247,6 +271,12 @@ describe('sweep unit tests', () => {
     expect(sweepResult).toBe(undefined);
     expect(interactionReplySpy.mock.calls.length).toBe(0);
     expect(reactSpy.mock.calls.length).toBe(0);
+
+    // Cleanup
+
+    fakePermissionsSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+    reactSpy.mockRestore();
   });
 
   test('should not run execute if no `question`', async () => {
@@ -270,6 +300,7 @@ describe('sweep unit tests', () => {
       },
     });
 
+    const fakePermissionsSpy = setFakePermissions(interaction);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -284,6 +315,12 @@ describe('sweep unit tests', () => {
     expect(sweepResult).toBe(undefined);
     expect(interactionReplySpy.mock.calls.length).toBe(0);
     expect(reactSpy.mock.calls.length).toBe(0);
+
+    // Cleanup
+
+    fakePermissionsSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+    reactSpy.mockRestore();
   });
 
   test('should reply with error if `nft_contract` option is not valid', async () => {
@@ -313,6 +350,7 @@ describe('sweep unit tests', () => {
       },
     });
 
+    const fakePermissionsSpy = setFakePermissions(interaction);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -330,6 +368,38 @@ describe('sweep unit tests', () => {
     expect(interactionReplySpy.mock.calls[0][0]).toEqual({
       content:
         'Invalid Ethereum address. Try something like: 0x000000000000000000000000000000000000bEEF.',
+      ephemeral: true,
+    });
+
+    // Cleanup
+
+    fakePermissionsSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+    reactSpy.mockRestore();
+  });
+
+  test('should reply with error if bot does not have access to channel', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const reactSpy = jest.fn();
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {guildId: '722525233755717762', react: reactSpy}) as any
+      );
+
+    const sweepResult = await sweep.execute(interaction);
+
+    expect(sweepResult).toBe(undefined);
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+
+    expect(interactionReplySpy.mock.calls[0][0]).toEqual({
+      content:
+        'The bot does not have access to this channel. Please update the permissions.',
       ephemeral: true,
     });
   });
@@ -361,6 +431,7 @@ describe('sweep unit tests', () => {
       },
     });
 
+    const fakePermissionsSpy = setFakePermissions(interaction);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -380,6 +451,12 @@ describe('sweep unit tests', () => {
         'Invalid duration. Try something like: 20 minutes; 12 hours; 1 day; 1 week. Short: d,w,M,y,h,m,s,ms',
       ephemeral: true,
     });
+
+    // Cleanup
+
+    fakePermissionsSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+    reactSpy.mockRestore();
   });
 
   test('should reply with error if duplicate numeric options provided', async () => {
@@ -410,6 +487,7 @@ describe('sweep unit tests', () => {
       },
     });
 
+    const fakePermissionsSpy = setFakePermissions(interaction);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -428,6 +506,12 @@ describe('sweep unit tests', () => {
       content: 'Duplicate poll options are not allowed.',
       ephemeral: true,
     });
+
+    // Cleanup
+
+    fakePermissionsSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+    reactSpy.mockRestore();
   });
 
   test('should reply with error and delete poll if DB crete entry fails', async () => {
