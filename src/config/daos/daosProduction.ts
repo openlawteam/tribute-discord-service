@@ -12,10 +12,15 @@ import {DaoData} from '../types';
  * If you want a DAO to interact with a Discord server,
  * start by adding its information to the enum and
  * exported mapping below.
+ *
+ * @todo we need to handle Moloch-based DAOs as first-class citizens
+ *   - `snapshotHub.proposalResolver`
+ *   - `DAO address`
  */
 
 export const DAO_NAMES_PRODUCTION = [
   'fashion',
+  'flamingo',
   'metaverse',
   'muse0',
   'music',
@@ -101,6 +106,24 @@ export const DAOS_PRODUCTION: Record<
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
       space: 'fashion',
     },
+  },
+
+  /**
+   * Moloch DAO
+   */
+  flamingo: {
+    actions: [],
+    applications: {
+      FLOOR_SWEEPER_POLL_BOT: {
+        name: 'FLOOR_SWEEPER_POLL_BOT',
+        resultChannelID: '938470347521540137',
+      },
+    },
+    baseURL: 'https://flamingodao.xyz',
+    events: [],
+    friendlyName: 'Flamingo',
+    guildID: '757641966530855074',
+    registryContractAddress: '',
   },
 
   metaverse: {
