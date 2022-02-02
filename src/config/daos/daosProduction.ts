@@ -116,8 +116,7 @@ export const DAOS_PRODUCTION: Record<
     applications: {
       FLOOR_SWEEPER_POLL_BOT: {
         name: 'FLOOR_SWEEPER_POLL_BOT',
-        // @todo
-        resultChannelID: '',
+        resultChannelID: '938470347521540137',
       },
     },
     baseURL: 'https://flamingodao.xyz',
