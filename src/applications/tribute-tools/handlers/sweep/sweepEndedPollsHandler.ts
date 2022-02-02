@@ -31,6 +31,7 @@ export function sweepEndedPollsHandler({
       where: {dateEnd: {lt: new Date()}, processed: false},
     });
 
+    console.log('--endedPolls---', endedPolls);
     endedPolls.forEach(
       async ({
         channelID,
@@ -46,6 +47,24 @@ export function sweepEndedPollsHandler({
           const channel = (await client.channels.fetch(
             channelID
           )) as TextChannel;
+          const canBotAccessChannel = channel.guild.me
+            ?.permissionsIn(channel)
+            .has('VIEW_CHANNEL');
+
+          if (!canBotAccessChannel) {
+            console.log('--NO ACCESS---');
+            // Mark the poll as `processed: true` in the db
+            await prisma.floorSweeperPoll.update({
+              where: {
+                id,
+              },
+              data: {
+                processed: true,
+              },
+            });
+
+            return;
+          }
 
           let message: Message;
 
@@ -64,10 +83,6 @@ export function sweepEndedPollsHandler({
 
               return;
             }
-
-            console.error(
-              `Something went wrong while fetching Discord message ID ${messageID}. ${e}`
-            );
 
             return;
           }
