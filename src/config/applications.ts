@@ -18,10 +18,10 @@ export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
 // Tribute Labs Discord Team Application IDs
 export const FLOOR_SWEEPER_POLL_BOT_ID: string =
   APP_ENV === 'production'
-    ? '938779189161644062'
+    ? '938837219282681936'
     : APP_ENV === 'development'
-    ? '938775957949530113'
-    : '938763190702063617'; /* localhost development */
+    ? '938835275696705556'
+    : '938831672063954964'; /* localhost development */
 
 /**
  * Development Guild ID for faster development
