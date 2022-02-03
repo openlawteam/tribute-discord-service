@@ -11,14 +11,17 @@ export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
  *
  * To keep the Discord bots as secure as possible we do not
  * use upstream bots locally in development.
+ *
+ * @see https://discord.com/developers/applications
  */
 
+// Tribute Labs Discord Team Application IDs
 export const FLOOR_SWEEPER_POLL_BOT_ID: string =
   APP_ENV === 'production'
-    ? '936161667304267807'
+    ? '938779189161644062'
     : APP_ENV === 'development'
-    ? '935866668104679464'
-    : '931125521645969448'; /* localhost development */
+    ? '938775957949530113'
+    : '938763190702063617'; /* localhost development */
 
 /**
  * Development Guild ID for faster development
