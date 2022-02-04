@@ -6,7 +6,7 @@ import {
   pollReactionHandler,
 } from './handlers';
 import {ApplicationReturn} from '../types';
-import {deployCommands, destroyClientHandler, getCommands} from '../helpers/';
+import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config';
 import {getEnv} from '../../helpers';
 
