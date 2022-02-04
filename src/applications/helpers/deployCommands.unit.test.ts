@@ -1,7 +1,7 @@
 import {deployCommands, getCommands} from './';
 
 import {APP_ENV} from '../../config/common';
-import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config/applications';
+import {TRIBUTE_TOOLS_BOT_ID} from '../../config/applications';
 import {rest, server} from '../../../test/msw/server';
 
 const appEnvOriginal = APP_ENV;
@@ -27,7 +27,7 @@ describe('deployCommands unit tests', () => {
     );
 
     const result = await deployCommands({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands,
       name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
@@ -60,7 +60,7 @@ describe('deployCommands unit tests', () => {
     );
 
     const result = await deployCommands({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands,
       name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
@@ -93,7 +93,7 @@ describe('deployCommands unit tests', () => {
     );
 
     const result = await deployCommands({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands,
       name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BAD_TOKEN_NAME' as any,

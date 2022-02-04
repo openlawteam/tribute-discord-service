@@ -7,8 +7,8 @@ import {
 } from './handlers';
 import {ApplicationReturn} from '../types';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
-import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config';
 import {getEnv} from '../../helpers';
+import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 
 export async function floorSweeperPollBot(): Promise<
   ApplicationReturn | undefined
@@ -23,7 +23,7 @@ export async function floorSweeperPollBot(): Promise<
     // Deploy commands
     try {
       await deployCommands({
-        applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+        applicationID: TRIBUTE_TOOLS_BOT_ID,
         commands,
         name: 'TRIBUTE_TOOLS_BOT',
         tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',

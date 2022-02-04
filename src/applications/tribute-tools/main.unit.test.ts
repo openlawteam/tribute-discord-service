@@ -1,4 +1,4 @@
-import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config';
+import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 import {getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 
@@ -29,7 +29,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
     expect(deployCommandsSpy).toHaveBeenCalledTimes(1);
 
     expect(deployCommandsSpy).toHaveBeenCalledWith({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands: await getCommands(async () => await import('./commands')),
       name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
@@ -234,7 +234,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
     expect(deployCommandsSpy).toHaveBeenCalledTimes(1);
 
     expect(deployCommandsSpy).toHaveBeenCalledWith({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands: await getCommands(async () => await import('./commands')),
       name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',

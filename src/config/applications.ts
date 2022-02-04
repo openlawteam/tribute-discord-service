@@ -16,7 +16,7 @@ export const APPLICATIONS = ['TRIBUTE_TOOLS_BOT'] as const;
  */
 
 // Tribute Labs Discord Team Application IDs
-export const FLOOR_SWEEPER_POLL_BOT_ID: string =
+export const TRIBUTE_TOOLS_BOT_ID: string =
   APP_ENV === 'production'
     ? '938837219282681936'
     : APP_ENV === 'development'
