@@ -12,7 +12,7 @@ import {getEnv} from '../../helpers';
 
 /**
  * Used to register and update
- * the slash commands for the floor sweeper poll bot application.
+ * the slash commands for the tribute tools bot application.
  */
 export async function deployCommands({
   applicationID,

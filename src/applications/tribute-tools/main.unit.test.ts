@@ -2,7 +2,7 @@ import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 import {getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 
-describe('floor-sweeper-poll/main unit tests', () => {
+describe('tribute-tools/main unit tests', () => {
   test('should log in to bot and return data', async () => {
     const discord = await import('discord.js');
 
@@ -22,9 +22,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
 
     expect(loginSpy).toHaveBeenCalledTimes(1);
 
-    expect(loginSpy).toHaveBeenCalledWith(
-      getEnv('BOT_TOKEN_FLOOR_SWEEPER_POLL')
-    );
+    expect(loginSpy).toHaveBeenCalledWith(getEnv('BOT_TOKEN_TRIBUTE_TOOLS'));
 
     expect(deployCommandsSpy).toHaveBeenCalledTimes(1);
 
@@ -32,7 +30,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands: await getCommands(async () => await import('./commands')),
       name: 'TRIBUTE_TOOLS_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
     });
 
     expect(returnValue?.name).toBe('TRIBUTE_TOOLS_BOT');
@@ -237,7 +235,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands: await getCommands(async () => await import('./commands')),
       name: 'TRIBUTE_TOOLS_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
     });
 
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);

@@ -30,7 +30,7 @@ describe('deployCommands unit tests', () => {
       applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands,
       name: 'TRIBUTE_TOOLS_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
     });
 
     expect(result).toBe(undefined);
@@ -63,7 +63,7 @@ describe('deployCommands unit tests', () => {
       applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands,
       name: 'TRIBUTE_TOOLS_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
     });
 
     expect(result).toBe(undefined);

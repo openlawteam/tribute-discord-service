@@ -14,7 +14,7 @@ export async function tributeToolsBot(): Promise<
   ApplicationReturn | undefined
 > {
   try {
-    if (!getEnv('BOT_TOKEN_FLOOR_SWEEPER_POLL')) {
+    if (!getEnv('BOT_TOKEN_TRIBUTE_TOOLS')) {
       return;
     }
 
@@ -26,7 +26,7 @@ export async function tributeToolsBot(): Promise<
         applicationID: TRIBUTE_TOOLS_BOT_ID,
         commands,
         name: 'TRIBUTE_TOOLS_BOT',
-        tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+        tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
       });
     } catch (error) {
       console.error(
@@ -47,7 +47,7 @@ export async function tributeToolsBot(): Promise<
     });
 
     // Login to Discord with the bot's token
-    client.login(getEnv('BOT_TOKEN_FLOOR_SWEEPER_POLL'));
+    client.login(getEnv('BOT_TOKEN_TRIBUTE_TOOLS'));
 
     // When the Discord client is ready, run this code (only once)
     client.once('ready', (): void => {
