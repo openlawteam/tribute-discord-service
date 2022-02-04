@@ -10,7 +10,7 @@ import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 
-export async function floorSweeperPollBot(): Promise<
+export async function tributeToolsBot(): Promise<
   ApplicationReturn | undefined
 > {
   try {
@@ -51,7 +51,7 @@ export async function floorSweeperPollBot(): Promise<
 
     // When the Discord client is ready, run this code (only once)
     client.once('ready', (): void => {
-      console.log('🤖  Floor sweeper bot ready');
+      console.log('🤖  Tribute Tools bot ready');
 
       // Poll every x seconds to check for ended polls and process them
       endedPollsHandler({client});

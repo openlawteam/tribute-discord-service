@@ -23,7 +23,7 @@ describe('deployCommands unit tests', () => {
     );
 
     const commands = await getCommands(
-      async () => await import('../floor-sweeper-poll/commands')
+      async () => await import('../tribute-tools/commands')
     );
 
     const result = await deployCommands({
@@ -56,7 +56,7 @@ describe('deployCommands unit tests', () => {
     );
 
     const commands = await getCommands(
-      async () => await import('../floor-sweeper-poll/commands')
+      async () => await import('../tribute-tools/commands')
     );
 
     const result = await deployCommands({
@@ -89,7 +89,7 @@ describe('deployCommands unit tests', () => {
     );
 
     const commands = await getCommands(
-      async () => await import('../floor-sweeper-poll/commands')
+      async () => await import('../tribute-tools/commands')
     );
 
     const result = await deployCommands({

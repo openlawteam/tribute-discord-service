@@ -10,14 +10,14 @@ describe('interactionExecuteHandler unit tests', () => {
   } as any as CommandInteraction;
 
   test('should execute commands', async () => {
-    const {sweep} = await import('../../floor-sweeper-poll/commands/sweep');
+    const {sweep} = await import('../../tribute-tools/commands/sweep');
 
     const executeSpy = jest
       .spyOn(sweep, 'execute')
       .mockImplementation(async () => undefined);
 
     const commands = await getCommands(
-      async () => await import('../../floor-sweeper-poll/commands')
+      async () => await import('../../tribute-tools/commands')
     );
 
     await interactionExecuteHandler({
@@ -36,7 +36,7 @@ describe('interactionExecuteHandler unit tests', () => {
   test('should catch error', async () => {
     const ERROR = new Error('Some bad error');
 
-    const {sweep} = await import('../../floor-sweeper-poll/commands/sweep');
+    const {sweep} = await import('../../tribute-tools/commands/sweep');
 
     const executeSpy = jest
       .spyOn(sweep, 'execute')
@@ -51,7 +51,7 @@ describe('interactionExecuteHandler unit tests', () => {
       .mockImplementation(() => '');
 
     const commands = await getCommands(
-      async () => await import('../../floor-sweeper-poll/commands')
+      async () => await import('../../tribute-tools/commands')
     );
 
     await interactionExecuteHandler({

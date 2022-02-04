@@ -10,7 +10,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -18,7 +18,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     expect(loginSpy).toHaveBeenCalledTimes(1);
 
@@ -56,7 +56,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(endedPollsHandler, 'endedPollsHandler')
       .mockImplementation(() => null as any);
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -64,7 +64,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     // Emit `ready` event
     returnValue?.client?.emit('ready', returnValue?.client);
@@ -97,7 +97,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(interactionExecuteHandler, 'interactionExecuteHandler')
       .mockImplementation(() => null as any);
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -105,7 +105,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     // Emit `interactionCreate` event
     returnValue?.client?.emit('interactionCreate', {
@@ -139,7 +139,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(pollReactionHandler, 'pollReactionHandler')
       .mockImplementation(() => null as any);
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -147,7 +147,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     // Emit `messageReactionAdd` event
     returnValue?.client?.emit(
@@ -185,7 +185,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -193,7 +193,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     await returnValue?.stop?.();
 
@@ -217,7 +217,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -227,7 +227,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
         throw new Error('Some bad error.');
       });
 
-    await floorSweeperPollBot();
+    await tributeToolsBot();
 
     expect(loginSpy).toHaveBeenCalledTimes(0);
 

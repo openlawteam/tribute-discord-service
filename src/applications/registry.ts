@@ -7,4 +7,4 @@
  * Comment-out, or remove, any individual applications not to be automatically run.
  */
 
-export {floorSweeperPollBot} from './tribute-tools';
+export {tributeToolsBot} from './tribute-tools';

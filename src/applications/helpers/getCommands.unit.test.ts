@@ -6,7 +6,7 @@ import {getCommands} from './';
 describe('getCommands unit tests', () => {
   test('should return commands', async () => {
     const {commandsCollection, commandsData} = await getCommands(
-      async () => await import('../floor-sweeper-poll/commands')
+      async () => await import('../tribute-tools/commands')
     );
 
     expect(commandsCollection).toBeInstanceOf(Collection);
