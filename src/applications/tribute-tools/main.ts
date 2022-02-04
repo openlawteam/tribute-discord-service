@@ -58,12 +58,12 @@ export async function tributeToolsBot(): Promise<
     });
 
     // Listen for interactions and possibly run commands
-    client.on('interactionCreate', async (interaction): Promise<void> => {
-      await sweepInteractionExecuteHandler({commands, interaction});
+    client.on('interactionCreate', (interaction) => {
+      sweepInteractionExecuteHandler({commands, interaction});
     });
 
     // Listen to reactions on messages and possibly handle
-    client.on('messageReactionAdd', async (reaction, user): Promise<void> => {
+    client.on('messageReactionAdd', (reaction, user) => {
       sweepPollReactionHandler({reaction, user});
     });
 
