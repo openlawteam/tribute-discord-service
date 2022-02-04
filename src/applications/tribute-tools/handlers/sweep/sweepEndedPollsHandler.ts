@@ -10,14 +10,14 @@ import {
 import {Prisma} from '@prisma/client';
 import {time} from '@discordjs/builders';
 
-import {getDaoDataByGuildID} from '../../../helpers';
-import {getDaos} from '../../../services';
-import {prisma} from '../../../singletons';
-import {SWEEP_EXTERNAL_URL} from '../config';
+import {getDaoDataByGuildID} from '../../../../helpers';
+import {getDaos} from '../../../../services';
+import {prisma} from '../../../../singletons';
+import {SWEEP_EXTERNAL_URL} from '../../config';
 
 const CHECK_POLL_ENDED_INTERVAL: number = 15000;
 
-export function endedPollsHandler({
+export function sweepEndedPollsHandler({
   checkInterval = CHECK_POLL_ENDED_INTERVAL,
   client,
 }: {

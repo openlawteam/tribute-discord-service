@@ -1,8 +1,8 @@
 import {Interaction} from 'discord.js';
 
-import {GetCommandsReturn} from '../../types';
+import {GetCommandsReturn} from '../../../types';
 
-export async function interactionExecuteHandler({
+export async function sweepInteractionExecuteHandler({
   commands,
   interaction,
 }: {

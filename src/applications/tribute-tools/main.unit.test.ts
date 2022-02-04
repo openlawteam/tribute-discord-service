@@ -44,14 +44,16 @@ describe('tribute-tools/main unit tests', () => {
 
   test('should call `ready` handlers', async () => {
     const discord = await import('discord.js');
-    const endedPollsHandler = await import('./handlers/endedPollsHandler');
+    const sweepEndedPollsHandler = await import(
+      './handlers/sweep/sweepEndedPollsHandler'
+    );
 
     const loginSpy = jest
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
     const endedPollsHandlerSpy = jest
-      .spyOn(endedPollsHandler, 'endedPollsHandler')
+      .spyOn(sweepEndedPollsHandler, 'sweepEndedPollsHandler')
       .mockImplementation(() => null as any);
 
     const {tributeToolsBot} = await import('../tribute-tools/main');
@@ -83,8 +85,8 @@ describe('tribute-tools/main unit tests', () => {
   test('should call `interactionCreate` handlers', async () => {
     const discord = await import('discord.js');
 
-    const interactionExecuteHandler = await import(
-      './handlers/interactionExecuteHandler'
+    const sweepInteractionExecuteHandler = await import(
+      './handlers/sweep/sweepInteractionExecuteHandler'
     );
 
     const loginSpy = jest
@@ -92,7 +94,7 @@ describe('tribute-tools/main unit tests', () => {
       .mockImplementation(async () => '');
 
     const interactionExecuteHandlerSpy = jest
-      .spyOn(interactionExecuteHandler, 'interactionExecuteHandler')
+      .spyOn(sweepInteractionExecuteHandler, 'sweepInteractionExecuteHandler')
       .mockImplementation(() => null as any);
 
     const {tributeToolsBot} = await import('../tribute-tools/main');
@@ -127,14 +129,16 @@ describe('tribute-tools/main unit tests', () => {
   test('should call `messageReactionAdd` handlers', async () => {
     const discord = await import('discord.js');
 
-    const pollReactionHandler = await import('./handlers/pollReactionHandler');
+    const sweepPollReactionHandler = await import(
+      './handlers/sweep/sweepPollReactionHandler'
+    );
 
     const loginSpy = jest
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
     const pollReactionHandlerSpy = jest
-      .spyOn(pollReactionHandler, 'pollReactionHandler')
+      .spyOn(sweepPollReactionHandler, 'sweepPollReactionHandler')
       .mockImplementation(() => null as any);
 
     const {tributeToolsBot} = await import('../tribute-tools/main');
