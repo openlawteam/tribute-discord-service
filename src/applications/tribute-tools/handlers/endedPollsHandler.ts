@@ -138,7 +138,7 @@ export function endedPollsHandler({
             }
 
             const resultChannelID =
-              dao.applications?.FLOOR_SWEEPER_POLL_BOT?.resultChannelID;
+              dao.applications?.TRIBUTE_TOOLS_BOT?.resultChannelID;
 
             if (!resultChannelID) {
               throw new Error('Could not find a `resultChannelID`.');

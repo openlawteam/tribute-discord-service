@@ -4,7 +4,7 @@ import {APP_ENV} from './common';
  * Register unique application names
  */
 
-export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
+export const APPLICATIONS = ['TRIBUTE_TOOLS_BOT'] as const;
 
 /**
  * Application Client IDs

@@ -29,7 +29,7 @@ describe('deployCommands unit tests', () => {
     const result = await deployCommands({
       applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
       commands,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
+      name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
     });
 
@@ -62,7 +62,7 @@ describe('deployCommands unit tests', () => {
     const result = await deployCommands({
       applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
       commands,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
+      name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
     });
 
@@ -95,7 +95,7 @@ describe('deployCommands unit tests', () => {
     const result = await deployCommands({
       applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
       commands,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
+      name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BAD_TOKEN_NAME' as any,
     });
 

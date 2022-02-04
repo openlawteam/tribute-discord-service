@@ -31,11 +31,11 @@ describe('floor-sweeper-poll/main unit tests', () => {
     expect(deployCommandsSpy).toHaveBeenCalledWith({
       applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
       commands: await getCommands(async () => await import('./commands')),
-      name: 'FLOOR_SWEEPER_POLL_BOT',
+      name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
     });
 
-    expect(returnValue?.name).toBe('FLOOR_SWEEPER_POLL_BOT');
+    expect(returnValue?.name).toBe('TRIBUTE_TOOLS_BOT');
     expect(returnValue?.stop).toBeInstanceOf(Function);
 
     // Cleanup
@@ -236,14 +236,14 @@ describe('floor-sweeper-poll/main unit tests', () => {
     expect(deployCommandsSpy).toHaveBeenCalledWith({
       applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
       commands: await getCommands(async () => await import('./commands')),
-      name: 'FLOOR_SWEEPER_POLL_BOT',
+      name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
     });
 
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
 
     expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
-      /Discord commands for FLOOR_SWEEPER_POLL_BOT could not be deployed\. Error: Some bad error\./i
+      /Discord commands for TRIBUTE_TOOLS_BOT could not be deployed\. Error: Some bad error\./i
     );
 
     // Cleanup

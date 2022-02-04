@@ -25,12 +25,12 @@ export async function floorSweeperPollBot(): Promise<
       await deployCommands({
         applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
         commands,
-        name: 'FLOOR_SWEEPER_POLL_BOT',
+        name: 'TRIBUTE_TOOLS_BOT',
         tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
       });
     } catch (error) {
       console.error(
-        `Discord commands for FLOOR_SWEEPER_POLL_BOT could not be deployed. ${error}`
+        `Discord commands for TRIBUTE_TOOLS_BOT could not be deployed. ${error}`
       );
 
       return;
@@ -68,12 +68,12 @@ export async function floorSweeperPollBot(): Promise<
     });
 
     const stop = async (): Promise<void> => {
-      await destroyClientHandler(client, 'FLOOR_SWEEPER_POLL_BOT');
+      await destroyClientHandler(client, 'TRIBUTE_TOOLS_BOT');
     };
 
     return {
       client,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
+      name: 'TRIBUTE_TOOLS_BOT',
       stop,
     };
   } catch (error) {
