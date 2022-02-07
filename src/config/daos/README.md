@@ -5,7 +5,7 @@ See `config/types.ts` `DaoData` for documentation about the configuration.
 Example:
 
 ```ts
-muse0: {
+museo: {
   actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],
   adapters: {
     [CORE_DAO_ADAPTERS['tribute-nft']]: {
@@ -24,7 +24,7 @@ muse0: {
         proposalID,
         space,
       }),
-    space: 'muse0',
+    space: 'museo',
   },
 }
 ```
