@@ -16,6 +16,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
       events: [{name: 'SPONSORED_PROPOSAL'}],
       friendlyName: 'Tribute DAO [DEV]',
       guildID: GUILD_ID_FIXTURE,
+      internalName: 'test',
       registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
     },
 
@@ -31,6 +32,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
       events: [{name: 'PROCESSED_PROPOSAL' as any}],
       friendlyName: 'Tribute DAO [DEV]',
       guildID: GUILD_ID_FIXTURE,
+      internalName: 'test1',
       registryContractAddress: '0x0000000000000000000000000000000000000000',
     },
 
@@ -49,6 +51,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
       ],
       friendlyName: 'Tribute DAO [DEV]',
       guildID: GUILD_ID_FIXTURE,
+      internalName: 'test2',
       registryContractAddress: '0x0000000000000000000000000000000000000000',
     },
 
@@ -67,6 +70,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
       ],
       friendlyName: 'Tribute DAO [DEV]',
       guildID: GUILD_ID_FIXTURE,
+      internalName: 'test3',
       registryContractAddress: '0x0000000000000000000000000000000000000000',
     },
   };

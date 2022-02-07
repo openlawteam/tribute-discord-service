@@ -153,7 +153,7 @@ export function sweepEndedPollsHandler({
                 .setLabel('Sweep')
                 .setStyle('LINK')
                 .setURL(
-                  `${SWEEP_EXTERNAL_URL}/?amount=${result}&contractAddress=${contractAddress}`
+                  `${SWEEP_EXTERNAL_URL}/?daoName=${dao.internalName}&amount=${result}&contractAddress=${contractAddress}`
                 )
                 .setEmoji('🧹')
             );
