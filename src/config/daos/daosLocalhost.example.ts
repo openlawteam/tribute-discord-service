@@ -62,6 +62,7 @@ export const DAOS_LOCALHOST: Record<
     events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Tribute DAO [DEV]',
     guildID: '00000000000000000000000',
+    internalName: 'test',
     registryContractAddress: '0x0000000000000000000000000000000000000000',
     snapshotHub: {
       proposalResolver: async <R = any>(

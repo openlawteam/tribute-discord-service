@@ -18,7 +18,7 @@ export type DaoDataAction = {
 
 export type Daos = Record<string, DaoData>;
 
-export type DaoData = {
+export type DaoData<InternalNames = string> = {
   /**
    * Adapter information
    */
@@ -51,6 +51,12 @@ export type DaoData = {
    * Discord guild (server) ID
    */
   guildID: string;
+  /**
+   * Internal DAO name
+   *
+   * @see `lao-backends` for most cases
+   */
+  internalName: InternalNames;
   /**
    * Snapshot Hub data
    */

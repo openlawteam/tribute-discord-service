@@ -14,10 +14,15 @@ import {DaoData} from '../types';
  * exported mapping below.
  */
 
+/**
+ * Our internal DAO names
+ *
+ * @see `lao-backends` for most cases
+ */
 export const DAO_NAMES_DEVELOPMENT = [
   'fashion',
   'metaverse',
-  'muse0',
+  'museo',
   'tribute',
 ] as const;
 
@@ -38,7 +43,7 @@ const DEFAULT_PROPOSAL_RESOLVER = async <R = any>(
 
 export const DAOS_DEVELOPMENT: Record<
   typeof DAO_NAMES_DEVELOPMENT[number],
-  DaoData
+  DaoData<typeof DAO_NAMES_DEVELOPMENT[number]>
 > = {
   tribute: {
     actions: [
@@ -71,6 +76,7 @@ export const DAOS_DEVELOPMENT: Record<
     events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Tribute DAO [DEV]',
     guildID: TRIBUTE_DISCORD_GUILD_ID,
+    internalName: 'tribute',
     registryContractAddress: '0xf5af0d9c3e4091a48925902eaAB2982e44E7a4C5',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
@@ -78,7 +84,7 @@ export const DAOS_DEVELOPMENT: Record<
     },
   },
 
-  muse0: {
+  museo: {
     actions: [
       {
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
@@ -107,6 +113,7 @@ export const DAOS_DEVELOPMENT: Record<
     events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Muse0 [DEV]',
     guildID: TRIBUTE_DISCORD_GUILD_ID,
+    internalName: 'museo',
     registryContractAddress: '0x00637869d068a5A5fB6fa42d7c025d1dCbd14f99',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
@@ -131,6 +138,7 @@ export const DAOS_DEVELOPMENT: Record<
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Red DAO [DEV]',
     guildID: TRIBUTE_DISCORD_GUILD_ID,
+    internalName: 'fashion',
     registryContractAddress: '0xeE2873D8E5380405eAF079491f7A6322fd35Db1f',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
@@ -155,6 +163,7 @@ export const DAOS_DEVELOPMENT: Record<
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'NEON DAO [DEV]',
     guildID: TRIBUTE_DISCORD_GUILD_ID,
+    internalName: 'metaverse',
     registryContractAddress: '0xB9CC072170b5407d37f1d2Bd07BEf7441e1942Dc',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,

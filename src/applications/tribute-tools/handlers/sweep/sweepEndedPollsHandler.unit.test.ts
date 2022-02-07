@@ -161,7 +161,9 @@ describe('sweepEndedPollsHandler unit tests', () => {
           .setLabel('Sweep')
           .setStyle('LINK')
           .setURL(
-            `${SWEEP_EXTERNAL_URL}/?amount=${100}&contractAddress=${ETH_ADDRESS_FIXTURE}`
+            `${SWEEP_EXTERNAL_URL}/?daoName=${
+              FAKE_DAOS_FIXTURE['test'].internalName
+            }&amount=${100}&contractAddress=${ETH_ADDRESS_FIXTURE}`
           )
           .setEmoji('🧹')
       )
@@ -173,7 +175,9 @@ describe('sweepEndedPollsHandler unit tests', () => {
           .setLabel('Sweep')
           .setStyle('LINK')
           .setURL(
-            `${SWEEP_EXTERNAL_URL}/?amount=${200}&contractAddress=${ETH_ADDRESS_FIXTURE}`
+            `${SWEEP_EXTERNAL_URL}/?daoName=${
+              FAKE_DAOS_FIXTURE['test'].internalName
+            }&amount=${200}&contractAddress=${ETH_ADDRESS_FIXTURE}`
           )
           .setEmoji('🧹')
       )

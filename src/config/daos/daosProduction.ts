@@ -18,11 +18,16 @@ import {DaoData} from '../types';
  *   - `DAO address`
  */
 
+/**
+ * Our internal DAO names
+ *
+ * @see `lao-backends` for most cases
+ */
 export const DAO_NAMES_PRODUCTION = [
   'fashion',
-  'flamingo',
+  'nft',
   'metaverse',
-  'muse0',
+  'museo',
   'music',
 ] as const;
 
@@ -40,9 +45,9 @@ const DEFAULT_PROPOSAL_RESOLVER = async <R = any>(
 
 export const DAOS_PRODUCTION: Record<
   typeof DAO_NAMES_PRODUCTION[number],
-  DaoData
+  DaoData<typeof DAO_NAMES_PRODUCTION[number]>
 > = {
-  muse0: {
+  museo: {
     actions: [
       {
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
@@ -71,6 +76,7 @@ export const DAOS_PRODUCTION: Record<
     events: [{name: 'SPONSORED_PROPOSAL'}, {name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Muse0',
     guildID: '846186721799569458',
+    internalName: 'museo',
     registryContractAddress: '0x7c8B281C56f7ef9b8099D3F491AF24DC2C2e3ee0',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
@@ -101,6 +107,7 @@ export const DAOS_PRODUCTION: Record<
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'Red DAO',
     guildID: '894656334069370900',
+    internalName: 'fashion',
     registryContractAddress: '0x1D96d039d384d3ECCaD6f07aAB27A49408A1Cf2B',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
@@ -109,9 +116,9 @@ export const DAOS_PRODUCTION: Record<
   },
 
   /**
-   * Moloch DAO
+   * Moloch-based (v2) DAO
    */
-  flamingo: {
+  nft: {
     actions: [],
     applications: {
       TRIBUTE_TOOLS_BOT: {
@@ -123,6 +130,7 @@ export const DAOS_PRODUCTION: Record<
     events: [],
     friendlyName: 'Flamingo',
     guildID: '757641966530855074',
+    internalName: 'nft',
     registryContractAddress: '',
   },
 
@@ -149,6 +157,7 @@ export const DAOS_PRODUCTION: Record<
     events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
     friendlyName: 'NEON DAO',
     guildID: '876601577157324840',
+    internalName: 'metaverse',
     registryContractAddress: '0xa9D57fB58926d498c792733ee86d3Cc8EB8bb7A0',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
@@ -168,6 +177,7 @@ export const DAOS_PRODUCTION: Record<
     events: [],
     friendlyName: 'Noise DAO',
     guildID: '922548287486193685',
+    internalName: 'music',
     registryContractAddress: '0x56138a0012A23E90a2EEE732221188881A87d684',
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
