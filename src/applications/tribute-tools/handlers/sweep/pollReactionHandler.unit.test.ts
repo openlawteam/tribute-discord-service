@@ -10,11 +10,11 @@ import {
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
   GUILD_ID_FIXTURE,
-} from '../../../../test';
-import {pollReactionHandler} from '.';
-import {prismaMock} from '../../../../test/prismaMock';
+} from '../../../../../test';
+import {sweepPollReactionHandler} from '.';
+import {prismaMock} from '../../../../../test/prismaMock';
 
-describe('pollReactionHandler unit tests', () => {
+describe('sweepPollReactionHandler unit tests', () => {
   test('should remove invalid reaction', async () => {
     const userReactionRemoveSpy = jest.fn();
 
@@ -55,7 +55,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler({reaction: REACTION, user: USER});
+    await sweepPollReactionHandler({reaction: REACTION, user: USER});
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
@@ -103,7 +103,7 @@ describe('pollReactionHandler unit tests', () => {
       result: 100,
     };
 
-    const getDaos = await import('../../../services/dao/getDaos');
+    const getDaos = await import('../../../../services/dao/getDaos');
 
     const getDaosSpy = jest
       .spyOn(getDaos, 'getDaos')
@@ -118,7 +118,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler({reaction: REACTION, user: USER});
+    await sweepPollReactionHandler({reaction: REACTION, user: USER});
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
@@ -183,7 +183,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler({reaction: REACTION, user: USER});
+    await sweepPollReactionHandler({reaction: REACTION, user: USER});
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
@@ -246,7 +246,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler({reaction: REACTION, user: USER});
+    await sweepPollReactionHandler({reaction: REACTION, user: USER});
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
@@ -315,7 +315,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler({reaction: REACTION, user: USER});
+    await sweepPollReactionHandler({reaction: REACTION, user: USER});
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
@@ -377,7 +377,7 @@ describe('pollReactionHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockResolvedValue(DB_ENTRY);
 
-    await pollReactionHandler({reaction: REACTION, user: USER});
+    await sweepPollReactionHandler({reaction: REACTION, user: USER});
 
     expect(reactionFetchSpy).toHaveBeenCalledTimes(1);
     expect(reactionUsersFetchSpy).toHaveBeenCalledTimes(1);

@@ -62,8 +62,8 @@ export const DAOS_DEVELOPMENT: Record<
       },
     },
     applications: {
-      FLOOR_SWEEPER_POLL_BOT: {
-        name: 'FLOOR_SWEEPER_POLL_BOT',
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
         resultChannelID: '933653038718128198',
       },
     },

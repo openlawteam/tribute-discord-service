@@ -1,20 +1,20 @@
 import {Client, Intents} from 'discord.js';
 
 import {
-  endedPollsHandler,
-  interactionExecuteHandler,
-  pollReactionHandler,
-} from './handlers';
+  sweepEndedPollsHandler,
+  sweepInteractionExecuteHandler,
+  sweepPollReactionHandler,
+} from './handlers/sweep';
 import {ApplicationReturn} from '../types';
-import {deployCommands, destroyClientHandler, getCommands} from '../helpers/';
-import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config';
+import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
+import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 
-export async function floorSweeperPollBot(): Promise<
+export async function tributeToolsBot(): Promise<
   ApplicationReturn | undefined
 > {
   try {
-    if (!getEnv('BOT_TOKEN_FLOOR_SWEEPER_POLL')) {
+    if (!getEnv('BOT_TOKEN_TRIBUTE_TOOLS')) {
       return;
     }
 
@@ -23,14 +23,14 @@ export async function floorSweeperPollBot(): Promise<
     // Deploy commands
     try {
       await deployCommands({
-        applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+        applicationID: TRIBUTE_TOOLS_BOT_ID,
         commands,
-        name: 'FLOOR_SWEEPER_POLL_BOT',
-        tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+        name: 'TRIBUTE_TOOLS_BOT',
+        tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
       });
     } catch (error) {
       console.error(
-        `Discord commands for FLOOR_SWEEPER_POLL_BOT could not be deployed. ${error}`
+        `Discord commands for TRIBUTE_TOOLS_BOT could not be deployed. ${error}`
       );
 
       return;
@@ -47,33 +47,33 @@ export async function floorSweeperPollBot(): Promise<
     });
 
     // Login to Discord with the bot's token
-    client.login(getEnv('BOT_TOKEN_FLOOR_SWEEPER_POLL'));
+    client.login(getEnv('BOT_TOKEN_TRIBUTE_TOOLS'));
 
     // When the Discord client is ready, run this code (only once)
     client.once('ready', (): void => {
-      console.log('🤖  Floor sweeper bot ready');
+      console.log('🤖  Tribute Tools bot ready');
 
       // Poll every x seconds to check for ended polls and process them
-      endedPollsHandler({client});
+      sweepEndedPollsHandler({client});
     });
 
     // Listen for interactions and possibly run commands
-    client.on('interactionCreate', async (interaction): Promise<void> => {
-      await interactionExecuteHandler({commands, interaction});
+    client.on('interactionCreate', (interaction) => {
+      sweepInteractionExecuteHandler({commands, interaction});
     });
 
     // Listen to reactions on messages and possibly handle
-    client.on('messageReactionAdd', async (reaction, user): Promise<void> => {
-      pollReactionHandler({reaction, user});
+    client.on('messageReactionAdd', (reaction, user) => {
+      sweepPollReactionHandler({reaction, user});
     });
 
     const stop = async (): Promise<void> => {
-      await destroyClientHandler(client, 'FLOOR_SWEEPER_POLL_BOT');
+      await destroyClientHandler(client, 'TRIBUTE_TOOLS_BOT');
     };
 
     return {
       client,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
+      name: 'TRIBUTE_TOOLS_BOT',
       stop,
     };
   } catch (error) {

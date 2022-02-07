@@ -26,7 +26,7 @@ export function envCheck(
       const value = getEnv(name);
 
       if (!value && !noLog) {
-        console.warn(`⚠️  Missing environment variable for ${name}.`);
+        console.warn(`⚠️  Missing required environment variable for ${name}.`);
       }
 
       return value;
@@ -34,7 +34,7 @@ export function envCheck(
     .every((v) => v);
 
   if (areAllSet && !noLog) {
-    console.log('✔ All environment variables are set.');
+    console.log('✔ All required environment variables are set.');
   }
 
   return areAllSet;

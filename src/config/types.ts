@@ -118,7 +118,7 @@ export type DaoDataSnapshotHub = {
  * Application-specific config mappings
  */
 export type DaoDataApplicationsMap = {
-  FLOOR_SWEEPER_POLL_BOT: FloorSweeperBotApplication;
+  TRIBUTE_TOOLS_BOT: FloorSweeperBotApplication;
 };
 
 /**

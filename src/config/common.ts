@@ -49,7 +49,7 @@ export const ENVIRONMENT_VARIABLE_KEYS = [
  * Environment variable keys used for Discord Bots.
  */
 export const ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS = [
-  'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+  'BOT_TOKEN_TRIBUTE_TOOLS',
 ] as const;
 
 /**

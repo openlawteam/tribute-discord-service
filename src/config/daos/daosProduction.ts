@@ -92,8 +92,8 @@ export const DAOS_PRODUCTION: Record<
       },
     },
     applications: {
-      FLOOR_SWEEPER_POLL_BOT: {
-        name: 'FLOOR_SWEEPER_POLL_BOT',
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
         resultChannelID: '936185841204744222',
       },
     },
@@ -114,8 +114,8 @@ export const DAOS_PRODUCTION: Record<
   flamingo: {
     actions: [],
     applications: {
-      FLOOR_SWEEPER_POLL_BOT: {
-        name: 'FLOOR_SWEEPER_POLL_BOT',
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
         resultChannelID: '938470347521540137',
       },
     },
@@ -140,8 +140,8 @@ export const DAOS_PRODUCTION: Record<
       },
     },
     applications: {
-      FLOOR_SWEEPER_POLL_BOT: {
-        name: 'FLOOR_SWEEPER_POLL_BOT',
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
         resultChannelID: '936184076107415602',
       },
     },
@@ -159,8 +159,8 @@ export const DAOS_PRODUCTION: Record<
   music: {
     actions: [],
     applications: {
-      FLOOR_SWEEPER_POLL_BOT: {
-        name: 'FLOOR_SWEEPER_POLL_BOT',
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
         resultChannelID: '936433157832589402',
       },
     },

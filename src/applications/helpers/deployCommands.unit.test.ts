@@ -1,7 +1,7 @@
 import {deployCommands, getCommands} from './';
 
 import {APP_ENV} from '../../config/common';
-import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config/applications';
+import {TRIBUTE_TOOLS_BOT_ID} from '../../config/applications';
 import {rest, server} from '../../../test/msw/server';
 
 const appEnvOriginal = APP_ENV;
@@ -23,14 +23,14 @@ describe('deployCommands unit tests', () => {
     );
 
     const commands = await getCommands(
-      async () => await import('../floor-sweeper-poll/commands')
+      async () => await import('../tribute-tools/commands')
     );
 
     const result = await deployCommands({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      name: 'TRIBUTE_TOOLS_BOT',
+      tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
     });
 
     expect(result).toBe(undefined);
@@ -56,14 +56,14 @@ describe('deployCommands unit tests', () => {
     );
 
     const commands = await getCommands(
-      async () => await import('../floor-sweeper-poll/commands')
+      async () => await import('../tribute-tools/commands')
     );
 
     const result = await deployCommands({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      name: 'TRIBUTE_TOOLS_BOT',
+      tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
     });
 
     expect(result).toBe(undefined);
@@ -89,13 +89,13 @@ describe('deployCommands unit tests', () => {
     );
 
     const commands = await getCommands(
-      async () => await import('../floor-sweeper-poll/commands')
+      async () => await import('../tribute-tools/commands')
     );
 
     const result = await deployCommands({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands,
-      name: 'FLOOR_SWEEPER_POLL_BOT',
+      name: 'TRIBUTE_TOOLS_BOT',
       tokenEnvVarName: 'BAD_TOKEN_NAME' as any,
     });
 

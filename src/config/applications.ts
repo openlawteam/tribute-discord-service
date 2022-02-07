@@ -4,7 +4,7 @@ import {APP_ENV} from './common';
  * Register unique application names
  */
 
-export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
+export const APPLICATIONS = ['TRIBUTE_TOOLS_BOT'] as const;
 
 /**
  * Application Client IDs
@@ -16,7 +16,7 @@ export const APPLICATIONS = ['FLOOR_SWEEPER_POLL_BOT'] as const;
  */
 
 // Tribute Labs Discord Team Application IDs
-export const FLOOR_SWEEPER_POLL_BOT_ID: string =
+export const TRIBUTE_TOOLS_BOT_ID: string =
   APP_ENV === 'production'
     ? '938837219282681936'
     : APP_ENV === 'development'

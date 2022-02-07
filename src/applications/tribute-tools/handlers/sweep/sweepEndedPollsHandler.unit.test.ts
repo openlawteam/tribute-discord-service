@@ -10,10 +10,10 @@ import {
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
   GUILD_ID_FIXTURE,
-} from '../../../../test';
-import {endedPollsHandler} from './endedPollsHandler';
-import {prismaMock} from '../../../../test/prismaMock';
-import {SWEEP_EXTERNAL_URL} from '../config';
+} from '../../../../../test';
+import {sweepEndedPollsHandler} from './sweepEndedPollsHandler';
+import {prismaMock} from '../../../../../test/prismaMock';
+import {SWEEP_EXTERNAL_URL} from '../../config';
 
 const DB_ENTRY = {
   channelID: '886976610018934824',
@@ -43,7 +43,7 @@ const DB_ENTRY_1 = {
   result: 0,
 };
 
-describe('endedPollsHandler unit tests', () => {
+describe('sweepEndedPollsHandler unit tests', () => {
   test('should process ended poll', async () => {
     /**
      * Mock db fetch
@@ -56,7 +56,7 @@ describe('endedPollsHandler unit tests', () => {
 
     // Mock `getDaos`
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(await import('../../../../services/dao/getDaos'), 'getDaos')
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const client = new Client({
@@ -113,7 +113,7 @@ describe('endedPollsHandler unit tests', () => {
     jest.useFakeTimers();
 
     // Run handler
-    endedPollsHandler({client, checkInterval: 1000});
+    sweepEndedPollsHandler({client, checkInterval: 1000});
 
     jest.advanceTimersByTime(2000);
 
@@ -242,7 +242,7 @@ describe('endedPollsHandler unit tests', () => {
 
     // Mock `getDaos`
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(await import('../../../../services/dao/getDaos'), 'getDaos')
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const client = new Client({
@@ -297,7 +297,7 @@ describe('endedPollsHandler unit tests', () => {
     jest.useFakeTimers();
 
     // Run handler
-    endedPollsHandler({client, checkInterval: 1000});
+    sweepEndedPollsHandler({client, checkInterval: 1000});
 
     jest.advanceTimersByTime(1000);
 

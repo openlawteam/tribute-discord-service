@@ -7,11 +7,11 @@ import {
 import {Prisma} from '@prisma/client';
 import {channelMention} from '@discordjs/builders';
 
-import {getDaoDataByGuildID} from '../../../helpers';
-import {getDaos} from '../../../services';
-import {prisma} from '../../../singletons';
+import {getDaoDataByGuildID} from '../../../../helpers';
+import {getDaos} from '../../../../services';
+import {prisma} from '../../../../singletons';
 
-export async function pollReactionHandler({
+export async function sweepPollReactionHandler({
   reaction,
   user,
 }: {
@@ -108,8 +108,7 @@ export async function pollReactionHandler({
         );
       }
 
-      resultChannelID =
-        dao.applications?.FLOOR_SWEEPER_POLL_BOT?.resultChannelID;
+      resultChannelID = dao.applications?.TRIBUTE_TOOLS_BOT?.resultChannelID;
 
       if (!resultChannelID) {
         throw new Error('Could not find a `resultChannelID`.');

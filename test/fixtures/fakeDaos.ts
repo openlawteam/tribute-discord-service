@@ -25,8 +25,8 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
       },
     },
     applications: {
-      FLOOR_SWEEPER_POLL_BOT: {
-        name: 'FLOOR_SWEEPER_POLL_BOT',
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
         resultChannelID: '123123123123123123',
       },
     },

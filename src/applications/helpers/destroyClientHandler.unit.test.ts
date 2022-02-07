@@ -20,14 +20,14 @@ describe('destroyClientHandler unit tests', () => {
 
     const destroySpy = jest.spyOn(client, 'destroy');
 
-    expect(await destroyClientHandler(client, 'FLOOR_SWEEPER_POLL_BOT')).toBe(
+    expect(await destroyClientHandler(client, 'TRIBUTE_TOOLS_BOT')).toBe(
       undefined
     );
 
     expect(destroySpy.mock.calls.length).toBe(1);
 
     expect(consoleLogSpy.mock.calls[0][0]).toMatch(
-      /Successfully destroyed FLOOR_SWEEPER_POLL_BOT client instance\./i
+      /Successfully destroyed TRIBUTE_TOOLS_BOT client instance\./i
     );
 
     // Cleanup
@@ -42,11 +42,11 @@ describe('destroyClientHandler unit tests', () => {
       .mockImplementation(() => {});
 
     try {
-      await destroyClientHandler({} as any, 'FLOOR_SWEEPER_POLL_BOT');
+      await destroyClientHandler({} as any, 'TRIBUTE_TOOLS_BOT');
     } catch (error) {
       expect(consoleErrorSpy.mock.calls.length).toBe(1);
       expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
-        /Error while destroying FLOOR_SWEEPER_POLL_BOT client instance: "client\.destroy is not a function/i
+        /Error while destroying TRIBUTE_TOOLS_BOT client instance: "client\.destroy is not a function/i
       );
     }
 

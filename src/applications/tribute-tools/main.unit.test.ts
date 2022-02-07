@@ -1,8 +1,8 @@
-import {FLOOR_SWEEPER_POLL_BOT_ID} from '../../config';
+import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 import {getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 
-describe('floor-sweeper-poll/main unit tests', () => {
+describe('tribute-tools/main unit tests', () => {
   test('should log in to bot and return data', async () => {
     const discord = await import('discord.js');
 
@@ -10,7 +10,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -18,24 +18,22 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     expect(loginSpy).toHaveBeenCalledTimes(1);
 
-    expect(loginSpy).toHaveBeenCalledWith(
-      getEnv('BOT_TOKEN_FLOOR_SWEEPER_POLL')
-    );
+    expect(loginSpy).toHaveBeenCalledWith(getEnv('BOT_TOKEN_TRIBUTE_TOOLS'));
 
     expect(deployCommandsSpy).toHaveBeenCalledTimes(1);
 
     expect(deployCommandsSpy).toHaveBeenCalledWith({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands: await getCommands(async () => await import('./commands')),
-      name: 'FLOOR_SWEEPER_POLL_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      name: 'TRIBUTE_TOOLS_BOT',
+      tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
     });
 
-    expect(returnValue?.name).toBe('FLOOR_SWEEPER_POLL_BOT');
+    expect(returnValue?.name).toBe('TRIBUTE_TOOLS_BOT');
     expect(returnValue?.stop).toBeInstanceOf(Function);
 
     // Cleanup
@@ -46,17 +44,19 @@ describe('floor-sweeper-poll/main unit tests', () => {
 
   test('should call `ready` handlers', async () => {
     const discord = await import('discord.js');
-    const endedPollsHandler = await import('./handlers/endedPollsHandler');
+    const sweepEndedPollsHandler = await import(
+      './handlers/sweep/sweepEndedPollsHandler'
+    );
 
     const loginSpy = jest
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
     const endedPollsHandlerSpy = jest
-      .spyOn(endedPollsHandler, 'endedPollsHandler')
+      .spyOn(sweepEndedPollsHandler, 'sweepEndedPollsHandler')
       .mockImplementation(() => null as any);
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -64,7 +64,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     // Emit `ready` event
     returnValue?.client?.emit('ready', returnValue?.client);
@@ -85,8 +85,8 @@ describe('floor-sweeper-poll/main unit tests', () => {
   test('should call `interactionCreate` handlers', async () => {
     const discord = await import('discord.js');
 
-    const interactionExecuteHandler = await import(
-      './handlers/interactionExecuteHandler'
+    const sweepInteractionExecuteHandler = await import(
+      './handlers/sweep/sweepInteractionExecuteHandler'
     );
 
     const loginSpy = jest
@@ -94,10 +94,10 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .mockImplementation(async () => '');
 
     const interactionExecuteHandlerSpy = jest
-      .spyOn(interactionExecuteHandler, 'interactionExecuteHandler')
+      .spyOn(sweepInteractionExecuteHandler, 'sweepInteractionExecuteHandler')
       .mockImplementation(() => null as any);
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -105,7 +105,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     // Emit `interactionCreate` event
     returnValue?.client?.emit('interactionCreate', {
@@ -129,17 +129,19 @@ describe('floor-sweeper-poll/main unit tests', () => {
   test('should call `messageReactionAdd` handlers', async () => {
     const discord = await import('discord.js');
 
-    const pollReactionHandler = await import('./handlers/pollReactionHandler');
+    const sweepPollReactionHandler = await import(
+      './handlers/sweep/sweepPollReactionHandler'
+    );
 
     const loginSpy = jest
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
     const pollReactionHandlerSpy = jest
-      .spyOn(pollReactionHandler, 'pollReactionHandler')
+      .spyOn(sweepPollReactionHandler, 'sweepPollReactionHandler')
       .mockImplementation(() => null as any);
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -147,7 +149,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     // Emit `messageReactionAdd` event
     returnValue?.client?.emit(
@@ -185,7 +187,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -193,7 +195,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(deployCommands, 'deployCommands')
       .mockImplementation(async () => {});
 
-    const returnValue = await floorSweeperPollBot();
+    const returnValue = await tributeToolsBot();
 
     await returnValue?.stop?.();
 
@@ -217,7 +219,7 @@ describe('floor-sweeper-poll/main unit tests', () => {
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
-    const {floorSweeperPollBot} = await import('../floor-sweeper-poll/main');
+    const {tributeToolsBot} = await import('../tribute-tools/main');
 
     const deployCommands = await import('../helpers/deployCommands');
 
@@ -227,23 +229,23 @@ describe('floor-sweeper-poll/main unit tests', () => {
         throw new Error('Some bad error.');
       });
 
-    await floorSweeperPollBot();
+    await tributeToolsBot();
 
     expect(loginSpy).toHaveBeenCalledTimes(0);
 
     expect(deployCommandsSpy).toHaveBeenCalledTimes(1);
 
     expect(deployCommandsSpy).toHaveBeenCalledWith({
-      applicationID: FLOOR_SWEEPER_POLL_BOT_ID,
+      applicationID: TRIBUTE_TOOLS_BOT_ID,
       commands: await getCommands(async () => await import('./commands')),
-      name: 'FLOOR_SWEEPER_POLL_BOT',
-      tokenEnvVarName: 'BOT_TOKEN_FLOOR_SWEEPER_POLL',
+      name: 'TRIBUTE_TOOLS_BOT',
+      tokenEnvVarName: 'BOT_TOKEN_TRIBUTE_TOOLS',
     });
 
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
 
     expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
-      /Discord commands for FLOOR_SWEEPER_POLL_BOT could not be deployed\. Error: Some bad error\./i
+      /Discord commands for TRIBUTE_TOOLS_BOT could not be deployed\. Error: Some bad error\./i
     );
 
     // Cleanup
