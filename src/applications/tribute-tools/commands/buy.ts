@@ -242,6 +242,16 @@ async function execute(interaction: CommandInteraction) {
     fetchReply: true,
   })) as Message;
 
+  const {guildId: guildID, channelId: channelID, id: messageID} = message;
+
+  if (!guildID) {
+    throw new Error(
+      `No \`guildId\` was found on \`Message\` ${messageID}. Channel: ${channelID}. Asset: ${name}.`
+    );
+  }
+
+  // @todo Store values in a DB table
+
   try {
     // React with thumbs up, and thumbs down voting buttons as emojis
     const reactionPromises = ['👍', '👎'].map(

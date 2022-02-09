@@ -482,4 +482,52 @@ describe('buy unit tests', () => {
       ephemeral: true,
     });
   });
+
+  test('should throw if no `guildId` returned from `reply`', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+    const reactSpy = jest.fn();
+
+    server.use(
+      rest.post(
+        'https://gem-public-api.herokuapp.com/assets',
+        async (_req, res, ctx) => res(ctx.json(GEM_RESPONSE_FIXTURE))
+      )
+    );
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          // Do not return `guildId`
+          (await {react: reactSpy}) as any
+      );
+
+    try {
+      await buy.execute(interaction);
+    } catch (error) {
+      expect((error as Error)?.message).toMatch(
+        /No `guildId` was found on `Message` undefined\. Channel: undefined\. Asset: Sad Girl #5314\./i
+      );
+
+      expect(interactionReplySpy.mock.calls.length).toBe(1);
+
+      expect(
+        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+          .embeds?.[0]?.description
+      ).toMatch(/📊 \*\*Should we buy it for 0\.285 ETH\?\*\*/i);
+
+      expect(
+        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+          .embeds?.[0]?.image?.url
+      ).toBe(GEM_RESPONSE_FIXTURE.data[0].smallImageUrl);
+
+      expect(
+        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+          .embeds?.[0]?.title
+      ).toBe(GEM_RESPONSE_FIXTURE.data[0].name);
+
+      expect(reactSpy.mock.calls.length).toBe(0);
+    }
+  });
 });
