@@ -171,6 +171,18 @@ describe('buy unit tests', () => {
         .embeds?.[0]?.title
     ).toBe(GEM_RESPONSE_FIXTURE.data[0].name);
 
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.footer?.text
+    ).toMatch(
+      /After a threshold has been reached the vote is final,\neven if you change your vote\./i
+    );
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.fields
+    ).toEqual([{inline: false, name: 'Vote Threshold', value: '5 upvotes'}]);
+
     expect(reactSpy.mock.calls.length).toBe(2);
     expect(reactSpy.mock.calls).toEqual([['👍'], ['👎']]);
   });
@@ -526,6 +538,18 @@ describe('buy unit tests', () => {
         (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
           .embeds?.[0]?.title
       ).toBe(GEM_RESPONSE_FIXTURE.data[0].name);
+
+      expect(
+        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+          .embeds?.[0]?.footer?.text
+      ).toMatch(
+        /After a threshold has been reached the vote is final,\neven if you change your vote\./i
+      );
+
+      expect(
+        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+          .embeds?.[0]?.fields
+      ).toEqual([{inline: false, name: 'Vote Threshold', value: '5 upvotes'}]);
 
       expect(reactSpy.mock.calls.length).toBe(0);
     }

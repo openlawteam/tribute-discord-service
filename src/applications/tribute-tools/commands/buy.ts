@@ -1,4 +1,4 @@
-import {CommandInteraction, Message} from 'discord.js';
+import {CommandInteraction, Message, MessageEmbed} from 'discord.js';
 import {isAddress, fromWei, toBN} from 'web3-utils';
 import {SlashCommandBuilder} from '@discordjs/builders';
 import {URL} from 'url';
@@ -226,19 +226,21 @@ async function execute(interaction: CommandInteraction) {
   const gemAssetURL: string = `https://www.gem.xyz/asset/${contractAddress}/${tokenID}`;
   const price = fromWei(toBN(priceInfo.price), 'ether');
 
-  const embeds: DiscordMessageEmbeds = [
-    {
-      color: 'DEFAULT',
-      description: `📊 **Should we buy it for ${price} ETH?**`,
-      image: {url: smallImageUrl},
-      title: name,
-      url: gemAssetURL,
-    },
-  ];
+  const embed = new MessageEmbed()
+    .setTitle(name)
+    .setDescription(
+      `📊 **Should we buy it for ${price} ETH?**\n\u200B`
+    ) /* `\u200B` = zero-width space */
+    .setURL(gemAssetURL)
+    .addFields({name: 'Vote Threshold', value: '5 upvotes'})
+    .setImage(smallImageUrl)
+    .setFooter(
+      'After a threshold has been reached the vote is final,\neven if you change your vote.'
+    );
 
   // Reply to user
   const message = (await interaction.reply({
-    embeds,
+    embeds: [embed],
     fetchReply: true,
   })) as Message;
 
