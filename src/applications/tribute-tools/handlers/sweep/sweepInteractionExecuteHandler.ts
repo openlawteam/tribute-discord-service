@@ -20,9 +20,13 @@ export async function sweepInteractionExecuteHandler({
   } catch (error) {
     console.error(error);
 
-    await interaction.followUp({
-      content: `There was an error while executing the command ${interaction.commandName}.`,
-      ephemeral: true,
-    });
+    try {
+      await interaction.reply({
+        content: `There was an error while executing the command \`/${interaction.commandName}\`.`,
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

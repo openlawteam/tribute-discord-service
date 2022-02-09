@@ -44,7 +44,7 @@ describe('sweepInteractionExecuteHandler unit tests', () => {
         throw ERROR;
       });
 
-    const followUpSpy = jest.fn();
+    const replySpy = jest.fn();
 
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
@@ -59,12 +59,12 @@ describe('sweepInteractionExecuteHandler unit tests', () => {
       // Use just enough data for the test to run
       interaction: {
         ...FAKE_INTERACTION,
-        followUp: followUpSpy,
+        reply: replySpy,
       } as any as CommandInteraction,
     });
 
-    expect(followUpSpy).toHaveBeenCalledWith({
-      content: 'There was an error while executing the command sweep.',
+    expect(replySpy).toHaveBeenCalledWith({
+      content: 'There was an error while executing the command `/sweep`.',
       ephemeral: true,
     });
 
@@ -73,6 +73,6 @@ describe('sweepInteractionExecuteHandler unit tests', () => {
     // Cleanup
     consoleErrorSpy.mockRestore();
     executeSpy.mockRestore();
-    followUpSpy.mockRestore();
+    replySpy.mockRestore();
   });
 });
