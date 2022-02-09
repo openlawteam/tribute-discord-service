@@ -39,7 +39,7 @@ describe('sweep unit tests', () => {
     {name: 'option_c', type: 4, value: 150},
   ];
 
-  const INTERACION_DATA: GatewayInteractionCreateDispatchData = {
+  const INTERACTION_DATA: GatewayInteractionCreateDispatchData = {
     /**
      * ID of the interaction
      */
@@ -114,7 +114,7 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACION_DATA);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -164,9 +164,9 @@ describe('sweep unit tests', () => {
 
     const client = new Client(CLIENT_OPTIONS);
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           {name: 'how_long', type: 3, value: '1 m'},
           {
@@ -229,7 +229,7 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       type: 1,
     });
 
@@ -253,9 +253,9 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           {name: 'how_long', type: 3, value: '1 m'},
           {
@@ -290,9 +290,9 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           {name: 'how_long', type: 3, value: '1 m'},
           {
@@ -338,9 +338,9 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           // Bad value
           {name: 'how_long', type: 3, value: '1mo'},
@@ -386,9 +386,9 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           {name: 'how_long', type: 3, value: '1 m'},
           {
@@ -441,7 +441,7 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACION_DATA);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
