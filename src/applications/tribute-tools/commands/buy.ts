@@ -1,8 +1,11 @@
 import {CommandInteraction, Message} from 'discord.js';
+import {isAddress, fromWei, toBN} from 'web3-utils';
 import {SlashCommandBuilder} from '@discordjs/builders';
 import {URL} from 'url';
+import fetch from 'node-fetch';
 
 import {Command} from '../../types';
+import {DiscordMessageEmbeds} from '../../../webhook-tasks/actions';
 
 const COMMAND_NAME: string = 'buy';
 
@@ -17,6 +20,18 @@ const INVALID_URL_ERROR_MESSAGE: string = 'The URL is invalid.';
 const INVALID_URL_HOST_ERROR_MESSAGE: string =
   'The URL host is not approved. Currently supported: OpenSea, Gem.';
 
+const BAD_PARSE_ERROR_MESSAGE: string =
+  "Could not get the NFT's information. Please check the URL.";
+
+const MISSING_ASSET_DATA_ERROR_MESSAGE: string =
+  "The NFT's data was returned incomplete.";
+
+const POLL_SETUP_ERROR_MESSAGE: string =
+  'Something went wrong while setting up the poll.';
+
+const NO_PRICE_ERROR_MESSAGE: string =
+  'Asset has no price information in Gem. It may be a brand new listing, or not for sale?';
+
 function isValidURL(url: string): boolean {
   try {
     new URL(url);
@@ -29,10 +44,10 @@ function isValidURL(url: string): boolean {
 
 function isValidURLHost(url: string): boolean {
   try {
-    const u = new URL(url);
+    const {host} = new URL(url);
 
-    const isGem = u.host.startsWith('gem.xyz');
-    const isOS = u.host.startsWith('opensea.io');
+    const isGem = /^(www\.)?gem\.xyz/.test(host);
+    const isOS = /^(www\.)?opensea\.io/.test(host);
 
     if (!isGem && !isOS) {
       throw new Error('URL `host` is not valid.');
@@ -44,8 +59,18 @@ function isValidURLHost(url: string): boolean {
   return true;
 }
 
-function parseBuyURL(): {contractAddress: `0x${string}`; tokenID: string} {
-  return {contractAddress: '0x0', tokenID: '0'};
+function parseBuyURL(url: string): {contractAddress: string; tokenID: string} {
+  const {pathname} = new URL(url);
+
+  const contractAddress =
+    pathname.split(/\//).find((p, i) => i === 2 && isAddress(p)) || '';
+
+  const tokenID =
+    pathname
+      .split(/\//)
+      .find((p, i) => i === 3 && Number.isInteger(parseInt(p))) || '';
+
+  return {contractAddress, tokenID};
 }
 
 // Sweep command structure
@@ -69,7 +94,6 @@ const command = new SlashCommandBuilder()
  * @returns `Promise<void>`
  */
 async function execute(interaction: CommandInteraction) {
-  const {data} = interaction.options;
   const {url: urlArgName} = ARG_NAMES;
   const url: string = interaction.options.getString(urlArgName) || '';
 
@@ -99,13 +123,145 @@ async function execute(interaction: CommandInteraction) {
     return;
   }
 
-  console.log('--DATA---', data);
+  const {contractAddress, tokenID} = parseBuyURL(url);
+
+  // Validate the URL fragments
+  if (!contractAddress || !tokenID) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: BAD_PARSE_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
+  const assetResponse = await fetch(
+    'https://gem-public-api.herokuapp.com/assets',
+    {
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        filters: {
+          tokenIds: [tokenID],
+          address: contractAddress,
+        },
+        /**
+         * Not sure why removing some of these fields causes nothing to return?
+         * Leaving as is, for now.
+         */
+        fields: {
+          address: 1,
+          animationUrl: 1,
+          collectionName: 1,
+          collectionSymbol: 1,
+          creator: 1,
+          currentBasePrice: 1,
+          decimals: 1,
+          ethReserves: 1,
+          externalLink: 1,
+          id: 1,
+          imageUrl: 1,
+          market: 1,
+          marketplace: 1,
+          marketUrl: 1,
+          name: 1,
+          owner: 1,
+          paymentToken: 1,
+          priceInfo: 1,
+          rarityScore: 1,
+          sellOrders: 1,
+          smallImageUrl: 1,
+          standard: 1,
+          tokenId: 1,
+          tokenReserves: 1,
+          traits: 1,
+          url: 1,
+        },
+        offset: 0,
+        limit: 1,
+        status: ['all'],
+      }),
+      method: 'POST',
+    }
+  );
+
+  // Check Gem response
+  if (!assetResponse.ok) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: POLL_SETUP_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
+  const assetResponseJSON = await assetResponse.json();
+
+  const {name, priceInfo, smallImageUrl} = assetResponseJSON?.data?.[0] || {};
+
+  // Validate the NFT price - it may be a brand new listing (e.g. <= ~15min old)
+  if (!priceInfo) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: NO_PRICE_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
+  // Validate required information
+  if (!name || !smallImageUrl) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: MISSING_ASSET_DATA_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
+  // Gem UI asset URL does not get returned, currently.
+  const gemAssetURL: string = `https://www.gem.xyz/asset/${contractAddress}/${tokenID}`;
+  const price = fromWei(toBN(priceInfo.price), 'ether');
+
+  const embeds: DiscordMessageEmbeds = [
+    {
+      color: 'DEFAULT',
+      description: `📊 **Should we buy it for ${price} ETH?**`,
+      image: {url: smallImageUrl},
+      title: name,
+      url: gemAssetURL,
+    },
+  ];
 
   // Reply to user
-  (await interaction.reply({
-    content: ':robot: is in development.',
+  const message = (await interaction.reply({
+    embeds,
     fetchReply: true,
   })) as Message;
+
+  try {
+    // React with thumbs up, and thumbs down voting buttons as emojis
+    const reactionPromises = ['👍', '👎'].map(
+      (emoji) => async () => await message.react(emoji)
+    );
+
+    // Run sequentially so reactions are in order
+    for (const fn of reactionPromises) {
+      await fn();
+    }
+  } catch (error) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.followUp({
+      content: POLL_SETUP_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    // Delete the original reply as we cannot run a poll without voting buttons
+    await message.delete();
+  }
 }
 
 // Export
