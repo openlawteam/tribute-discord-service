@@ -5,7 +5,9 @@ import {URL} from 'url';
 import fetch from 'node-fetch';
 
 import {Command} from '../../types';
-import {DiscordMessageEmbeds} from '../../../webhook-tasks/actions';
+import {getDaoDataByGuildID} from '../../../helpers';
+import {getDaos} from '../../../services';
+import {getVoteThreshold} from '../helpers';
 
 const COMMAND_NAME: string = 'buy';
 
@@ -225,6 +227,23 @@ async function execute(interaction: CommandInteraction) {
   // Gem UI asset URL does not get returned, currently.
   const gemAssetURL: string = `https://www.gem.xyz/asset/${contractAddress}/${tokenID}`;
   const price = fromWei(toBN(priceInfo.price), 'ether');
+  const dao = getDaoDataByGuildID(interaction.guildId || '', await getDaos());
+
+  if (!dao) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: POLL_SETUP_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
+  const voteThreshold = getVoteThreshold({
+    amount: price,
+    thresholds:
+      dao.applications?.TRIBUTE_TOOLS_BOT?.commands.BUY.voteThresholds,
+  });
 
   const embed = new MessageEmbed()
     .setTitle(name)
@@ -232,7 +251,10 @@ async function execute(interaction: CommandInteraction) {
       `📊 **Should we buy it for ${price} ETH?**\n\u200B`
     ) /* `\u200B` = zero-width space */
     .setURL(gemAssetURL)
-    .addFields({name: 'Vote Threshold', value: '5 upvotes'})
+    .addFields({
+      name: 'Vote Threshold',
+      value: `${voteThreshold} upvote${voteThreshold > 1 ? 's' : ''}`,
+    })
     .setImage(smallImageUrl)
     .setFooter(
       'After a threshold has been reached the vote is final,\neven if you change your vote.'

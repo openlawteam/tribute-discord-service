@@ -30,12 +30,11 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
         commands: {
           BUY: {
             resultChannelID: '123123123123123123',
-            // Setting low vote thresholds at `1` required for testing
             voteThresholds: new Map([
-              [[0, 15], 1],
-              [[15, 30], 1],
-              [[30, 100], 1],
-              [[100, 0], 1],
+              [[0, 15], 3],
+              [[15, 30], 5],
+              [[30, 100], 10],
+              [[100, 0], 20],
             ]),
           },
           SWEEP: {

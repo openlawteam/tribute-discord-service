@@ -7,8 +7,11 @@ import {
 } from 'discord.js';
 import {GatewayInteractionCreateDispatchData} from 'discord-api-types';
 
-import {ETH_ADDRESS_FIXTURE} from '../../../../test';
-import {prismaMock} from '../../../../test/prismaMock';
+import {
+  ETH_ADDRESS_FIXTURE,
+  FAKE_DAOS_FIXTURE,
+  GUILD_ID_FIXTURE,
+} from '../../../../test';
 import {buy} from './buy';
 import {rest, server} from '../../../../test/msw/server';
 
@@ -57,7 +60,7 @@ describe('buy unit tests', () => {
     /**
      * The guild it was sent from
      */
-    guild_id: '722525233755717762',
+    guild_id: GUILD_ID_FIXTURE,
     /**
      * The channel it was sent from
      */
@@ -144,6 +147,11 @@ describe('buy unit tests', () => {
       )
     );
 
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
+
     const interactionReplySpy = jest
       .spyOn(interaction, 'reply')
       .mockImplementation(
@@ -181,10 +189,15 @@ describe('buy unit tests', () => {
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.fields
-    ).toEqual([{inline: false, name: 'Vote Threshold', value: '5 upvotes'}]);
+    ).toEqual([{inline: false, name: 'Vote Threshold', value: '3 upvotes'}]);
 
     expect(reactSpy.mock.calls.length).toBe(2);
     expect(reactSpy.mock.calls).toEqual([['👍'], ['👎']]);
+
+    // Cleanup
+
+    getDaosSpy.mockRestore();
+    interactionReplySpy.mockRestore();
   });
 
   test('should not run execute if interaction not command', async () => {
@@ -495,6 +508,42 @@ describe('buy unit tests', () => {
     });
   });
 
+  test('should reply with error if DAO is not found', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+    const reactSpy = jest.fn();
+
+    server.use(
+      rest.post(
+        'https://gem-public-api.herokuapp.com/assets',
+        async (_req, res, ctx) => res(ctx.json(GEM_RESPONSE_FIXTURE))
+      )
+    );
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      // Insert bad guild ID so the dao is not found
+      .mockImplementation(async () => ({
+        ...FAKE_DAOS_FIXTURE,
+        test: {...FAKE_DAOS_FIXTURE.test, guildID: '00000000000000'},
+      }));
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {guildId: '722525233755717762', react: reactSpy}) as any
+      );
+
+    await buy.execute(interaction);
+
+    expect(interactionReplySpy.mock.calls[0][0]).toEqual({
+      content: 'Something went wrong while setting up the poll.',
+      ephemeral: true,
+    });
+  });
+
   test('should throw if no `guildId` returned from `reply`', async () => {
     const client = new Client(CLIENT_OPTIONS);
     const interaction = new CommandInteraction(client, INTERACTION_DATA);
@@ -506,6 +555,11 @@ describe('buy unit tests', () => {
         async (_req, res, ctx) => res(ctx.json(GEM_RESPONSE_FIXTURE))
       )
     );
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
       .spyOn(interaction, 'reply')
@@ -549,9 +603,14 @@ describe('buy unit tests', () => {
       expect(
         (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
           .embeds?.[0]?.fields
-      ).toEqual([{inline: false, name: 'Vote Threshold', value: '5 upvotes'}]);
+      ).toEqual([{inline: false, name: 'Vote Threshold', value: '3 upvotes'}]);
 
       expect(reactSpy.mock.calls.length).toBe(0);
+
+      // Cleanup
+
+      interactionReplySpy.mockRestore();
+      getDaosSpy.mockRestore();
     }
   });
 });
