@@ -27,7 +27,21 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
     applications: {
       TRIBUTE_TOOLS_BOT: {
         name: 'TRIBUTE_TOOLS_BOT',
-        resultChannelID: '123123123123123123',
+        commands: {
+          BUY: {
+            resultChannelID: '123123123123123123',
+            // Setting low vote thresholds at `1` required for testing
+            voteThresholds: new Map([
+              [[0, 15], 1],
+              [[15, 30], 1],
+              [[30, 100], 1],
+              [[100, 0], 1],
+            ]),
+          },
+          SWEEP: {
+            resultChannelID: '123123123123123123',
+          },
+        },
       },
     },
     baseURL: 'http://localhost:3000',

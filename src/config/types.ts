@@ -2,7 +2,7 @@ import {
   SnapshotHubProposalBase,
   SnapshotHubProposalResolverArgs,
 } from '../services/snapshotHub/types';
-import {ACTIONS, EVENTS, APPLICATIONS} from '.';
+import {ACTIONS, EVENTS, APPLICATIONS, APPLICATION_COMMANDS} from '.';
 
 export type ActionNames = typeof ACTIONS[number];
 export type ApplicationNames = typeof APPLICATIONS[number];
@@ -124,26 +124,51 @@ export type DaoDataSnapshotHub = {
  * Application-specific config mappings
  */
 export type DaoDataApplicationsMap = {
-  TRIBUTE_TOOLS_BOT: FloorSweeperBotApplication;
+  TRIBUTE_TOOLS_BOT: DaoDataApplication<TributeToolsCommandsConfiguration>;
 };
 
 /**
  * Base interface for application configs
  */
-export interface DaoDataApplication {
+export interface DaoDataApplication<CommandsConfiguration> {
   name: typeof APPLICATIONS[number];
+  commands: ExtractApplicationCommandFields<CommandsConfiguration>;
 }
 
 /**
- * Floor Sweeper Poll application
+ * Tribute Tools Application Commands configuration
  */
-export interface FloorSweeperBotApplication extends DaoDataApplication {
-  /**
-   * Discord channel ID to send a message on poll end with the content:
-   *
-   * - poll question
-   * - poll result
-   * - sweep action button
-   */
-  resultChannelID: string;
-}
+export type TributeToolsCommandsConfiguration = {
+  BUY: {
+    /**
+     * ```
+     * [
+     *   [[ethMin, ethMax], requiredVotes],
+     *   [[ethMin, ethMax], requiredVotes],
+     *   // ...
+     * ]
+     * ```
+     */
+    voteThresholds: Map<[number, number], number>;
+    // Discord channel ID to send a message on poll threshold reached.
+    resultChannelID: string;
+  };
+  SWEEP: {
+    // Discord channel ID to send a message on poll end.
+    resultChannelID: string;
+  };
+};
+
+/**
+ * Helper for creating a type for command configurations
+ * where *only* the `APPLICATION_COMMANDS` keys are taken
+ * which exist in the configuration type.
+ *
+ * @see https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#key-remapping-via-as
+ */
+type ExtractApplicationCommandFields<Type> = {
+  [Property in keyof Type as Extract<
+    Property,
+    typeof APPLICATION_COMMANDS[number]
+  >]: Type[Property];
+};

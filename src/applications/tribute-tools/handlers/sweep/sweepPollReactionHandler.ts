@@ -108,7 +108,8 @@ export async function sweepPollReactionHandler({
         );
       }
 
-      resultChannelID = dao.applications?.TRIBUTE_TOOLS_BOT?.resultChannelID;
+      resultChannelID =
+        dao.applications?.TRIBUTE_TOOLS_BOT?.commands.SWEEP.resultChannelID;
 
       if (!resultChannelID) {
         throw new Error('Could not find a `resultChannelID`.');
