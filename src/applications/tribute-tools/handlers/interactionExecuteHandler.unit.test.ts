@@ -1,9 +1,9 @@
 import {CommandInteraction} from 'discord.js';
 
-import {sweepInteractionExecuteHandler} from './sweep';
+import {interactionExecuteHandler} from './';
 import {getCommands} from '../../helpers';
 
-describe('sweepInteractionExecuteHandler unit tests', () => {
+describe('interactionExecuteHandler unit tests', () => {
   const FAKE_INTERACTION = {
     commandName: 'sweep',
     isCommand: () => true,
@@ -18,7 +18,7 @@ describe('sweepInteractionExecuteHandler unit tests', () => {
 
     const commands = await getCommands(async () => await import('../commands'));
 
-    await sweepInteractionExecuteHandler({
+    await interactionExecuteHandler({
       commands,
       // Use just enough data for the test to run
       interaction: FAKE_INTERACTION,
@@ -50,7 +50,7 @@ describe('sweepInteractionExecuteHandler unit tests', () => {
 
     const commands = await getCommands(async () => await import('../commands'));
 
-    await sweepInteractionExecuteHandler({
+    await interactionExecuteHandler({
       commands,
       // Use just enough data for the test to run
       interaction: {

@@ -85,8 +85,8 @@ describe('tribute-tools/main unit tests', () => {
   test('should call `interactionCreate` handlers', async () => {
     const discord = await import('discord.js');
 
-    const sweepInteractionExecuteHandler = await import(
-      './handlers/sweep/sweepInteractionExecuteHandler'
+    const interactionExecuteHandler = await import(
+      './handlers/interactionExecuteHandler'
     );
 
     const loginSpy = jest
@@ -94,7 +94,7 @@ describe('tribute-tools/main unit tests', () => {
       .mockImplementation(async () => '');
 
     const interactionExecuteHandlerSpy = jest
-      .spyOn(sweepInteractionExecuteHandler, 'sweepInteractionExecuteHandler')
+      .spyOn(interactionExecuteHandler, 'interactionExecuteHandler')
       .mockImplementation(() => null as any);
 
     const {tributeToolsBot} = await import('../tribute-tools/main');
