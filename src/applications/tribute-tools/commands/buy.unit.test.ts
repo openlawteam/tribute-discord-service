@@ -13,6 +13,7 @@ import {
   GUILD_ID_FIXTURE,
 } from '../../../../test';
 import {buy} from './buy';
+import {prismaMock} from '../../../../test/prismaMock';
 import {rest, server} from '../../../../test/msw/server';
 
 describe('buy unit tests', () => {
@@ -135,10 +136,31 @@ describe('buy unit tests', () => {
     ],
   };
 
+  const DB_INSERT_DATA = {
+    channelID: '886976610018934824',
+    contractAddress: ETH_ADDRESS_FIXTURE,
+    createdAt: new Date(0),
+    guildID: '722525233755717762',
+    id: 1,
+    messageID: '123456789',
+    name: 'Sad Girl #5314',
+    processed: false,
+    tokenID: '5314',
+    upvoteCount: 0,
+    voteThreshold: 3,
+  };
+
   test('should run execute', async () => {
     const client = new Client(CLIENT_OPTIONS);
     const interaction = new CommandInteraction(client, INTERACTION_DATA);
     const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    (prismaMock.buyNFTPoll as any).create.mockResolvedValue(DB_INSERT_DATA);
 
     server.use(
       rest.post(
@@ -544,10 +566,20 @@ describe('buy unit tests', () => {
     });
   });
 
-  test('should throw if no `guildId` returned from `reply`', async () => {
+  test('should reply with error and delete poll if no `guildId` returned from `reply`', async () => {
     const client = new Client(CLIENT_OPTIONS);
     const interaction = new CommandInteraction(client, INTERACTION_DATA);
+    const deleteSpy = jest.fn();
     const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert error
+     *
+     * @todo fix types
+     */
+    (prismaMock.buyNFTPoll as any).create.mockImplementation(() => {
+      throw new Error('Some bad error');
+    });
 
     server.use(
       rest.post(
@@ -565,52 +597,159 @@ describe('buy unit tests', () => {
       .spyOn(interaction, 'reply')
       .mockImplementation(
         async (_o) =>
-          // Do not return `guildId`
-          (await {react: reactSpy}) as any
+          // Do not return a `guildID`
+          (await {
+            delete: deleteSpy,
+            react: reactSpy,
+          }) as any
       );
 
-    try {
-      await buy.execute(interaction);
-    } catch (error) {
-      expect((error as Error)?.message).toMatch(
-        /No `guildId` was found on `Message` undefined\. Channel: undefined\. Asset: Sad Girl #5314\./i
+    const interactionFollowUpSpy = jest
+      .spyOn(interaction, 'followUp')
+      .mockImplementation(async (_o) => (await {}) as any);
+
+    await buy.execute(interaction);
+
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+    expect(reactSpy.mock.calls.length).toBe(0);
+    expect(interactionFollowUpSpy.mock.calls.length).toBe(1);
+
+    expect(interactionFollowUpSpy.mock.calls[0][0]).toEqual({
+      content: 'Something went wrong while setting up the poll.',
+      ephemeral: true,
+    });
+
+    expect(deleteSpy.mock.calls.length).toBe(1);
+
+    // Cleanup
+
+    getDaosSpy.mockRestore();
+    interactionFollowUpSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should reply with error and delete poll if DB create entry fails', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+    const deleteSpy = jest.fn();
+    const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert error
+     *
+     * @todo fix types
+     */
+    (prismaMock.buyNFTPoll as any).create.mockImplementation(() => {
+      throw new Error('Some bad error');
+    });
+
+    server.use(
+      rest.post(
+        'https://gem-public-api.herokuapp.com/assets',
+        async (_req, res, ctx) => res(ctx.json(GEM_RESPONSE_FIXTURE))
+      )
+    );
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            delete: deleteSpy,
+            guildId: '722525233755717762',
+            react: reactSpy,
+          }) as any
       );
 
-      expect(interactionReplySpy.mock.calls.length).toBe(1);
+    const interactionFollowUpSpy = jest
+      .spyOn(interaction, 'followUp')
+      .mockImplementation(async (_o) => (await {}) as any);
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .embeds?.[0]?.description
-      ).toMatch(/📊 \*\*Should we buy it for 0\.285 ETH\?\*\*/i);
+    await buy.execute(interaction);
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .embeds?.[0]?.image?.url
-      ).toBe(GEM_RESPONSE_FIXTURE.data[0].smallImageUrl);
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+    expect(reactSpy.mock.calls.length).toBe(0);
+    expect(interactionFollowUpSpy.mock.calls.length).toBe(1);
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .embeds?.[0]?.title
-      ).toBe(GEM_RESPONSE_FIXTURE.data[0].name);
+    expect(interactionFollowUpSpy.mock.calls[0][0]).toEqual({
+      content: 'Something went wrong while setting up the poll.',
+      ephemeral: true,
+    });
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .embeds?.[0]?.footer?.text
-      ).toMatch(
-        /After a threshold has been reached the vote is final,\neven if you change your vote\./i
+    expect(deleteSpy.mock.calls.length).toBe(1);
+
+    // Cleanup
+
+    getDaosSpy.mockRestore();
+    interactionFollowUpSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should reply with error and delete poll if Discord reaction fails', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+    const deleteSpy = jest.fn();
+
+    const reactSpy = jest.fn().mockImplementation(() => {
+      throw new Error('Some bad error');
+    });
+
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    (prismaMock.buyNFTPoll as any).create.mockResolvedValue(DB_INSERT_DATA);
+
+    server.use(
+      rest.post(
+        'https://gem-public-api.herokuapp.com/assets',
+        async (_req, res, ctx) => res(ctx.json(GEM_RESPONSE_FIXTURE))
+      )
+    );
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            delete: deleteSpy,
+            guildId: '722525233755717762',
+            react: reactSpy,
+          }) as any
       );
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .embeds?.[0]?.fields
-      ).toEqual([{inline: false, name: 'Vote Threshold', value: '3 upvotes'}]);
+    const interactionFollowUpSpy = jest
+      .spyOn(interaction, 'followUp')
+      .mockImplementation(async (_o) => (await {}) as any);
 
-      expect(reactSpy.mock.calls.length).toBe(0);
+    await buy.execute(interaction);
 
-      // Cleanup
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+    expect(reactSpy.mock.calls.length).toBe(1);
+    expect(interactionFollowUpSpy.mock.calls.length).toBe(1);
 
-      interactionReplySpy.mockRestore();
-      getDaosSpy.mockRestore();
-    }
+    expect(interactionFollowUpSpy.mock.calls[0][0]).toEqual({
+      content: 'Something went wrong while setting up the poll.',
+      ephemeral: true,
+    });
+
+    expect(deleteSpy.mock.calls.length).toBe(1);
+
+    // Cleanup
+
+    getDaosSpy.mockRestore();
+    interactionFollowUpSpy.mockRestore();
+    interactionReplySpy.mockRestore();
   });
 });

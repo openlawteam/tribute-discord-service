@@ -8,6 +8,7 @@ import {Command} from '../../types';
 import {getDaoDataByGuildID} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {getVoteThreshold} from '../helpers';
+import {prisma} from '../../../singletons';
 
 const COMMAND_NAME: string = 'buy';
 
@@ -266,17 +267,28 @@ async function execute(interaction: CommandInteraction) {
     fetchReply: true,
   })) as Message;
 
-  const {guildId: guildID, channelId: channelID, id: messageID} = message;
-
-  if (!guildID) {
-    throw new Error(
-      `No \`guildId\` was found on \`Message\` ${messageID}. Channel: ${channelID}. Asset: ${name}.`
-    );
-  }
-
-  // @todo Store values in a DB table
-
   try {
+    const {guildId: guildID, channelId: channelID, id: messageID} = message;
+
+    if (!guildID) {
+      throw new Error(
+        `No \`guildId\` was found on \`Message\` ${messageID}. Channel: ${channelID}. Asset: ${name}.`
+      );
+    }
+
+    // Store poll data in DB
+    await prisma.buyNFTPoll.create({
+      data: {
+        channelID,
+        contractAddress,
+        guildID,
+        messageID,
+        name,
+        tokenID,
+        voteThreshold,
+      },
+    });
+
     // React with thumbs up, and thumbs down voting buttons as emojis
     const reactionPromises = ['👍', '👎'].map(
       (emoji) => async () => await message.react(emoji)
