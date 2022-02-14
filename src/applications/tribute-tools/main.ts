@@ -5,9 +5,9 @@ import {
   sweepPollReactionHandler,
 } from './handlers/sweep';
 import {ApplicationReturn} from '../types';
+import {buyPollReactionHandler, interactionExecuteHandler} from './handlers';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
-import {interactionExecuteHandler} from './handlers';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 
 export async function tributeToolsBot(): Promise<
@@ -64,6 +64,7 @@ export async function tributeToolsBot(): Promise<
 
     // Listen to reactions on messages and possibly handle
     client.on('messageReactionAdd', (reaction, user) => {
+      buyPollReactionHandler({reaction, user});
       sweepPollReactionHandler({reaction, user});
     });
 

@@ -1,6 +1,10 @@
 import {APP_ENV} from '../../config';
 import {PollOptionLetters} from './types';
 
+/**
+ * `/sweep` Command Config
+ */
+
 // For getting the `regional_indicator_<x>` emojis
 export const REGIONAL_INDICATOR_PREFIX: 'regional_indicator_' =
   'regional_indicator_';
@@ -29,3 +33,9 @@ export const SWEEP_EXTERNAL_URL: string =
   APP_ENV === 'production'
     ? 'https://tools.tributelabs.xyz/floor-sweeper'
     : 'https://develop--tools-tributelabs.netlify.app/floor-sweeper';
+
+/**
+ * `/buy` Command Config
+ */
+
+export const BUY_ALLOWED_EMOJIS: string[] = ['👍', '👎'];

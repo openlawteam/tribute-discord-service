@@ -133,12 +133,20 @@ describe('tribute-tools/main unit tests', () => {
       './handlers/sweep/sweepPollReactionHandler'
     );
 
+    const buyPollReactionHandler = await import(
+      './handlers/buy/buyPollReactionHandler'
+    );
+
     const loginSpy = jest
       .spyOn(discord.Client.prototype, 'login')
       .mockImplementation(async () => '');
 
-    const pollReactionHandlerSpy = jest
+    const sweepPollReactionHandlerSpy = jest
       .spyOn(sweepPollReactionHandler, 'sweepPollReactionHandler')
+      .mockImplementation(() => null as any);
+
+    const buyPollReactionHandlerSpy = jest
+      .spyOn(buyPollReactionHandler, 'buyPollReactionHandler')
       .mockImplementation(() => null as any);
 
     const {tributeToolsBot} = await import('../tribute-tools/main');
@@ -158,9 +166,16 @@ describe('tribute-tools/main unit tests', () => {
       {userTest: 'test'}
     );
 
-    expect(pollReactionHandlerSpy).toHaveBeenCalledTimes(1);
+    expect(sweepPollReactionHandlerSpy).toHaveBeenCalledTimes(1);
 
-    expect(pollReactionHandlerSpy).toHaveBeenCalledWith({
+    expect(sweepPollReactionHandlerSpy).toHaveBeenCalledWith({
+      reaction: {reactionTest: 'test'},
+      user: {userTest: 'test'},
+    });
+
+    expect(buyPollReactionHandlerSpy).toHaveBeenCalledTimes(1);
+
+    expect(buyPollReactionHandlerSpy).toHaveBeenCalledWith({
       reaction: {reactionTest: 'test'},
       user: {userTest: 'test'},
     });
@@ -168,7 +183,8 @@ describe('tribute-tools/main unit tests', () => {
     // Cleanup
 
     deployCommandsSpy.mockRestore();
-    pollReactionHandlerSpy.mockRestore();
+    buyPollReactionHandlerSpy.mockRestore();
+    sweepPollReactionHandlerSpy.mockRestore();
     loginSpy.mockRestore();
   });
 

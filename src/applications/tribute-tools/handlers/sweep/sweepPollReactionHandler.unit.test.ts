@@ -1,5 +1,4 @@
 import {
-  Collection,
   MessageReaction,
   PartialMessageReaction,
   PartialUser,
@@ -11,8 +10,8 @@ import {
   FAKE_DAOS_FIXTURE,
   GUILD_ID_FIXTURE,
 } from '../../../../../test';
-import {sweepPollReactionHandler} from '.';
 import {prismaMock} from '../../../../../test/prismaMock';
+import {sweepPollReactionHandler} from '.';
 
 describe('sweepPollReactionHandler unit tests', () => {
   test('should remove invalid reaction', async () => {
