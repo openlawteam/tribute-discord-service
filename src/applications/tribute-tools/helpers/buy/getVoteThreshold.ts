@@ -3,6 +3,12 @@ import {TributeToolsCommandsConfiguration} from '../../../../config';
 /**
  * Gets a vote threshold given a value.
  *
+ * - `rangeMin` (floor) is treated as greater than.
+ * - `rangeMin` If `0` is provided it is treated as equal to, or greater than.
+ * - `rangeMax` (ceiling) is treated as equal to, or less than.
+ * - `rangeMax` If `0` is provided, it is treated as greater than. i.e. no ceiling.
+ *
+ * @param data - `amount` is the `number` to compare against the `thresholds`.
  * @returns `number`
  */
 export function getVoteThreshold({
