@@ -2,12 +2,12 @@ import {Client, Intents} from 'discord.js';
 
 import {
   sweepEndedPollsHandler,
-  sweepInteractionExecuteHandler,
   sweepPollReactionHandler,
 } from './handlers/sweep';
 import {ApplicationReturn} from '../types';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
+import {interactionExecuteHandler} from './handlers';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 
 export async function tributeToolsBot(): Promise<
@@ -59,7 +59,7 @@ export async function tributeToolsBot(): Promise<
 
     // Listen for interactions and possibly run commands
     client.on('interactionCreate', (interaction) => {
-      sweepInteractionExecuteHandler({commands, interaction});
+      interactionExecuteHandler({commands, interaction});
     });
 
     // Listen to reactions on messages and possibly handle

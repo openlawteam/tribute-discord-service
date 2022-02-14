@@ -1,7 +1,7 @@
 import {CommandInteraction} from 'discord.js';
 
-import {sweepInteractionExecuteHandler} from '.';
-import {getCommands} from '../../../helpers';
+import {sweepInteractionExecuteHandler} from './sweep';
+import {getCommands} from '../../helpers';
 
 describe('sweepInteractionExecuteHandler unit tests', () => {
   const FAKE_INTERACTION = {
@@ -10,15 +10,13 @@ describe('sweepInteractionExecuteHandler unit tests', () => {
   } as any as CommandInteraction;
 
   test('should execute commands', async () => {
-    const {sweep} = await import('../../commands/sweep');
+    const {sweep} = await import('../commands/sweep');
 
     const executeSpy = jest
       .spyOn(sweep, 'execute')
       .mockImplementation(async () => undefined);
 
-    const commands = await getCommands(
-      async () => await import('../../commands')
-    );
+    const commands = await getCommands(async () => await import('../commands'));
 
     await sweepInteractionExecuteHandler({
       commands,
@@ -36,7 +34,7 @@ describe('sweepInteractionExecuteHandler unit tests', () => {
   test('should catch error', async () => {
     const ERROR = new Error('Some bad error');
 
-    const {sweep} = await import('../../commands/sweep');
+    const {sweep} = await import('../commands/sweep');
 
     const executeSpy = jest
       .spyOn(sweep, 'execute')
@@ -50,9 +48,7 @@ describe('sweepInteractionExecuteHandler unit tests', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => '');
 
-    const commands = await getCommands(
-      async () => await import('../../commands')
-    );
+    const commands = await getCommands(async () => await import('../commands'));
 
     await sweepInteractionExecuteHandler({
       commands,
