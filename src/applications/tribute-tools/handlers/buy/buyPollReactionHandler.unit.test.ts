@@ -14,6 +14,9 @@ import {buyPollReactionHandler} from './buyPollReactionHandler';
 import {prismaMock} from '../../../../../test/prismaMock';
 
 describe('buyPollReactionHandler unit tests', () => {
+  const ERROR_REGEXP =
+    /Something went wrong while handling the Discord reaction: Error: Some bad error/i;
+
   test.skip('should increment upvotes on upvote, if `processed: false`', () => {});
 
   test('should exit with no error if `user` is a bot', () => {
@@ -67,20 +70,10 @@ describe('buyPollReactionHandler unit tests', () => {
       }
     );
 
-    let e: Error | undefined = undefined;
+    await buyPollReactionHandler({reaction: REACTION, user: USER});
 
-    try {
-      await buyPollReactionHandler({reaction: REACTION, user: USER});
-    } catch (error) {
-      e = error as Error;
-    }
-
-    expect(e).toBe(undefined);
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-
-    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
-      /Something went wrong while finding `messageID` abc123: Error: Some bad error/i
-    );
+    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(ERROR_REGEXP);
 
     // Cleanup
 
@@ -148,21 +141,12 @@ describe('buyPollReactionHandler unit tests', () => {
       DB_ENTRY
     );
 
-    let e: Error | undefined = undefined;
+    await buyPollReactionHandler({reaction: REACTION, user: USER});
 
-    try {
-      await buyPollReactionHandler({reaction: REACTION, user: USER});
-    } catch (error) {
-      e = error as Error;
-    }
-
-    // Assert no error thrown
-
-    expect(e).toBe(undefined);
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
 
-    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
-      /There was an error while removing the user\'s \(testuser#1234\) last reaction for `buy_nft_poll` abc123def456\./i
+    expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
+      /some bad error/i
     );
 
     // Assert did not exit function early
@@ -247,23 +231,10 @@ describe('buyPollReactionHandler unit tests', () => {
       DB_ENTRY
     );
 
-    let e: Error | undefined = undefined;
+    await buyPollReactionHandler({reaction: REACTION, user: USER});
 
-    try {
-      await buyPollReactionHandler({reaction: REACTION, user: USER});
-    } catch (error) {
-      e = error as Error;
-    }
-
-    // Assert no error thrown
-
-    expect(e).toBe(undefined);
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-
-    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
-      /There was an error while DM-ing user testuser#1234 about `buy_nft_poll` abc123def456\. Maybe their DMs are turned off\?: Error: Some bad error/i
-    );
-
+    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(ERROR_REGEXP);
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
     expect(getDaosSpy).toHaveBeenCalledTimes(1);
