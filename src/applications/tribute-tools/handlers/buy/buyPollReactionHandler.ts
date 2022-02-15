@@ -7,6 +7,7 @@ import {
 import {channelMention} from '@discordjs/builders';
 
 import {BUY_ALLOWED_EMOJIS} from '../../config';
+import {BuyNFTPoll} from '@prisma/client';
 import {getDaoDataByGuildID} from '../../../../helpers';
 import {getDaos} from '../../../../services';
 import {prisma} from '../../../../singletons';
@@ -38,11 +39,19 @@ export async function buyPollReactionHandler({
     }
   }
 
-  const pollEntry = await prisma.buyNFTPoll.findUnique({
-    where: {
-      messageID: reaction.message.id,
-    },
-  });
+  let pollEntry: BuyNFTPoll | null = null;
+
+  try {
+    pollEntry = await prisma.buyNFTPoll.findUnique({
+      where: {
+        messageID: reaction.message.id,
+      },
+    });
+  } catch (error) {
+    console.error(
+      `Something went wrong while finding \`messageID\` ${reaction.message.id}: ${error}`
+    );
+  }
 
   // Exit if this is not a poll message
   if (!pollEntry) {
@@ -93,7 +102,13 @@ export async function buyPollReactionHandler({
    * messages within this event's callback
    */
   if (pollEntry.processed) {
-    await reaction.users.remove(user.id);
+    try {
+      await reaction.users.remove(user.id);
+    } catch (error) {
+      console.error(
+        `There was an error while removing the user\'s (${user.username}#${user.discriminator}) last reaction for \`buy_nft_poll\` ${pollEntry.uuid}.`
+      );
+    }
 
     let resultChannelID: string | undefined;
 
@@ -111,14 +126,19 @@ export async function buyPollReactionHandler({
     }
 
     // DM the user that the poll has ended
-    await user.send(
-      `The poll has ended for *${
-        pollEntry.name
-      }*, because the number of required upvotes has been reached. To purchase, go to ${channelMention(
-        resultChannelID
-      )}.`
-    );
-
+    try {
+      await user.send(
+        `The poll has ended for *${
+          pollEntry.name
+        }*, because the number of required upvotes has been reached. To purchase, go to ${channelMention(
+          resultChannelID
+        )}.`
+      );
+    } catch (error) {
+      console.error(
+        `There was an error while DM-ing user ${user.username}#${user.discriminator} about \`buy_nft_poll\` ${pollEntry.uuid}. Maybe their DMs are turned off?: ${error}`
+      );
+    }
     return;
   }
 

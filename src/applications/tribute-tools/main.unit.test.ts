@@ -1,6 +1,6 @@
-import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 import {getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
+import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 
 describe('tribute-tools/main unit tests', () => {
   test('should log in to bot and return data', async () => {
