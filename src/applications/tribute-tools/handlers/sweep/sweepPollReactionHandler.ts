@@ -138,6 +138,8 @@ export async function sweepPollReactionHandler({
       }
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      `Something went wrong while handling the Discord reaction: ${error}`
+    );
   }
 }
