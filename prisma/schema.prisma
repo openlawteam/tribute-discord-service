@@ -27,7 +27,7 @@ model DiscordWebhook {
 
 model FloorSweeperPoll {
   id              Int      @id @default(autoincrement())
-  uuid            String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  uuid            String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt       DateTime @default(now())
   question        String   @db.VarChar(255)
   contractAddress String   @db.VarChar(255)
@@ -44,7 +44,7 @@ model FloorSweeperPoll {
 
 model BuyNFTPoll {
   id              Int      @id @default(autoincrement())
-  uuid            String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  uuid            String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt       DateTime @default(now())
   name            String   @db.VarChar(255)
   contractAddress String   @db.VarChar(255)
