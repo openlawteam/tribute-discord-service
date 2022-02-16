@@ -1,8 +1,10 @@
 import {
+  MessageActionRow,
+  MessageButton,
   MessageReaction,
   PartialMessageReaction,
-  User,
   PartialUser,
+  User,
 } from 'discord.js';
 
 import {
@@ -10,6 +12,7 @@ import {
   FAKE_DAOS_FIXTURE,
   GUILD_ID_FIXTURE,
 } from '../../../../../test';
+import {BUY_EXTERNAL_URL} from '../../config';
 import {buyPollReactionHandler} from './buyPollReactionHandler';
 import {prismaMock} from '../../../../../test/prismaMock';
 
@@ -17,7 +20,356 @@ describe('buyPollReactionHandler unit tests', () => {
   const ERROR_REGEXP =
     /Something went wrong while handling the Discord reaction: Error: Some bad error/i;
 
-  test.skip('should increment upvotes on upvote, if `processed: false`', () => {});
+  test('should increment upvotes on upvote', async () => {
+    const REACTION: MessageReaction | PartialMessageReaction = {
+      emoji: {name: '👍'},
+      message: {
+        id: 'abc123',
+        reactions: {
+          cache: [],
+        },
+      },
+    } as any;
+
+    const USER: User | PartialUser = {bot: false, id: '123'} as any;
+
+    const DB_ENTRY = {
+      channelID: '886976610018934824',
+      contractAddress: ETH_ADDRESS_FIXTURE,
+      createdAt: new Date(0),
+      guildID: GUILD_ID_FIXTURE,
+      id: 1,
+      messageID: 'abc123',
+      name: 'Test Punk #123',
+      processed: false,
+      tokenID: '123',
+      upvoteCount: 2,
+      uuid: 'abc123def456',
+      voteThreshold: 5,
+    };
+
+    /**
+     * Mock db return value
+     *
+     * @todo fix types
+     */
+    const dbFindSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(DB_ENTRY);
+
+    /**
+     * Mock db update
+     *
+     * @todo fix types
+     */
+    const dbUpdateSpy = (
+      prismaMock.buyNFTPoll as any
+    ).update.mockImplementation(async () => {});
+
+    await buyPollReactionHandler({reaction: REACTION, user: USER});
+
+    expect(dbFindSpy).toHaveBeenCalledTimes(1);
+    expect(dbFindSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
+    expect(dbUpdateSpy).toHaveBeenCalledTimes(1);
+
+    expect(dbUpdateSpy.mock.calls[0][0]).toEqual({
+      data: {upvoteCount: 3},
+      where: {messageID: 'abc123'},
+    });
+
+    // Cleanup
+
+    dbFindSpy.mockRestore();
+  });
+
+  test('should handle poll threshold reached', async () => {
+    const channelSendSpy = jest
+      .fn()
+      .mockImplementation(async () => ({url: BUY_EXTERNAL_URL}));
+
+    const messageReplySpy = jest.fn();
+
+    const messageFetchSpy = jest
+      .fn()
+      .mockImplementation(async () => ({reply: messageReplySpy}));
+
+    const channelFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {fetch: messageFetchSpy},
+      send: channelSendSpy,
+    }));
+
+    const REACTION: MessageReaction | PartialMessageReaction = {
+      client: {
+        channels: {
+          fetch: channelFetchSpy,
+        },
+      },
+      emoji: {name: '👍'},
+      message: {
+        id: 'abc123',
+        reactions: {
+          cache: [],
+        },
+      },
+    } as any;
+
+    const USER: User | PartialUser = {bot: false, id: '123'} as any;
+
+    const DB_ENTRY = {
+      channelID: '886976610018934824',
+      contractAddress: ETH_ADDRESS_FIXTURE,
+      createdAt: new Date(0),
+      guildID: GUILD_ID_FIXTURE,
+      id: 1,
+      messageID: 'abc123',
+      name: 'Test Punk #123',
+      processed: false,
+      tokenID: '123',
+      upvoteCount: 4,
+      uuid: 'abc123def456',
+      voteThreshold: 5,
+    };
+
+    const getDaos = await import('../../../../services/dao/getDaos');
+
+    const getDaosSpy = jest
+      .spyOn(getDaos, 'getDaos')
+      .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
+
+    /**
+     * Mock db return value
+     *
+     * @todo fix types
+     */
+    const dbFindSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(DB_ENTRY);
+
+    /**
+     * Mock db update
+     *
+     * @todo fix types
+     */
+    const dbUpdateSpy = (
+      prismaMock.buyNFTPoll as any
+    ).update.mockImplementation(async () => {});
+
+    const BUY_BUTTON = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setLabel('Buy')
+        .setStyle('LINK')
+        .setURL(
+          `${BUY_EXTERNAL_URL}/?daoName=test&tokenId=${DB_ENTRY.tokenID}&contractAddress=${DB_ENTRY.contractAddress}&id=${DB_ENTRY.uuid}`
+        )
+        .setEmoji('💸')
+    );
+
+    await buyPollReactionHandler({reaction: REACTION, user: USER});
+
+    expect(dbFindSpy).toHaveBeenCalledTimes(1);
+    expect(dbFindSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
+    expect(dbUpdateSpy).toHaveBeenCalledTimes(2);
+
+    expect(dbUpdateSpy.mock.calls[0][0]).toEqual({
+      data: {upvoteCount: 5},
+      where: {messageID: 'abc123'},
+    });
+
+    expect(dbUpdateSpy.mock.calls[1][0]).toEqual({
+      data: {processed: true},
+      where: {messageID: 'abc123'},
+    });
+
+    // Assert result was posted in the result channel
+
+    expect(channelSendSpy).toHaveBeenCalledTimes(1);
+
+    expect(channelSendSpy.mock.calls[0][0].content).toMatch(
+      /The poll for "\*Test Punk #123\*" ended <t:\d+:R>\. The threshold of 5 votes has been reached\./i
+    );
+
+    expect(channelSendSpy.mock.calls[0][0].components).toEqual([BUY_BUTTON]);
+
+    // Assert result was posted in the poll's channel
+
+    expect(messageReplySpy).toHaveBeenCalledTimes(1);
+    expect(messageReplySpy.mock.calls[0][0].embeds[0].title).toMatch(/buy/i);
+
+    expect(messageReplySpy.mock.calls[0][0].embeds[0].url).toBe(
+      BUY_EXTERNAL_URL
+    );
+
+    expect(messageReplySpy.mock.calls[0][0].embeds[0].description).toMatch(
+      /The poll for "\*Test Punk #123\*" ended <t:\d+:R>\. The threshold of 5 votes has been reached\./i
+    );
+
+    // Cleanup
+
+    dbFindSpy.mockRestore();
+    dbUpdateSpy.mockRestore();
+    getDaosSpy.mockRestore();
+  });
+
+  test('should exit with no error if dao cannot be found', async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation((m) => m);
+
+    const channelSendSpy = jest.fn().mockImplementation(async () => ({}));
+
+    const REACTION: MessageReaction | PartialMessageReaction = {
+      emoji: {name: '👍'},
+      message: {
+        id: 'abc123',
+        reactions: {
+          cache: [],
+        },
+      },
+    } as any;
+
+    const USER: User | PartialUser = {bot: false, id: '123'} as any;
+
+    const DB_ENTRY = {
+      channelID: '886976610018934824',
+      contractAddress: ETH_ADDRESS_FIXTURE,
+      createdAt: new Date(0),
+      guildID: GUILD_ID_FIXTURE,
+      id: 1,
+      messageID: 'abc123',
+      name: 'Test Punk #123',
+      processed: false,
+      tokenID: '123',
+      upvoteCount: 4,
+      uuid: 'abc123def456',
+      voteThreshold: 5,
+    };
+
+    const getDaos = await import('../../../../services/dao/getDaos');
+
+    const getDaosSpy = jest
+      .spyOn(getDaos, 'getDaos')
+      .mockImplementationOnce(async () => undefined);
+
+    /**
+     * Mock db return value
+     *
+     * @todo fix types
+     */
+    const dbFindSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(DB_ENTRY);
+
+    /**
+     * Mock db update
+     *
+     * @todo fix types
+     */
+    const dbUpdateSpy = (
+      prismaMock.buyNFTPoll as any
+    ).update.mockImplementation(async () => {});
+
+    await buyPollReactionHandler({reaction: REACTION, user: USER});
+
+    // Assert `console.error` was called
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
+      /Something went wrong while handling the Discord reaction: Error: Could not find DAO by 'guildID' 123123123123123123/i
+    );
+
+    // Assert nothing else was called
+
+    expect(channelSendSpy).toHaveBeenCalledTimes(0);
+
+    // Cleanup
+
+    dbFindSpy.mockRestore();
+    dbUpdateSpy.mockRestore();
+    getDaosSpy.mockRestore();
+  });
+
+  test('should exit with no error if result channel ID cannot be found', async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation((m) => m);
+
+    const channelSendSpy = jest.fn().mockImplementation(async () => ({}));
+
+    const REACTION: MessageReaction | PartialMessageReaction = {
+      emoji: {name: '👍'},
+      message: {
+        id: 'abc123',
+        reactions: {
+          cache: [],
+        },
+      },
+    } as any;
+
+    const USER: User | PartialUser = {bot: false, id: '123'} as any;
+
+    const DB_ENTRY = {
+      channelID: '886976610018934824',
+      contractAddress: ETH_ADDRESS_FIXTURE,
+      createdAt: new Date(0),
+      guildID: GUILD_ID_FIXTURE,
+      id: 1,
+      messageID: 'abc123',
+      name: 'Test Punk #123',
+      processed: false,
+      tokenID: '123',
+      upvoteCount: 4,
+      uuid: 'abc123def456',
+      voteThreshold: 5,
+    };
+
+    const getDaos = await import('../../../../services/dao/getDaos');
+
+    const getDaosSpy = jest
+      .spyOn(getDaos, 'getDaos')
+      .mockImplementationOnce(async () => ({
+        ...FAKE_DAOS_FIXTURE,
+        test: {...FAKE_DAOS_FIXTURE.test, applications: {}},
+      }));
+
+    /**
+     * Mock db return value
+     *
+     * @todo fix types
+     */
+    const dbFindSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(DB_ENTRY);
+
+    /**
+     * Mock db update
+     *
+     * @todo fix types
+     */
+    const dbUpdateSpy = (
+      prismaMock.buyNFTPoll as any
+    ).update.mockImplementation(async () => {});
+
+    await buyPollReactionHandler({reaction: REACTION, user: USER});
+
+    // Assert `console.error` was called
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
+      /Something went wrong while handling the Discord reaction: Error: Could not find a `resultChannelID`\./i
+    );
+
+    // Assert nothing else was called
+
+    expect(channelSendSpy).toHaveBeenCalledTimes(0);
+
+    // Cleanup
+
+    dbFindSpy.mockRestore();
+    dbUpdateSpy.mockRestore();
+    getDaosSpy.mockRestore();
+  });
 
   test('should exit with no error if `user` is a bot', () => {
     const REACTION: MessageReaction | PartialMessageReaction = {
@@ -56,8 +408,6 @@ describe('buyPollReactionHandler unit tests', () => {
     } as any;
 
     const USER: User | PartialUser = {bot: false, id: '123'} as any;
-
-    const DB_ENTRY = undefined;
 
     /**
      * Mock db error

@@ -1,12 +1,17 @@
 import {
+  Message,
+  MessageActionRow,
+  MessageButton,
+  MessageEmbed,
   MessageReaction,
   PartialMessageReaction,
   PartialUser,
+  TextChannel,
   User,
 } from 'discord.js';
-import {channelMention} from '@discordjs/builders';
+import {channelMention, time} from '@discordjs/builders';
 
-import {BUY_ALLOWED_EMOJIS} from '../../config';
+import {BUY_ALLOWED_EMOJIS, BUY_EXTERNAL_URL} from '../../config';
 import {getDaoDataByGuildID} from '../../../../helpers';
 import {getDaos} from '../../../../services';
 import {prisma} from '../../../../singletons';
@@ -44,6 +49,8 @@ export async function buyPollReactionHandler({
       return;
     }
 
+    const {processed} = pollEntry;
+
     /**
      * If it was a `partial` and it was `fetch`ed, it is not a `partial`, anymore.
      *
@@ -71,7 +78,7 @@ export async function buyPollReactionHandler({
      * message, as we don't have access to send channel-based ephemeral
      * messages within this event's callback
      */
-    if (pollEntry.processed) {
+    if (processed) {
       try {
         await reaction.users.remove(user.id);
       } catch (error) {
@@ -87,7 +94,7 @@ export async function buyPollReactionHandler({
       }
 
       const resultChannelID = (dao as any).applications?.TRIBUTE_TOOLS_BOT
-        ?.commands.SWEEP.resultChannelID;
+        ?.commands.BUY.resultChannelID;
 
       if (!resultChannelID) {
         throw new Error('Could not find a `resultChannelID`.');
@@ -120,6 +127,110 @@ export async function buyPollReactionHandler({
         }
       }
     });
+
+    const {
+      channelID,
+      contractAddress,
+      guildID,
+      messageID,
+      name,
+      tokenID,
+      upvoteCount,
+      uuid,
+      voteThreshold,
+    } = pollEntry;
+
+    /**
+     * Handle upvote
+     */
+    if (
+      !processed &&
+      voteThreshold > upvoteCount &&
+      (reaction.emoji.name as typeof BUY_ALLOWED_EMOJIS[number]) === '👍'
+    ) {
+      // Add to upvote tally in db
+      await prisma.buyNFTPoll.update({
+        where: {
+          messageID: reaction.message.id,
+        },
+        data: {
+          upvoteCount: upvoteCount + 1,
+        },
+      });
+
+      /**
+       * Handle upvote when threshold will be reached.
+       * Send message to the result channel.
+       */
+      if (voteThreshold - upvoteCount === 1) {
+        // Mark entry as `processed: true`
+        await prisma.buyNFTPoll.update({
+          where: {
+            messageID: reaction.message.id,
+          },
+          data: {
+            processed: true,
+          },
+        });
+
+        const dao = getDaoDataByGuildID(guildID, await getDaos());
+
+        if (!dao) {
+          throw new Error(`Could not find DAO by \'guildID\' ${guildID}`);
+        }
+
+        const resultChannelID = (dao as any).applications?.TRIBUTE_TOOLS_BOT
+          ?.commands.BUY.resultChannelID;
+
+        if (!resultChannelID) {
+          throw new Error('Could not find a `resultChannelID`.');
+        }
+
+        const resultChannel = (await reaction.client.channels.fetch(
+          resultChannelID
+        )) as TextChannel;
+
+        const buyButton = new MessageActionRow().addComponents(
+          new MessageButton()
+            .setLabel('Buy')
+            .setStyle('LINK')
+            .setURL(
+              `${BUY_EXTERNAL_URL}/?daoName=${dao.internalName}&tokenId=${tokenID}&contractAddress=${contractAddress}&id=${uuid}`
+            )
+            .setEmoji('💸')
+        );
+
+        const content: string = `The poll for "*${name}*" ended ${time(
+          Math.floor(Date.now() / 1000),
+          'R'
+        )}. The threshold of ${voteThreshold} vote${
+          voteThreshold > 1 ? 's' : ''
+        } has been reached.`;
+
+        // Send message to the result channel with the buy button
+        const buyChannelMessage = await resultChannel.send({
+          content,
+          components: [buyButton],
+        });
+
+        const pollEndEmbed = new MessageEmbed()
+          .setTitle('Buy')
+          .setURL(buyChannelMessage?.url || '')
+          .setDescription(content);
+
+        // Get original poll message and reply to it in the same channel
+        const channel = (await reaction.client.channels.fetch(
+          channelID
+        )) as TextChannel;
+
+        const message = await channel.messages.fetch(messageID);
+
+        // Notify poll channel that the poll has ended
+        await message.reply({
+          embeds: [pollEndEmbed],
+        });
+      }
+    }
   } catch (error) {
     console.error(
       `Something went wrong while handling the Discord reaction: ${error}`
