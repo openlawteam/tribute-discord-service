@@ -1,4 +1,4 @@
-import {APP_ENV} from '../../config';
+import {APP_ENV, TRIBUTE_TOOLS_BOT_ID} from '../../config';
 import {PollOptionLetters} from './types';
 
 /**
@@ -29,13 +29,16 @@ export const POLL_REACTION_EMOJIS: Record<
   no_entry_sign: '🚫',
 };
 
-export const SWEEP_EXTERNAL_URL: string =
+export const TRIBUTE_TOOLS_URL: string =
   APP_ENV === 'production'
-    ? 'https://tools.tributelabs.xyz/floor-sweeper'
-    : 'https://develop--tools-tributelabs.netlify.app/floor-sweeper';
+    ? 'https://tools.tributelabs.xyz'
+    : 'https://develop--tools-tributelabs.netlify.app';
+
+export const BUY_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/single-buy`;
+export const SWEEP_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/floor-sweeper`;
 
 /**
  * `/buy` Command Config
  */
 
-export const BUY_ALLOWED_EMOJIS: string[] = ['👍', '👎'];
+export const BUY_ALLOWED_EMOJIS = ['👍', '👎'] as const;
