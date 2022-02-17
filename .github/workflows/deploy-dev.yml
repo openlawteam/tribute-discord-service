@@ -6,9 +6,9 @@ on:
       - 'v*'
     paths:
       # ignore changes
-      - "!.github/worflows/deploy-prod.yml"
+      - "!.github/workflows/deploy-prod.yml"
       # detect changes
-      - ".github/worflows/deploy-dev.yml"
+      - ".github/workflows/deploy-dev.yml"
       - "src/**"
       - "prisma/**"
       - "scripts/**"
