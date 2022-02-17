@@ -4,6 +4,9 @@ on:
   push:
     tags-ignore:
       - 'v*'
+    paths:
+      # ignore changes in the prod workflow
+      - "!.github/worflows/deploy-prod.yml" 
     branches:
       - main
 
