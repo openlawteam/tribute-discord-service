@@ -17,8 +17,8 @@ env:
   DEPLOYMENT_BRANCH: main
   # Do not change the env vars below:
   INFRA_REPO: openlawteam/infrastructure
-  DEPLOYMENT_FOLDER: gke-projects/${{ env.GCP_PROJECT_ID }}/prod/deployments/
-  IMAGE_NAME: ${{ env.GCP_PROJECT_ID }}/${{ env.GITHUB_REPO_NAME }}
+  DEPLOYMENT_FOLDER: gke-projects/$GCP_PROJECT_ID/prod/deployments/
+  IMAGE_NAME: $GCP_PROJECT_ID/$GITHUB_REPO_NAME
   REGISTRY_HOSTNAME: gcr.io
   GIT_COMMITTER_NAME: 'Pizza Dog'
   GIT_COMMITTER_EMAIL: 'dev@tributelabs.xyz'
