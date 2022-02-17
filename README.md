@@ -74,10 +74,10 @@ DEBUG=true
 
 ### Development
 
-Any merge, or push, to `main` will run a development environment release on Tribute Labs' Google Cloud->Kubernetes Engine. The `deploy-dev.yml` GitHub Action will run and, if successful, will push a commit to `lao-backends`, which will complete the deployment (NOTE: this will change in the future as we improve our deployments).
+Any push to `main` will run a development environment release to Tribute Labs' Google Cloud->Kubernetes Engine. The `deploy-dev.yml` GitHub Action will run and, if successful, will push a commit to `infrastructure`, which will complete the deployment to Google Cloud.
 
 ### Production
 
 It is recommended to use [`bump`](https://github.com/mroth/bump) locally to deploy a production release; the formatting is nice! Bump will determine the next semantic version and open a page to create a new GitHub release. The tag will be created once the GitHub release is published, not when `bump` is run.
 
-Once the release has been published, the `deploy-prod.yml` GitHub Action will run and, if successful, will push a commit to `lao-backends`. In `lao-backends` a new GitHub release needs to be created (preferably with `bump`), which will complete the deployment to Tribute Labs' Google Cloud->Kubernetes Engine (NOTE: this will change in the future as we improve our deployments).
+Any tags (`v*`) pushed to `main` will run a production environment release to Tribute Labs' Google Cloud->Kubernetes Engine. The `deploy-prod.yml` GitHub Action will run and, if successful, will push a commit to `infrastructure`, which will complete the deployment to Google Cloud.
