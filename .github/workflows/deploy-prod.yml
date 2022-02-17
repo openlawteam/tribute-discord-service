@@ -6,12 +6,23 @@ on:
       - v*
 
 env:
+  ## Required Env Vars
+  # The id of the google cloud project that you want to deploy to
+  GCP_PROJECT_ID: thelao
+  # The github repo name that will be used to build the project docker image
+  GITHUB_REPO_NAME: tribute-discord-service
+  # The name of the deployment file in openlawteam/infrastructure repo, e.g: tribute-discord-deployment.yaml
+  DEPLOYMENT_FILE: tribute-discord-deployment.yaml
+  # The main/master branch of your new github project. It will be used to compose the docker image tag.
+  DEPLOYMENT_BRANCH: main
+  # Do not change the env vars below:
+  INFRA_REPO: openlawteam/infrastructure
+  DEPLOYMENT_FOLDER: gke-projects/${{ env.GCP_PROJECT_ID }}/prod/deployments/
+  IMAGE_NAME: ${{ env.GCP_PROJECT_ID }}/${{ env.GITHUB_REPO_NAME }}
   REGISTRY_HOSTNAME: gcr.io
-  IMAGE_NAME: thelao/tribute-discord-service
   GIT_COMMITTER_NAME: 'Pizza Dog'
-  GIT_COMMITTER_EMAIL: 'dev@openlaw.io'
+  GIT_COMMITTER_EMAIL: 'dev@tributelabs.xyz'
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-  INFRA_REPO: openlawteam/lao-backends
 
 jobs:
   deploy:
@@ -24,21 +35,13 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v2.x
 
-      # Use the GCP official setup action to auth, note that while mentioned in
-      # the documentation, `service_account_email` value is not required if
-      # using a JSON key versus legacy P12.
-      #
-      # Also the GCP_SA_KEY should be a base64 encoding of the JSON key file
-      # obtained for a service account with appropriate permissions.
       - name: Set up Google Cloud Platform SDK and authenticate
         uses: google-github-actions/setup-gcloud@master
         with:
-          project_id: ${{ secrets.GPC_THELAO_PROJECT_ID }}
+          project_id: ${{ env.GPC_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_THELAO_SA_KEY }}
           export_default_credentials: true
 
-      # Configure Docker to use the gcloud command-line tool as a credential
-      # helper for authentication. Needed if pushing images to GCR.io, etc.
       - name: Configure Docker for GCP credential helper
         run: gcloud --quiet auth configure-docker
 
@@ -48,10 +51,10 @@ jobs:
           echo $TAG
           docker build -t "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG" .
           docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG"
-          docker tag "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG" "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:main
-          docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:main
+          docker tag "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG" "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:${{ env.DEPLOYMENT_BRANCH }}
+          docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:${{ env.DEPLOYMENT_BRANCH }}
           
-      - name: Checkout openlawteam/lao-backends repo
+      - name: Checkout openlawteam/infrastructure repo
         uses: actions/checkout@v2
         with: 
           repository: ${{ env.INFRA_REPO }}
@@ -59,17 +62,17 @@ jobs:
 
       - name: Update the prod image tag
         run: |
-          cd k8s/deployments/prod
+          cd ${{ env.DEPLOYMENT_FOLDER }}
           export TAG=${{ env.GITHUB_REF_SLUG }}
           echo $TAG
           ls
-          sed -i "s|${{ env.IMAGE_NAME }}:v.*|${{ env.IMAGE_NAME }}:$TAG|g" tribute-discord-deployment.yaml
+          sed -i "s|${{ env.IMAGE_NAME }}:v.*|${{ env.IMAGE_NAME }}:$TAG|g" ${{ env.DEPLOYMENT_FILE }}
           git config --local user.email ${{ env.GIT_COMMITTER_EMAIL }}
           git config --local user.name ${{ env.GIT_COMMITTER_NAME }}
           git commit -am "auto-release(prod): ${{ env.IMAGE_NAME }}:$TAG"
           git show
 
-      - name: Push changes to openlawteam/lao-backends repo
+      - name: Push changes to openlawteam/infrastructure repo
         uses: ad-m/github-push-action@master
         with:
           repository: ${{ env.INFRA_REPO }}
