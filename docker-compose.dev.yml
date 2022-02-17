@@ -3,7 +3,8 @@ version: "3.8"
 services:
   # Postgres
   db:
-    image: postgres
+    # Tribute Labs is using version 9.6 upstream
+    image: postgres:9.6
     env_file:
       # Committed to source control for convience.
       - .env.dev
