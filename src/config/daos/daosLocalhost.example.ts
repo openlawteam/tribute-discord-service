@@ -55,7 +55,21 @@ export const DAOS_LOCALHOST: Record<
     applications: {
       TRIBUTE_TOOLS_BOT: {
         name: 'TRIBUTE_TOOLS_BOT',
-        resultChannelID: '933653038718128198',
+        commands: {
+          BUY: {
+            resultChannelID: '933653038718128198',
+            // Setting low vote thresholds at `1` required for local development
+            voteThresholds: new Map([
+              [[0, 15], 1],
+              [[15, 30], 1],
+              [[30, 100], 1],
+              [[100, 0], 1],
+            ]),
+          },
+          SWEEP: {
+            resultChannelID: '933653038718128198',
+          },
+        },
       },
     },
     baseURL: 'https://demo.tributedao.com',

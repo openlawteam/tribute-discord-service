@@ -50,6 +50,9 @@ const INVALID_ETH_ADDRESS_ERROR_MESSAGE: string =
 const DUPLICATE_OPTIONS_ERROR_MESSAGE: string =
   'Duplicate poll options are not allowed.';
 
+const POLL_SETUP_ERROR_MESSAGE: string =
+  'Something went wrong while setting up the poll.';
+
 function getOptionLetter(o: CommandInteractionOption): PollOptionLetters {
   return normalizeString(o.name.split(OPTION_REGEX)[1]) as PollOptionLetters;
 }
@@ -265,36 +268,39 @@ async function execute(interaction: CommandInteraction) {
     fetchReply: true,
   })) as Message;
 
-  const {guildId: guildID, channelId: channelID, id: messageID} = message;
-
-  if (!guildID) {
-    throw new Error(
-      `No \`guildId\` was found on \`Message\` ${messageID}. Channel: ${channelID}. Poll question: ${question}.`
-    );
-  }
-
-  // Store poll data in DB
-  await prisma.floorSweeperPoll.create({
-    data: {
-      channelID,
-      contractAddress: contract,
-      dateEnd,
-      guildID,
-      messageID,
-      options,
-      question,
-    },
-  });
-
   try {
+    const {guildId: guildID, channelId: channelID, id: messageID} = message;
+
+    if (!guildID) {
+      throw new Error(
+        `No \`guildId\` was found on \`Message\` ${messageID}. Channel: ${channelID}. Poll question: ${question}.`
+      );
+    }
+
+    // Store poll data in DB
+    await prisma.floorSweeperPoll.create({
+      data: {
+        channelID,
+        contractAddress: contract,
+        dateEnd,
+        guildID,
+        messageID,
+        options,
+        question,
+      },
+    });
+
     // React with voting buttons as emojis, which correspond to option letters.
     await reactPollVotingEmojis(data, message);
   } catch (error) {
-    // Delete the original reply as we cannot run a poll without voting buttons
-    await message.delete();
+    // Reply with an error/help message that only the user can see.
+    await interaction.followUp({
+      content: POLL_SETUP_ERROR_MESSAGE,
+      ephemeral: true,
+    });
 
-    // Handle error at a higher level
-    throw error;
+    // Delete the original reply as we cannot run a poll without voting buttons
+    https: await message.delete();
   }
 }
 

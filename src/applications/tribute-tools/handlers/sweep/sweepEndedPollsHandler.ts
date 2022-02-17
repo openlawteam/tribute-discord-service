@@ -138,7 +138,8 @@ export function sweepEndedPollsHandler({
             }
 
             const resultChannelID =
-              dao.applications?.TRIBUTE_TOOLS_BOT?.resultChannelID;
+              dao.applications?.TRIBUTE_TOOLS_BOT?.commands.SWEEP
+                .resultChannelID;
 
             if (!resultChannelID) {
               throw new Error('Could not find a `resultChannelID`.');

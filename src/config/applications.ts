@@ -5,6 +5,7 @@ import {APP_ENV} from './common';
  */
 
 export const APPLICATIONS = ['TRIBUTE_TOOLS_BOT'] as const;
+export const APPLICATION_COMMANDS = ['BUY', 'SWEEP'] as const;
 
 /**
  * Application Client IDs

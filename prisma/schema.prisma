@@ -27,6 +27,7 @@ model DiscordWebhook {
 
 model FloorSweeperPoll {
   id              Int      @id @default(autoincrement())
+  uuid            String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt       DateTime @default(now())
   question        String   @db.VarChar(255)
   contractAddress String   @db.VarChar(255)
@@ -39,4 +40,21 @@ model FloorSweeperPoll {
   messageID       String   @unique @db.VarChar(255)
 
   @@map("floor_sweeper_poll")
+}
+
+model BuyNFTPoll {
+  id              Int      @id @default(autoincrement())
+  uuid            String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt       DateTime @default(now())
+  name            String   @db.VarChar(255)
+  contractAddress String   @db.VarChar(255)
+  tokenID         String   @db.VarChar(255)
+  processed       Boolean  @default(false) @db.Boolean
+  voteThreshold   Int      @default(0) @db.Integer
+  upvoteCount     Int      @default(0) @db.Integer
+  guildID         String   @db.VarChar(255)
+  channelID       String   @db.VarChar(255)
+  messageID       String   @unique @db.VarChar(255)
+
+  @@map("buy_nft_poll")
 }

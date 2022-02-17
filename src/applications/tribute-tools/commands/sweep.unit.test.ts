@@ -39,7 +39,7 @@ describe('sweep unit tests', () => {
     {name: 'option_c', type: 4, value: 150},
   ];
 
-  const INTERACION_DATA: GatewayInteractionCreateDispatchData = {
+  const INTERACTION_DATA: GatewayInteractionCreateDispatchData = {
     /**
      * ID of the interaction
      */
@@ -114,7 +114,7 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACION_DATA);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -164,9 +164,9 @@ describe('sweep unit tests', () => {
 
     const client = new Client(CLIENT_OPTIONS);
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           {name: 'how_long', type: 3, value: '1 m'},
           {
@@ -229,7 +229,7 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       type: 1,
     });
 
@@ -253,9 +253,9 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           {name: 'how_long', type: 3, value: '1 m'},
           {
@@ -290,9 +290,9 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           {name: 'how_long', type: 3, value: '1 m'},
           {
@@ -338,9 +338,9 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           // Bad value
           {name: 'how_long', type: 3, value: '1mo'},
@@ -386,9 +386,9 @@ describe('sweep unit tests', () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new CommandInteraction(client, {
-      ...INTERACION_DATA,
+      ...INTERACTION_DATA,
       data: {
-        ...INTERACION_DATA.data,
+        ...INTERACTION_DATA.data,
         options: [
           {name: 'how_long', type: 3, value: '1 m'},
           {
@@ -430,7 +430,55 @@ describe('sweep unit tests', () => {
     });
   });
 
-  test('should throw if no `guildId` returned from `reply`', async () => {
+  test('should reply with error and delete poll if DB crete entry fails', async () => {
+    /**
+     * Mock db insert error
+     *
+     * @todo fix types
+     */
+    (prismaMock.floorSweeperPoll as any).create.mockImplementation(() => {
+      throw new Error('Some bad error');
+    });
+
+    const client = new Client(CLIENT_OPTIONS);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+    const reactSpy = jest.fn();
+    const deleteSpy = jest.fn();
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            delete: deleteSpy,
+            guildId: '722525233755717762',
+            react: reactSpy,
+          }) as any
+      );
+
+    const interactionFollowUpSpy = jest
+      .spyOn(interaction, 'followUp')
+      .mockImplementation(async (_o) => (await {}) as any);
+
+    await sweep.execute(interaction);
+
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+    expect(interactionFollowUpSpy.mock.calls.length).toBe(1);
+    expect(reactSpy.mock.calls.length).toBe(0);
+    expect(deleteSpy.mock.calls.length).toBe(1);
+
+    expect(interactionFollowUpSpy.mock.calls[0][0]).toEqual({
+      content: 'Something went wrong while setting up the poll.',
+      ephemeral: true,
+    });
+
+    // Cleanup
+
+    interactionFollowUpSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should reply with error and delete poll if Discord reaction fails', async () => {
     /**
      * Mock db insert entry
      *
@@ -441,47 +489,88 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACION_DATA);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+    const deleteSpy = jest.fn();
+
+    const reactSpy = jest.fn().mockImplementation(() => {
+      throw new Error('Some bad error');
+    });
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            delete: deleteSpy,
+            guildId: '722525233755717762',
+            react: reactSpy,
+          }) as any
+      );
+
+    const interactionFollowUpSpy = jest
+      .spyOn(interaction, 'followUp')
+      .mockImplementation(async (_o) => (await {}) as any);
+
+    await sweep.execute(interaction);
+
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+    expect(interactionFollowUpSpy.mock.calls.length).toBe(1);
+    expect(reactSpy.mock.calls.length).toBe(1);
+    expect(deleteSpy.mock.calls.length).toBe(1);
+
+    expect(interactionFollowUpSpy.mock.calls[0][0]).toEqual({
+      content: 'Something went wrong while setting up the poll.',
+      ephemeral: true,
+    });
+
+    // Cleanup
+
+    interactionFollowUpSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should reply with error and delete poll if no `guildId` returned from `reply', async () => {
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    (prismaMock.floorSweeperPoll as any).create.mockResolvedValue(
+      DB_INSERT_DATA
+    );
+
+    const client = new Client(CLIENT_OPTIONS);
+    const interaction = new CommandInteraction(client, INTERACTION_DATA);
     const reactSpy = jest.fn();
+    const deleteSpy = jest.fn();
 
     const interactionReplySpy = jest
       .spyOn(interaction, 'reply')
       .mockImplementation(
         async (_o) =>
           // Do not return `guildId`
-          (await {react: reactSpy}) as any
+          (await {delete: deleteSpy, react: reactSpy}) as any
       );
 
-    try {
-      await sweep.execute(interaction);
-    } catch (error) {
-      expect((error as Error)?.message).toMatch(
-        /No `guildId` was found on `Message` undefined\. Channel: undefined\. Poll question: How much to sweep larvalads fam\?\./i
-      );
+    const interactionFollowUpSpy = jest
+      .spyOn(interaction, 'followUp')
+      .mockImplementation(async (_o) => (await {}) as any);
 
-      expect(interactionReplySpy.mock.calls.length).toBe(1);
+    await sweep.execute(interaction);
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .content
-      ).toMatch(/📊 \*\*how much to sweep larvalads fam\?\*\*/i);
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+    expect(interactionFollowUpSpy.mock.calls.length).toBe(1);
+    expect(reactSpy.mock.calls.length).toBe(0);
+    expect(deleteSpy.mock.calls.length).toBe(1);
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .embeds?.[0]?.description
-      ).toMatch(/🇦: 50 ETH\n🇧: 100 ETH\n🇨: 150 ETH\n🚫: None\n/i);
+    expect(interactionFollowUpSpy.mock.calls[0][0]).toEqual({
+      content: 'Something went wrong while setting up the poll.',
+      ephemeral: true,
+    });
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .embeds?.[0]?.fields?.[0].value
-      ).toMatch(/<t:\d{1,}:F>/i);
+    // Cleanup
 
-      expect(
-        (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
-          .embeds?.[0]?.fields?.[0].name
-      ).toMatch(/⏱ poll ends:/i);
-
-      expect(reactSpy.mock.calls.length).toBe(0);
-    }
+    interactionFollowUpSpy.mockRestore();
+    interactionReplySpy.mockRestore();
   });
 });

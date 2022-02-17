@@ -2,10 +2,14 @@ import {Client, Intents} from 'discord.js';
 
 import {
   sweepEndedPollsHandler,
-  sweepInteractionExecuteHandler,
   sweepPollReactionHandler,
 } from './handlers/sweep';
 import {ApplicationReturn} from '../types';
+import {
+  buyPollReactionHandler,
+  buyPollRemoveReactionHandler,
+  interactionExecuteHandler,
+} from './handlers';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
@@ -59,12 +63,18 @@ export async function tributeToolsBot(): Promise<
 
     // Listen for interactions and possibly run commands
     client.on('interactionCreate', (interaction) => {
-      sweepInteractionExecuteHandler({commands, interaction});
+      interactionExecuteHandler({commands, interaction});
     });
 
-    // Listen to reactions on messages and possibly handle
+    // Listen to reactions on messages, and possibly handle.
     client.on('messageReactionAdd', (reaction, user) => {
+      buyPollReactionHandler({reaction, user});
       sweepPollReactionHandler({reaction, user});
+    });
+
+    // Listen to the removal of reactions on messages, and possibly handle.
+    client.on('messageReactionRemove', (reaction, user) => {
+      buyPollRemoveReactionHandler({reaction, user});
     });
 
     const stop = async (): Promise<void> => {

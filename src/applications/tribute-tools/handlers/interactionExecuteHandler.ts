@@ -1,8 +1,8 @@
 import {Interaction} from 'discord.js';
 
-import {GetCommandsReturn} from '../../../types';
+import {GetCommandsReturn} from '../../types';
 
-export async function sweepInteractionExecuteHandler({
+export async function interactionExecuteHandler({
   commands,
   interaction,
 }: {
@@ -20,9 +20,13 @@ export async function sweepInteractionExecuteHandler({
   } catch (error) {
     console.error(error);
 
-    await interaction.followUp({
-      content: `There was an error while executing the command ${interaction.commandName}.`,
-      ephemeral: true,
-    });
+    try {
+      await interaction.reply({
+        content: `There was an error while executing the command \`/${interaction.commandName}\`.`,
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
