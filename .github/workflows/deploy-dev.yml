@@ -50,11 +50,10 @@ jobs:
         uses: rlespinasse/github-slug-action@v3.x
 
       - name: Set up Google Cloud Platform SDK and authenticate
-        uses: google-github-actions/setup-gcloud@v0.5.1
+        uses: google-github-actions/auth@v0
         with:
           project_id: ${{ env.GPC_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_THELAO_SA_KEY }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.GCP_THELAO_SA_KEY }}
 
       - name: Configure Docker for GCP credential helper
         run: gcloud --quiet auth configure-docker
