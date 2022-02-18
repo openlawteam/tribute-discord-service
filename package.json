@@ -49,7 +49,7 @@
     "http-terminator": "^3.0.3",
     "koa": "^2.13.3",
     "koa-bodyparser": "^4.3.0",
-    "node-fetch": "^2.6.2",
+    "node-fetch": "^2.6.7",
     "prisma": "^2.29.1"
   },
   "devDependencies": {
@@ -59,7 +59,7 @@
     "@types/koa": "^2.13.4",
     "@types/koa-bodyparser": "^4.3.4",
     "@types/node": "^16.7.1",
-    "@types/node-fetch": "^2.5.12",
+    "@types/node-fetch": "^2.6.1",
     "dotenv-cli": "^4.0.0",
     "jest": "^27.4.7",
     "jest-mock-extended": "^2.0.4",
