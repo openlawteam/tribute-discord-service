@@ -41,7 +41,7 @@
   "dependencies": {
     "@alch/alchemy-web3": "^1.2.4",
     "@discordjs/rest": "^0.3.0",
-    "@prisma/client": "^2.29.1",
+    "@prisma/client": "^3.9.2",
     "abi-decoder": "^2.4.0",
     "dayjs": "^1.10.7",
     "discord-api-types": "^0.27.2",
@@ -50,7 +50,7 @@
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "node-fetch": "^2.6.7",
-    "prisma": "^2.29.1"
+    "prisma": "^3.9.2"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.2",
