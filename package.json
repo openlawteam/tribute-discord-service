@@ -60,7 +60,7 @@
     "@types/koa-bodyparser": "^4.3.5",
     "@types/node": "^17.0.18",
     "@types/node-fetch": "^2.6.1",
-    "dotenv-cli": "^4.0.0",
+    "dotenv-cli": "^5.0.0",
     "jest": "^27.5.1",
     "jest-mock-extended": "^2.0.4",
     "msw": "^0.35.0",
