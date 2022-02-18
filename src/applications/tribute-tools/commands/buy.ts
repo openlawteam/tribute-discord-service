@@ -258,9 +258,9 @@ async function execute(interaction: CommandInteraction) {
       value: `${voteThreshold} upvote${voteThreshold > 1 ? 's' : ''}`,
     })
     .setImage(smallImageUrl)
-    .setFooter(
-      'After a threshold has been reached the vote is final,\neven if you change your vote.'
-    );
+    .setFooter({
+      text: 'After a threshold has been reached the vote is final,\neven if you change your vote.',
+    });
 
   // Reply to user
   const message = (await interaction.reply({
