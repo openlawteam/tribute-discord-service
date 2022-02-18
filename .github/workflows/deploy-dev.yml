@@ -4,20 +4,10 @@ on:
   push:
     tags-ignore:
       - 'v*'
-    paths:
-      # ignore changes
-      - "!.github/workflows/deploy-prod.yml"
-      # detect changes
-      - ".github/workflows/deploy-dev.yml"
-      - "src/**"
-      - "prisma/**"
-      - "scripts/**"
-      - "Dockerfile"
-      - "package*.json"
-      - "README.md"
-      
     branches:
       - main
+    paths-ignore:
+      - ".github/workflows/deploy-prod.yml"
 
 env:
   ## Required Env Vars
