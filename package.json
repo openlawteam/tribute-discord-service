@@ -46,7 +46,7 @@
     "dayjs": "^1.10.7",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
-    "http-terminator": "^3.0.3",
+    "http-terminator": "^3.0.4",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "node-fetch": "^2.6.7",
