@@ -259,7 +259,7 @@ describe('sweepEndedPollsHandler unit tests', () => {
 
     // Mock `getDaos`
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(await import('../../../../services/dao/getDaos'), 'getDaos')
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const client = new Client({
@@ -316,7 +316,7 @@ describe('sweepEndedPollsHandler unit tests', () => {
     jest.useFakeTimers();
 
     // Run handler
-    endedPollsHandler({client, checkInterval: 1000});
+    sweepEndedPollsHandler({client, checkInterval: 1000});
 
     jest.advanceTimersByTime(2000);
 
