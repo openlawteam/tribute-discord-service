@@ -27,6 +27,7 @@ const DB_ENTRY = {
   processed: false,
   question: 'How much to sweep larvalads fam?',
   result: 0,
+  uuid: 'abc123def456',
 };
 
 const DB_ENTRY_1 = {
@@ -41,6 +42,7 @@ const DB_ENTRY_1 = {
   processed: false,
   question: 'How much to sweep bladerunner punks fam?',
   result: 0,
+  uuid: 'xyz123456',
 };
 
 describe('sweepEndedPollsHandler unit tests', () => {
@@ -163,7 +165,9 @@ describe('sweepEndedPollsHandler unit tests', () => {
           .setURL(
             `${SWEEP_EXTERNAL_URL}/?daoName=${
               FAKE_DAOS_FIXTURE['test'].internalName
-            }&amount=${100}&contractAddress=${ETH_ADDRESS_FIXTURE}`
+            }&amount=${100}&contractAddress=${ETH_ADDRESS_FIXTURE}&id=${
+              DB_ENTRY.uuid
+            }`
           )
           .setEmoji('🧹')
       )
@@ -177,7 +181,9 @@ describe('sweepEndedPollsHandler unit tests', () => {
           .setURL(
             `${SWEEP_EXTERNAL_URL}/?daoName=${
               FAKE_DAOS_FIXTURE['test'].internalName
-            }&amount=${200}&contractAddress=${ETH_ADDRESS_FIXTURE}`
+            }&amount=${200}&contractAddress=${ETH_ADDRESS_FIXTURE}&id=${
+              DB_ENTRY_1.uuid
+            }`
           )
           .setEmoji('🧹')
       )

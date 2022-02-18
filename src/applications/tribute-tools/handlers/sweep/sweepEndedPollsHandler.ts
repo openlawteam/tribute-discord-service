@@ -41,6 +41,7 @@ export function sweepEndedPollsHandler({
         messageID,
         options,
         question,
+        uuid,
       }) => {
         try {
           const channel = (await client.channels.fetch(
@@ -154,7 +155,7 @@ export function sweepEndedPollsHandler({
                 .setLabel('Sweep')
                 .setStyle('LINK')
                 .setURL(
-                  `${SWEEP_EXTERNAL_URL}/?daoName=${dao.internalName}&amount=${result}&contractAddress=${contractAddress}`
+                  `${SWEEP_EXTERNAL_URL}/?daoName=${dao.internalName}&amount=${result}&contractAddress=${contractAddress}&id=${uuid}`
                 )
                 .setEmoji('🧹')
             );
