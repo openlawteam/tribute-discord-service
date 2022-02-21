@@ -4,7 +4,7 @@ import {
   Intents,
   InteractionReplyOptions,
 } from 'discord.js';
-import {GatewayInteractionCreateDispatchData} from 'discord-api-types/v10';
+import {RawInteractionData} from 'discord.js/typings/rawDataTypes';
 
 import {
   ETH_ADDRESS_FIXTURE,
@@ -41,7 +41,7 @@ describe('sweep unit tests', () => {
     {name: 'option_c', type: 4, value: 150},
   ];
 
-  const INTERACTION_DATA: GatewayInteractionCreateDispatchData = {
+  const INTERACTION_DATA: RawInteractionData = {
     /**
      * ID of the interaction
      */
@@ -54,7 +54,6 @@ describe('sweep unit tests', () => {
      * The type of interaction
      */
     type: 2,
-    locale: 'en-US',
     /**
      * The command data payload
      */

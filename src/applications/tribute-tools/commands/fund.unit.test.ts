@@ -4,6 +4,7 @@ import {
   Intents,
   InteractionReplyOptions,
 } from 'discord.js';
+import {RawInteractionData} from 'discord.js/typings/rawDataTypes';
 
 import {
   ETH_ADDRESS_FIXTURE,
@@ -35,7 +36,7 @@ describe('fund unit tests', () => {
     },
   ];
 
-  const INTERACTION_DATA = {
+  const INTERACTION_DATA: RawInteractionData = {
     /**
      * ID of the interaction
      */
