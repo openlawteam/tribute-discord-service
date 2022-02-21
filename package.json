@@ -3,7 +3,7 @@
   "version": "1.0.6",
   "private": true,
   "description": "A Discord service to interact with curated TributeDAOs' Discord servers.",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "engines": {
     "node": "^16.6.0",
     "npm": ">=7"
@@ -16,7 +16,7 @@
     "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/**/*.json'",
     "migrate:dev": "dotenv -e .env.dev -- npx prisma migrate dev",
     "release": "np --no-publish --no-yarn",
-    "start:deployed": "npx prisma generate && prisma migrate deploy && node dist/index.js",
+    "start:deployed": "npx prisma generate && prisma migrate deploy && node .",
     "start": "npx prisma generate --watch & npm run generate-abi-types && npm run docker:up",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
     "style": "prettier --check '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
