@@ -22,7 +22,8 @@ COPY --chown=node:node src src
 COPY --chown=node:node abi-types abi-types
 # Make `wait-for-it` executable by the container's user
 RUN ["chmod", "u+x", "./scripts/wait-for-it.sh"]
+RUN ["chmod", "u+x", "./scripts/start-dev.sh"]
 # Wait for `db` to be available at port, then run the start commands
 CMD ./scripts/wait-for-it.sh db:5432 --\
     npm run migrate:dev && \
-    npx nodemon --signal SIGTERM --watch 'src/**/*.{ts,js,json}' --exec 'ts-node' src/index.ts
+    npx nodemon --signal SIGTERM --watch src -e ts,js,json --exec 'sh' scripts/start-dev.sh
