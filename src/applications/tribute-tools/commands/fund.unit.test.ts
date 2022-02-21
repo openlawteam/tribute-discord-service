@@ -1,18 +1,17 @@
 import {
   Client,
   ClientOptions,
-  CommandInteraction,
   Intents,
   InteractionReplyOptions,
 } from 'discord.js';
-import {GatewayInteractionCreateDispatchData} from 'discord-api-types';
 
-import {BUY_ALLOWED_EMOJIS} from '../config';
 import {
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
+  FakeDiscordCommandInteraction,
   GUILD_ID_FIXTURE,
 } from '../../../../test';
+import {BUY_ALLOWED_EMOJIS} from '../config';
 import {fund} from './fund';
 
 describe('fund unit tests', () => {
@@ -36,7 +35,7 @@ describe('fund unit tests', () => {
     },
   ];
 
-  const INTERACTION_DATA: GatewayInteractionCreateDispatchData = {
+  const INTERACTION_DATA = {
     /**
      * ID of the interaction
      */
@@ -56,6 +55,7 @@ describe('fund unit tests', () => {
       id: '123456789',
       name: 'fund',
       options: INTERACTION_OPTIONS,
+      type: 1,
     },
 
     /**
@@ -88,7 +88,12 @@ describe('fund unit tests', () => {
 
   test('should run execute', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -148,7 +153,7 @@ describe('fund unit tests', () => {
   test('should not run execute if interaction not command', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       type: 1,
     });
@@ -176,7 +181,7 @@ describe('fund unit tests', () => {
   test('should reply with error if `address_to_fund` option is not valid', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -211,7 +216,12 @@ describe('fund unit tests', () => {
 
   test('should reply with error if DAO is not found', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     // Mock `getDaos`
@@ -245,7 +255,12 @@ describe('fund unit tests', () => {
 
   test('should reply with error and delete poll if no `guildId` returned from `reply`', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const deleteSpy = jest.fn();
     const reactSpy = jest.fn();
 

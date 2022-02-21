@@ -1,15 +1,14 @@
 import {
   Client,
   ClientOptions,
-  CommandInteraction,
   Intents,
   InteractionReplyOptions,
 } from 'discord.js';
-import {GatewayInteractionCreateDispatchData} from 'discord-api-types';
 
 import {
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
+  FakeDiscordCommandInteraction,
   GUILD_ID_FIXTURE,
 } from '../../../../test';
 import {buy} from './buy';
@@ -36,7 +35,7 @@ describe('buy unit tests', () => {
     },
   ];
 
-  const INTERACTION_DATA: GatewayInteractionCreateDispatchData = {
+  const INTERACTION_DATA = {
     /**
      * ID of the interaction
      */
@@ -56,6 +55,7 @@ describe('buy unit tests', () => {
       id: '123456789',
       name: 'buy',
       options: INTERACTION_OPTIONS,
+      type: 1,
     },
 
     /**
@@ -152,7 +152,12 @@ describe('buy unit tests', () => {
 
   test('should run execute', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     /**
@@ -225,7 +230,7 @@ describe('buy unit tests', () => {
   test('should not run execute if interaction not command', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       type: 1,
     });
@@ -249,7 +254,7 @@ describe('buy unit tests', () => {
   test('should reply with error if `url` option is not valid', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -280,7 +285,7 @@ describe('buy unit tests', () => {
   test('should reply with error if `url` option `host` is not valid', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -318,7 +323,7 @@ describe('buy unit tests', () => {
   test('should reply with error if `url` address path fragment is not valid', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -356,7 +361,7 @@ describe('buy unit tests', () => {
   test('should reply with error if `url` address token ID fragment is not valid', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -393,7 +398,12 @@ describe('buy unit tests', () => {
 
   test('should reply with error if Gem response has no price information', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     server.use(
@@ -430,7 +440,12 @@ describe('buy unit tests', () => {
 
   test('should reply with error if Gem response has no `name`', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     server.use(
@@ -466,7 +481,12 @@ describe('buy unit tests', () => {
 
   test('should reply with error if Gem response has no `smallImageUrl`', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     server.use(
@@ -502,7 +522,12 @@ describe('buy unit tests', () => {
 
   test('should reply with error if Gem response is not OK', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     server.use(
@@ -532,7 +557,12 @@ describe('buy unit tests', () => {
 
   test('should reply with error if DAO is not found', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     server.use(
@@ -568,7 +598,12 @@ describe('buy unit tests', () => {
 
   test('should reply with error and delete poll if no `guildId` returned from `reply`', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const deleteSpy = jest.fn();
     const reactSpy = jest.fn();
 
@@ -630,7 +665,12 @@ describe('buy unit tests', () => {
 
   test('should reply with error and delete poll if DB create entry fails', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const deleteSpy = jest.fn();
     const reactSpy = jest.fn();
 
@@ -692,7 +732,12 @@ describe('buy unit tests', () => {
 
   test('should reply with error and delete poll if Discord reaction fails', async () => {
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const deleteSpy = jest.fn();
 
     const reactSpy = jest.fn().mockImplementation(() => {
