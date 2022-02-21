@@ -1,13 +1,15 @@
 import {
   Client,
   ClientOptions,
-  CommandInteraction,
   Intents,
   InteractionReplyOptions,
 } from 'discord.js';
-import {GatewayInteractionCreateDispatchData} from 'discord-api-types';
+import {RawInteractionData} from 'discord.js/typings/rawDataTypes';
 
-import {ETH_ADDRESS_FIXTURE} from '../../../../test';
+import {
+  ETH_ADDRESS_FIXTURE,
+  FakeDiscordCommandInteraction,
+} from '../../../../test';
 import {prismaMock} from '../../../../test/prismaMock';
 import {sweep} from './sweep';
 
@@ -39,7 +41,7 @@ describe('sweep unit tests', () => {
     {name: 'option_c', type: 4, value: 150},
   ];
 
-  const INTERACTION_DATA: GatewayInteractionCreateDispatchData = {
+  const INTERACTION_DATA: RawInteractionData = {
     /**
      * ID of the interaction
      */
@@ -59,6 +61,7 @@ describe('sweep unit tests', () => {
       id: '123456789',
       name: 'sweep',
       options: INTERACTION_OPTIONS,
+      type: 1,
     },
 
     /**
@@ -114,7 +117,12 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
 
     const interactionReplySpy = jest
@@ -163,7 +171,8 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, {
+
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -228,7 +237,7 @@ describe('sweep unit tests', () => {
   test('should not run execute if interaction not command', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       type: 1,
     });
@@ -252,7 +261,7 @@ describe('sweep unit tests', () => {
   test('should not run execute if no `question`', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -289,7 +298,7 @@ describe('sweep unit tests', () => {
   test('should reply with error if `nft_contract` option is not valid', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -337,7 +346,7 @@ describe('sweep unit tests', () => {
   test('should reply with error if `how_long` option is not valid', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -385,7 +394,7 @@ describe('sweep unit tests', () => {
   test('should reply with error if duplicate numeric options provided', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
-    const interaction = new CommandInteraction(client, {
+    const interaction = new FakeDiscordCommandInteraction(client, {
       ...INTERACTION_DATA,
       data: {
         ...INTERACTION_DATA.data,
@@ -441,7 +450,12 @@ describe('sweep unit tests', () => {
     });
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
     const deleteSpy = jest.fn();
 
@@ -489,7 +503,12 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const deleteSpy = jest.fn();
 
     const reactSpy = jest.fn().mockImplementation(() => {
@@ -540,7 +559,12 @@ describe('sweep unit tests', () => {
     );
 
     const client = new Client(CLIENT_OPTIONS);
-    const interaction = new CommandInteraction(client, INTERACTION_DATA);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
     const reactSpy = jest.fn();
     const deleteSpy = jest.fn();
 

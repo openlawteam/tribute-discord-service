@@ -1,4 +1,4 @@
-import {APIMessage} from 'discord-api-types';
+import {APIMessage} from 'discord-api-types/v10';
 
 import {
   DISCORD_WEBHOOK_POST_FIXTURE,

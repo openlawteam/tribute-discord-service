@@ -1,4 +1,9 @@
-import {CommandInteraction, Message, MessageEmbed} from 'discord.js';
+import {
+  CommandInteraction,
+  Message,
+  MessageEmbed,
+  EmbedFooterData,
+} from 'discord.js';
 import {SlashCommandBuilder} from '@discordjs/builders';
 
 import {BUY_ALLOWED_EMOJIS} from '../config';
@@ -117,9 +122,9 @@ async function execute(interaction: CommandInteraction) {
         UPVOTE_THRESHOLD > 1 ? 's' : ''
       }\n\u200B`,
     })
-    .setFooter(
-      'After a threshold has been reached the vote is final,\neven if you change your vote.'
-    );
+    .setFooter({
+      text: 'After a threshold has been reached the vote is final,\neven if you change your vote.',
+    });
 
   // Reply to user
   const message = (await interaction.reply({
