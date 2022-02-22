@@ -154,7 +154,7 @@ describe('fund unit tests', () => {
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.description
     ).toMatch(
-      /📊 \*\*Should we fund `0x04028Df0Cea639E97fDD3fC01bA5CC172613211D` for \$50\.00 USDC\?\*\*/i
+      /📊 \*\*Should we fund `0x04028Df0Cea639E97fDD3fC01bA5CC172613211D` for \$50 USDC\?\*\*/i
     );
 
     expect(

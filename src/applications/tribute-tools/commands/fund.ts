@@ -122,9 +122,8 @@ async function execute(interaction: CommandInteraction) {
   const embed = new MessageEmbed()
     .setTitle(purpose)
     .setDescription(
-      `📊 **Should we fund \`${addressToFund}\` for ${new Intl.NumberFormat(
-        'en-US',
-        {style: 'currency', currency: 'USD'}
+      `📊 **Should we fund \`${addressToFund}\` for $${new Intl.NumberFormat(
+        'en-US'
       ).format(amountUSDC)} USDC?**\n\u200B`
     ) /* `\u200B` = zero-width space */
     .setURL(`https://etherscan.io/address/${addressToFund}`)
