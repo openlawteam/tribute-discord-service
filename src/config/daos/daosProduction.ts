@@ -109,6 +109,14 @@ export const DAOS_PRODUCTION: Record<
               [[30, 100], 10],
             ]),
           },
+          FUND: {
+            resultChannelID: '936185841204744222',
+            voteThresholds: new Map([
+              [[0, 15], 3],
+              [[15, 30], 5],
+              [[30, 100], 10],
+            ]),
+          },
           SWEEP: {
             resultChannelID: '936185841204744222',
           },
@@ -137,6 +145,15 @@ export const DAOS_PRODUCTION: Record<
         name: 'TRIBUTE_TOOLS_BOT',
         commands: {
           BUY: {
+            resultChannelID: '938470347521540137',
+            voteThresholds: new Map([
+              [[0, 5], 5],
+              [[5, 30], 10],
+              [[30, 100], 20],
+              [[100, 0], 25],
+            ]),
+          },
+          FUND: {
             resultChannelID: '938470347521540137',
             voteThresholds: new Map([
               [[0, 5], 5],
@@ -185,6 +202,15 @@ export const DAOS_PRODUCTION: Record<
               [[100, 0], 25],
             ]),
           },
+          FUND: {
+            resultChannelID: '936184076107415602',
+            voteThresholds: new Map([
+              [[0, 5], 5],
+              [[5, 30], 10],
+              [[30, 100], 20],
+              [[100, 0], 25],
+            ]),
+          },
           SWEEP: {
             resultChannelID: '936184076107415602',
           },
@@ -210,6 +236,14 @@ export const DAOS_PRODUCTION: Record<
         name: 'TRIBUTE_TOOLS_BOT',
         commands: {
           BUY: {
+            resultChannelID: '936433157832589402',
+            voteThresholds: new Map([
+              [[0, 15], 5],
+              [[15, 30], 10],
+              [[30, 100], 20],
+            ]),
+          },
+          FUND: {
             resultChannelID: '936433157832589402',
             voteThresholds: new Map([
               [[0, 15], 5],

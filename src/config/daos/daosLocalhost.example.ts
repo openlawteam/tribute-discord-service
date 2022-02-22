@@ -66,6 +66,15 @@ export const DAOS_LOCALHOST: Record<
               [[100, 0], 1],
             ]),
           },
+          FUND: {
+            resultChannelID: '933653038718128198',
+            voteThresholds: new Map([
+              [[0, 15], 1],
+              [[15, 30], 1],
+              [[30, 100], 1],
+              [[100, 0], 1],
+            ]),
+          },
           SWEEP: {
             resultChannelID: '933653038718128198',
           },

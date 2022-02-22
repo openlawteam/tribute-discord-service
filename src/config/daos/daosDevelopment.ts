@@ -80,6 +80,16 @@ export const DAOS_DEVELOPMENT: Record<
               [[100, 0], 1],
             ]),
           },
+          FUND: {
+            resultChannelID: '933653038718128198',
+            // Setting low vote thresholds at `1` required for development
+            voteThresholds: new Map([
+              [[0, 15], 1],
+              [[15, 30], 1],
+              [[30, 100], 1],
+              [[100, 0], 1],
+            ]),
+          },
           SWEEP: {
             resultChannelID: '933653038718128198',
           },
