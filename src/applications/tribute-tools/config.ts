@@ -35,5 +35,6 @@ export const TRIBUTE_TOOLS_URL: string =
     : 'https://develop--tools-tributelabs.netlify.app';
 
 export const BUY_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/single-buy`;
+export const FUND_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/fund`;
 export const SWEEP_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/floor-sweeper`;
 export const THUMBS_EMOJIS = ['👍', '👎'] as const;

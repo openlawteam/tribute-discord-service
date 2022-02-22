@@ -111,11 +111,7 @@ export const DAOS_PRODUCTION: Record<
           },
           FUND: {
             resultChannelID: '936185841204744222',
-            voteThresholds: new Map([
-              [[0, 15], 3],
-              [[15, 30], 5],
-              [[30, 100], 10],
-            ]),
+            voteThreshold: 3,
           },
           SWEEP: {
             resultChannelID: '936185841204744222',
@@ -155,12 +151,7 @@ export const DAOS_PRODUCTION: Record<
           },
           FUND: {
             resultChannelID: '938470347521540137',
-            voteThresholds: new Map([
-              [[0, 5], 5],
-              [[5, 30], 10],
-              [[30, 100], 20],
-              [[100, 0], 25],
-            ]),
+            voteThreshold: 3,
           },
           SWEEP: {
             resultChannelID: '938470347521540137',
@@ -204,12 +195,7 @@ export const DAOS_PRODUCTION: Record<
           },
           FUND: {
             resultChannelID: '936184076107415602',
-            voteThresholds: new Map([
-              [[0, 5], 5],
-              [[5, 30], 10],
-              [[30, 100], 20],
-              [[100, 0], 25],
-            ]),
+            voteThreshold: 3,
           },
           SWEEP: {
             resultChannelID: '936184076107415602',
@@ -245,11 +231,7 @@ export const DAOS_PRODUCTION: Record<
           },
           FUND: {
             resultChannelID: '936433157832589402',
-            voteThresholds: new Map([
-              [[0, 15], 5],
-              [[15, 30], 10],
-              [[30, 100], 20],
-            ]),
+            voteThreshold: 3,
           },
           SWEEP: {
             resultChannelID: '936433157832589402',

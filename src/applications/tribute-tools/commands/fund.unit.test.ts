@@ -13,6 +13,7 @@ import {
   GUILD_ID_FIXTURE,
 } from '../../../../test';
 import {prismaMock} from '../../../../test/prismaMock';
+import {DaoData} from '../../../config';
 import {THUMBS_EMOJIS} from '../config';
 import {fund} from './fund';
 
@@ -153,7 +154,7 @@ describe('fund unit tests', () => {
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.description
     ).toMatch(
-      /⚠️ 🤖 is in development\.\n\n📊 \*\*Should we fund `0x04028Df0Cea639E97fDD3fC01bA5CC172613211D` for \$50\.00 USDC\?\*\*/i
+      /📊 \*\*Should we fund `0x04028Df0Cea639E97fDD3fC01bA5CC172613211D` for \$50\.00 USDC\?\*\*/i
     );
 
     expect(
@@ -240,7 +241,7 @@ describe('fund unit tests', () => {
     interactionReplySpy.mockRestore();
   });
 
-  test('should reply with error if DAO is not found', async () => {
+  test('should reply with error if DAO configuration is not found', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new FakeDiscordCommandInteraction(
@@ -269,7 +270,67 @@ describe('fund unit tests', () => {
     await fund.execute(interaction);
 
     expect(interactionReplySpy.mock.calls[0][0]).toEqual({
-      content: 'Something went wrong while setting up the poll.',
+      content: 'No dao configuration was found while setting up the poll.',
+      ephemeral: true,
+    });
+
+    // Cleanup
+
+    getDaosSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should reply with error if `voteThreshold` configuration is not found', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
+    const reactSpy = jest.fn();
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(
+        async () =>
+          ({
+            ...FAKE_DAOS_FIXTURE,
+            test: {
+              ...FAKE_DAOS_FIXTURE.test,
+              applications: {
+                ...FAKE_DAOS_FIXTURE.test.applications,
+                TRIBUTE_TOOLS_BOT: {
+                  ...FAKE_DAOS_FIXTURE.test.applications?.TRIBUTE_TOOLS_BOT,
+                  commands: {
+                    ...FAKE_DAOS_FIXTURE.test.applications?.TRIBUTE_TOOLS_BOT
+                      ?.commands,
+                    FUND: {
+                      ...FAKE_DAOS_FIXTURE.test.applications?.TRIBUTE_TOOLS_BOT
+                        ?.commands.FUND,
+                      // Set no vote threshold
+                      voteThreshold: 0,
+                    },
+                  },
+                },
+              },
+            },
+          } as Record<string, DaoData>)
+      );
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {guildId: '722525233755717762', react: reactSpy}) as any
+      );
+
+    await fund.execute(interaction);
+
+    expect(interactionReplySpy.mock.calls[0][0]).toEqual({
+      content:
+        'No vote threshold configuration was found while setting up the poll.',
       ephemeral: true,
     });
 

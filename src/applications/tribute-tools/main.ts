@@ -4,12 +4,14 @@ import {
   sweepEndedPollsHandler,
   sweepPollReactionHandler,
 } from './handlers/sweep';
-import {ApplicationReturn} from '../types';
 import {
   buyPollReactionHandler,
   buyPollRemoveReactionHandler,
+  fundPollReactionHandler,
+  fundPollRemoveReactionHandler,
   interactionExecuteHandler,
 } from './handlers';
+import {ApplicationReturn} from '../types';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
@@ -69,11 +71,13 @@ export async function tributeToolsBot(): Promise<
     // Listen to reactions on messages, and possibly handle.
     client.on('messageReactionAdd', (reaction, user) => {
       buyPollReactionHandler({reaction, user});
+      fundPollReactionHandler({reaction, user});
       sweepPollReactionHandler({reaction, user});
     });
 
     // Listen to the removal of reactions on messages, and possibly handle.
     client.on('messageReactionRemove', (reaction, user) => {
+      fundPollRemoveReactionHandler({reaction, user});
       buyPollRemoveReactionHandler({reaction, user});
     });
 

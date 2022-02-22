@@ -155,16 +155,7 @@ export type TributeToolsCommandsConfiguration = {
   };
 
   FUND: {
-    /**
-     * ```
-     * [
-     *   [[ethMin, ethMax], requiredVotes],
-     *   [[ethMin, ethMax], requiredVotes],
-     *   // ...
-     * ]
-     * ```
-     */
-    voteThresholds: Map<[number, number], number>;
+    voteThreshold: number;
     // Discord channel ID to send a message on poll threshold reached.
     resultChannelID: string;
   };

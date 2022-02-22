@@ -19,10 +19,14 @@ const ARG_NAMES = {
   purpose: 'purpose',
 };
 
-const UPVOTE_THRESHOLD: number = 3;
-
 const POLL_SETUP_ERROR_MESSAGE: string =
   'Something went wrong while setting up the poll.';
+
+const NO_VOTE_THRESHOLD_ERROR_MESSAGE: string =
+  'No vote threshold configuration was found while setting up the poll.';
+
+const NO_DAO_ERROR_MESSAGE: string =
+  'No dao configuration was found while setting up the poll.';
 
 const INVALID_ETH_ADDRESS_ERROR_MESSAGE: string =
   'Invalid Ethereum address. Try something like: 0x000000000000000000000000000000000000bEEF.';
@@ -95,7 +99,20 @@ async function execute(interaction: CommandInteraction) {
   if (!dao) {
     // Reply with an error/help message that only the user can see.
     await interaction.reply({
-      content: POLL_SETUP_ERROR_MESSAGE,
+      content: NO_DAO_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
+  const voteThreshold =
+    dao.applications?.TRIBUTE_TOOLS_BOT?.commands.FUND.voteThreshold;
+
+  if (!voteThreshold) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: NO_VOTE_THRESHOLD_ERROR_MESSAGE,
       ephemeral: true,
     });
 
@@ -105,7 +122,7 @@ async function execute(interaction: CommandInteraction) {
   const embed = new MessageEmbed()
     .setTitle(purpose)
     .setDescription(
-      `${DEV_COMMAND_NOT_READY}\n\n📊 **Should we fund \`${addressToFund}\` for ${new Intl.NumberFormat(
+      `📊 **Should we fund \`${addressToFund}\` for ${new Intl.NumberFormat(
         'en-US',
         {style: 'currency', currency: 'USD'}
       ).format(amountUSDC)} USDC?**\n\u200B`
@@ -113,9 +130,7 @@ async function execute(interaction: CommandInteraction) {
     .setURL(`https://etherscan.io/address/${addressToFund}`)
     .addFields({
       name: 'Vote Threshold',
-      value: `${UPVOTE_THRESHOLD} upvote${
-        UPVOTE_THRESHOLD > 1 ? 's' : ''
-      }\n\u200B`,
+      value: `${voteThreshold} upvote${voteThreshold > 1 ? 's' : ''}\n\u200B`,
     })
     .setFooter({
       text: 'After a threshold has been reached the vote is final,\neven if you change your vote.',
@@ -138,7 +153,15 @@ async function execute(interaction: CommandInteraction) {
 
     // Store poll data in DB
     await prisma.fundAddressPoll.create({
-      data: {addressToFund, amountUSDC, channelID, guildID, messageID, purpose},
+      data: {
+        addressToFund,
+        amountUSDC,
+        channelID,
+        guildID,
+        messageID,
+        purpose,
+        voteThreshold,
+      },
     });
 
     // React with thumbs up, and thumbs down voting buttons as emojis
