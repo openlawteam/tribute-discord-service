@@ -12,7 +12,8 @@ import {
   FakeDiscordCommandInteraction,
   GUILD_ID_FIXTURE,
 } from '../../../../test';
-import {BUY_ALLOWED_EMOJIS} from '../config';
+import {prismaMock} from '../../../../test/prismaMock';
+import {THUMBS_EMOJIS} from '../config';
 import {fund} from './fund';
 
 describe('fund unit tests', () => {
@@ -87,6 +88,21 @@ describe('fund unit tests', () => {
     },
   };
 
+  const DB_INSERT_DATA = {
+    addressToFund: ETH_ADDRESS_FIXTURE,
+    amountUSDC: 50000,
+    channelID: '886976610018934824',
+    createdAt: new Date(0),
+    guildID: '722525233755717762',
+    id: 1,
+    messageID: '123456789',
+    processed: false,
+    purpose: 'XYZ Seed Round',
+    upvoteCount: 0,
+    uuid: 'abc123def456',
+    voteThreshold: 3,
+  };
+
   test('should run execute', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
@@ -96,6 +112,15 @@ describe('fund unit tests', () => {
     );
 
     const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    (prismaMock.fundAddressPoll as any).create.mockResolvedValue(
+      DB_INSERT_DATA
+    );
 
     const interactionReplySpy = jest
       .spyOn(interaction, 'reply')
@@ -142,8 +167,8 @@ describe('fund unit tests', () => {
     ).toMatch(/3 upvotes/i);
 
     expect(reactSpy).toHaveBeenCalledTimes(2);
-    expect(reactSpy).toHaveBeenNthCalledWith(1, BUY_ALLOWED_EMOJIS[0]);
-    expect(reactSpy).toHaveBeenNthCalledWith(2, BUY_ALLOWED_EMOJIS[1]);
+    expect(reactSpy).toHaveBeenNthCalledWith(1, THUMBS_EMOJIS[0]);
+    expect(reactSpy).toHaveBeenNthCalledWith(2, THUMBS_EMOJIS[1]);
 
     // Cleanup
 

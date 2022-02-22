@@ -1,9 +1,4 @@
-import {
-  CommandInteraction,
-  Message,
-  MessageEmbed,
-  EmbedFooterData,
-} from 'discord.js';
+import {CommandInteraction, Message, MessageEmbed} from 'discord.js';
 import {SlashCommandBuilder} from '@discordjs/builders';
 
 import {Command} from '../../types';
@@ -141,7 +136,10 @@ async function execute(interaction: CommandInteraction) {
       );
     }
 
-    // @todo Store poll data in DB
+    // Store poll data in DB
+    await prisma.fundAddressPoll.create({
+      data: {addressToFund, amountUSDC, channelID, guildID, messageID, purpose},
+    });
 
     // React with thumbs up, and thumbs down voting buttons as emojis
     const reactionPromises = THUMBS_EMOJIS.map(
