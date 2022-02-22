@@ -8,7 +8,7 @@ import {
 import {THUMBS_EMOJIS} from '../../config';
 import {prisma} from '../../../../singletons';
 
-export async function buyPollRemoveReactionHandler({
+export async function fundPollRemoveReactionHandler({
   reaction,
   user,
 }: {
@@ -28,7 +28,7 @@ export async function buyPollRemoveReactionHandler({
       await reaction.fetch();
     }
 
-    const pollEntry = await prisma.buyNFTPoll.findUnique({
+    const pollEntry = await prisma.fundAddressPoll.findUnique({
       where: {
         messageID: reaction.message.id,
       },
@@ -50,7 +50,7 @@ export async function buyPollRemoveReactionHandler({
       (reaction.emoji.name as typeof THUMBS_EMOJIS[number]) === '👍'
     ) {
       // Subtract from upvote tally in db
-      await prisma.buyNFTPoll.update({
+      await prisma.fundAddressPoll.update({
         where: {
           messageID: reaction.message.id,
         },

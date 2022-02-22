@@ -10,12 +10,12 @@ import {
 } from 'discord.js';
 import {channelMention, time} from '@discordjs/builders';
 
-import {THUMBS_EMOJIS, BUY_EXTERNAL_URL} from '../../config';
 import {getDaoDataByGuildID} from '../../../../helpers';
 import {getDaos} from '../../../../services';
 import {prisma} from '../../../../singletons';
+import {THUMBS_EMOJIS, FUND_EXTERNAL_URL} from '../../config';
 
-export async function buyPollReactionHandler({
+export async function fundPollReactionHandler({
   reaction,
   user,
 }: {
@@ -37,7 +37,7 @@ export async function buyPollReactionHandler({
       await reaction.fetch();
     }
 
-    const pollEntry = await prisma.buyNFTPoll.findUnique({
+    const pollEntry = await prisma.fundAddressPoll.findUnique({
       where: {
         messageID: reaction.message.id,
       },
@@ -93,7 +93,7 @@ export async function buyPollReactionHandler({
       }
 
       const resultChannelID =
-        dao.applications?.TRIBUTE_TOOLS_BOT?.commands.BUY.resultChannelID;
+        dao.applications?.TRIBUTE_TOOLS_BOT?.commands.FUND.resultChannelID;
 
       if (!resultChannelID) {
         throw new Error('Could not find a `resultChannelID`.');
@@ -102,7 +102,7 @@ export async function buyPollReactionHandler({
       // DM the user that the poll has ended
       await user.send(
         `The poll has ended for *${
-          pollEntry.name
+          pollEntry.purpose
         }*, because the number of required upvotes has been reached. To purchase, go to ${channelMention(
           resultChannelID
         )}.`
@@ -128,14 +128,12 @@ export async function buyPollReactionHandler({
     });
 
     const {
+      amountUSDC,
       channelID,
-      contractAddress,
       guildID,
       messageID,
-      name,
-      tokenID,
+      purpose,
       upvoteCount,
-      uuid,
       voteThreshold,
     } = pollEntry;
 
@@ -148,7 +146,7 @@ export async function buyPollReactionHandler({
       (reaction.emoji.name as typeof THUMBS_EMOJIS[number]) === '👍'
     ) {
       // Add to upvote tally in db
-      await prisma.buyNFTPoll.update({
+      await prisma.fundAddressPoll.update({
         where: {
           messageID: reaction.message.id,
         },
@@ -163,7 +161,7 @@ export async function buyPollReactionHandler({
        */
       if (voteThreshold - upvoteCount === 1) {
         // Mark entry as `processed: true`
-        await prisma.buyNFTPoll.update({
+        await prisma.fundAddressPoll.update({
           where: {
             messageID: reaction.message.id,
           },
@@ -189,32 +187,32 @@ export async function buyPollReactionHandler({
           resultChannelID
         )) as TextChannel;
 
-        const buyButton = new MessageActionRow().addComponents(
+        const fundButton = new MessageActionRow().addComponents(
           new MessageButton()
-            .setLabel('Buy')
+            .setLabel('Fund')
             .setStyle('LINK')
             .setURL(
-              `${BUY_EXTERNAL_URL}/?daoName=${dao.internalName}&tokenId=${tokenID}&contractAddress=${contractAddress}&id=${uuid}`
+              `${FUND_EXTERNAL_URL}/?daoName=${dao.internalName}&amount=${amountUSDC}`
             )
             .setEmoji('💸')
         );
 
-        const content: string = `The poll for "*${name}*" ended ${time(
+        const content: string = `The poll for "*${purpose}*" ended ${time(
           Math.floor(Date.now() / 1000),
           'R'
         )}. The threshold of ${voteThreshold} vote${
           voteThreshold > 1 ? 's' : ''
         } has been reached.`;
 
-        // Send message to the result channel with the buy button
-        const buyChannelMessage = await resultChannel.send({
+        // Send message to the result channel with the button
+        const fundChannelMessage = await resultChannel.send({
           content,
-          components: [buyButton],
+          components: [fundButton],
         });
 
         const pollEndEmbed = new MessageEmbed()
-          .setTitle('Buy')
-          .setURL(buyChannelMessage?.url || '')
+          .setTitle('Fund')
+          .setURL(fundChannelMessage?.url || '')
           .setDescription(content);
 
         // Get original poll message and reply to it in the same channel

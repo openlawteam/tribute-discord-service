@@ -37,6 +37,10 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoData> = {
               [[100, 0], 20],
             ]),
           },
+          FUND: {
+            resultChannelID: '123123123123123123',
+            voteThreshold: 3,
+          },
           SWEEP: {
             resultChannelID: '123123123123123123',
           },
