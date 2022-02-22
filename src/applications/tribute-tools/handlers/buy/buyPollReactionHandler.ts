@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import {channelMention, time} from '@discordjs/builders';
 
-import {BUY_ALLOWED_EMOJIS, BUY_EXTERNAL_URL} from '../../config';
+import {THUMBS_EMOJIS, BUY_EXTERNAL_URL} from '../../config';
 import {getDaoDataByGuildID} from '../../../../helpers';
 import {getDaos} from '../../../../services';
 import {prisma} from '../../../../singletons';
@@ -62,11 +62,11 @@ export async function buyPollReactionHandler({
       );
     }
 
-    const isValidEmoji: boolean = BUY_ALLOWED_EMOJIS.some(
+    const isValidEmoji: boolean = THUMBS_EMOJIS.some(
       (name) => name === reaction.emoji.name
     );
 
-    // If the emoji is not from `BUY_ALLOWED_EMOJIS`, remove it.
+    // If the emoji is not from `THUMBS_EMOJIS`, remove it.
     if (!isValidEmoji) {
       await reaction.users.remove(user.id);
 
@@ -146,7 +146,7 @@ export async function buyPollReactionHandler({
     if (
       !processed &&
       voteThreshold > upvoteCount &&
-      (reaction.emoji.name as typeof BUY_ALLOWED_EMOJIS[number]) === '👍'
+      (reaction.emoji.name as typeof THUMBS_EMOJIS[number]) === '👍'
     ) {
       // Add to upvote tally in db
       await prisma.buyNFTPoll.update({

@@ -4,12 +4,12 @@ import {SlashCommandBuilder} from '@discordjs/builders';
 import {URL} from 'url';
 import fetch from 'node-fetch';
 
-import {BUY_ALLOWED_EMOJIS} from '../config';
 import {Command} from '../../types';
 import {getDaoDataByGuildID} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {getVoteThreshold} from '../helpers';
 import {prisma} from '../../../singletons';
+import {THUMBS_EMOJIS} from '../config';
 
 const COMMAND_NAME: string = 'buy';
 
@@ -291,7 +291,7 @@ async function execute(interaction: CommandInteraction) {
     });
 
     // React with thumbs up, and thumbs down voting buttons as emojis
-    const reactionPromises = BUY_ALLOWED_EMOJIS.map(
+    const reactionPromises = THUMBS_EMOJIS.map(
       (emoji) => async () => await message.react(emoji)
     );
 

@@ -36,9 +36,4 @@ export const TRIBUTE_TOOLS_URL: string =
 
 export const BUY_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/single-buy`;
 export const SWEEP_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/floor-sweeper`;
-
-/**
- * `/buy` Command Config
- */
-
-export const BUY_ALLOWED_EMOJIS = ['👍', '👎'] as const;
+export const THUMBS_EMOJIS = ['👍', '👎'] as const;

@@ -5,7 +5,7 @@ import {
   User,
 } from 'discord.js';
 
-import {BUY_ALLOWED_EMOJIS} from '../../config';
+import {THUMBS_EMOJIS} from '../../config';
 import {prisma} from '../../../../singletons';
 
 export async function buyPollRemoveReactionHandler({
@@ -47,7 +47,7 @@ export async function buyPollRemoveReactionHandler({
     if (
       !processed &&
       voteThreshold > upvoteCount &&
-      (reaction.emoji.name as typeof BUY_ALLOWED_EMOJIS[number]) === '👍'
+      (reaction.emoji.name as typeof THUMBS_EMOJIS[number]) === '👍'
     ) {
       // Subtract from upvote tally in db
       await prisma.buyNFTPoll.update({

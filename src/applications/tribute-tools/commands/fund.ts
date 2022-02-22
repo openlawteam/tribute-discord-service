@@ -6,12 +6,12 @@ import {
 } from 'discord.js';
 import {SlashCommandBuilder} from '@discordjs/builders';
 
-import {BUY_ALLOWED_EMOJIS} from '../config';
 import {Command} from '../../types';
 import {DEV_COMMAND_NOT_READY} from '../helpers';
 import {getDaoDataByGuildID, normalizeString} from '../../../helpers';
 import {getDaos} from '../../../services';
-import {web3} from '../../../singletons';
+import {prisma, web3} from '../../../singletons';
+import {THUMBS_EMOJIS} from '../config';
 
 const COMMAND_NAME: string = 'fund';
 
@@ -131,6 +131,7 @@ async function execute(interaction: CommandInteraction) {
     embeds: [embed],
     fetchReply: true,
   })) as Message;
+
   try {
     const {guildId: guildID, channelId: channelID, id: messageID} = message;
 
@@ -143,7 +144,7 @@ async function execute(interaction: CommandInteraction) {
     // @todo Store poll data in DB
 
     // React with thumbs up, and thumbs down voting buttons as emojis
-    const reactionPromises = BUY_ALLOWED_EMOJIS.map(
+    const reactionPromises = THUMBS_EMOJIS.map(
       (emoji) => async () => await message.react(emoji)
     );
 
