@@ -10,6 +10,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum TributeToolsTxStatus {
+  failed
+  success
+}
+
 // Models
 // ------
 // @see https://www.prisma.io/docs/concepts/components/prisma-schema/data-model
@@ -26,52 +31,58 @@ model DiscordWebhook {
 }
 
 model FloorSweeperPoll {
-  id              Int      @id @default(autoincrement())
-  uuid            String   @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  createdAt       DateTime @default(now())
-  question        String   @db.VarChar(255)
-  contractAddress String   @db.VarChar(255)
-  dateEnd         DateTime @db.Timestamp(3)
+  id              Int                   @id @default(autoincrement())
+  uuid            String                @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt       DateTime              @default(now())
+  question        String                @db.VarChar(255)
+  contractAddress String                @db.VarChar(255)
+  dateEnd         DateTime              @db.Timestamp(3)
   options         Json
-  processed       Boolean  @default(false) @db.Boolean
-  result          Int      @default(0) @db.Integer
-  guildID         String   @db.VarChar(255)
-  channelID       String   @db.VarChar(255)
-  messageID       String   @unique @db.VarChar(255)
+  processed       Boolean               @default(false) @db.Boolean
+  result          Int                   @default(0) @db.Integer
+  guildID         String                @db.VarChar(255)
+  channelID       String                @db.VarChar(255)
+  messageID       String                @unique @db.VarChar(255)
+  txStatus        TributeToolsTxStatus?
+  txHash          String?               @db.VarChar(255)
 
   @@map("floor_sweeper_poll")
 }
 
 model BuyNFTPoll {
-  id              Int      @id @default(autoincrement())
-  uuid            String   @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  createdAt       DateTime @default(now())
-  name            String   @db.VarChar(255)
-  contractAddress String   @db.VarChar(255)
-  tokenID         String   @db.VarChar(255)
-  processed       Boolean  @default(false) @db.Boolean
-  voteThreshold   Int      @default(0) @db.Integer
-  upvoteCount     Int      @default(0) @db.Integer
-  guildID         String   @db.VarChar(255)
-  channelID       String   @db.VarChar(255)
-  messageID       String   @unique @db.VarChar(255)
+  id              Int                   @id @default(autoincrement())
+  uuid            String                @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt       DateTime              @default(now())
+  name            String                @db.VarChar(255)
+  contractAddress String                @db.VarChar(255)
+  tokenID         String                @db.VarChar(255)
+  processed       Boolean               @default(false) @db.Boolean
+  voteThreshold   Int                   @default(0) @db.Integer
+  upvoteCount     Int                   @default(0) @db.Integer
+  guildID         String                @db.VarChar(255)
+  channelID       String                @db.VarChar(255)
+  messageID       String                @unique @db.VarChar(255)
+  txStatus        TributeToolsTxStatus?
+  txHash          String?               @db.VarChar(255)
 
   @@map("buy_nft_poll")
 }
 
 model FundAddressPoll {
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  createdAt     DateTime @default(now())
-  purpose       String   @db.VarChar(255)
-  addressToFund String   @db.VarChar(255)
-  amountUSDC    Int      @default(0) @db.Integer
-  processed     Boolean  @default(false) @db.Boolean
-  voteThreshold Int      @default(0) @db.Integer
-  upvoteCount   Int      @default(0) @db.Integer
-  guildID       String   @db.VarChar(255)
-  channelID     String   @db.VarChar(255)
-  messageID     String   @unique @db.VarChar(255)
+  id            Int                   @id @default(autoincrement())
+  uuid          String                @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt     DateTime              @default(now())
+  purpose       String                @db.VarChar(255)
+  addressToFund String                @db.VarChar(255)
+  amountUSDC    Int                   @default(0) @db.Integer
+  processed     Boolean               @default(false) @db.Boolean
+  voteThreshold Int                   @default(0) @db.Integer
+  upvoteCount   Int                   @default(0) @db.Integer
+  guildID       String                @db.VarChar(255)
+  channelID     String                @db.VarChar(255)
+  messageID     String                @unique @db.VarChar(255)
+  txStatus      TributeToolsTxStatus?
+  txHash        String?               @db.VarChar(255)
 
   @@map("fund_address_poll")
 }
