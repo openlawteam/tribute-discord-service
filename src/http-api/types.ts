@@ -16,7 +16,27 @@ export enum TributeToolsWebhookTxType {
   SWEEP = 'sweep',
 }
 
+/**
+ * Types for `POST /webhook/tribute-tools-tx`
+ */
+
 export enum TributeToolsWebhookTxStatus {
   FAILED = 'failed',
-  SUCCSS = 'success',
+  SUCCESS = 'success',
 }
+
+export type TributeToolsWebhookPayload = {
+  data: {
+    date: Date;
+    /**
+     * UUID
+     */
+    id: string;
+    type: TributeToolsWebhookTxType;
+    tx: {
+      hash: string;
+      status: TributeToolsWebhookTxStatus;
+    };
+  };
+  version: string;
+};
