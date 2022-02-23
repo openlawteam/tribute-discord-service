@@ -9,3 +9,14 @@ export enum HTTPMethod {
   PUT = 'PUT',
   TRACE = 'TRACE',
 }
+
+export enum TributeToolsWebhookTxType {
+  BUY = 'singleBuy',
+  FUND = 'fund',
+  SWEEP = 'sweep',
+}
+
+export enum TributeToolsWebhookTxStatus {
+  FAILED = 'failed',
+  SUCCSS = 'success',
+}
