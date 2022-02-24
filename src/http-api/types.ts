@@ -27,7 +27,6 @@ export enum TributeToolsWebhookTxStatus {
 
 export type TributeToolsWebhookPayload = {
   data: {
-    date: Date;
     /**
      * UUID
      */
@@ -38,5 +37,4 @@ export type TributeToolsWebhookPayload = {
       status: TributeToolsWebhookTxStatus;
     };
   };
-  version: string;
 };
