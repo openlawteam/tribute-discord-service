@@ -9,3 +9,34 @@ export enum HTTPMethod {
   PUT = 'PUT',
   TRACE = 'TRACE',
 }
+
+export enum TributeToolsWebhookTxType {
+  BUY = 'singleBuy',
+  FUND = 'fund',
+  SWEEP = 'sweep',
+}
+
+/**
+ * Types for `POST /webhook/tribute-tools-tx`
+ */
+
+export enum TributeToolsWebhookTxStatus {
+  FAILED = 'failed',
+  SUCCESS = 'success',
+}
+
+export type TributeToolsWebhookPayload = {
+  data: {
+    date: Date;
+    /**
+     * UUID
+     */
+    id: string;
+    type: TributeToolsWebhookTxType;
+    tx: {
+      hash: string;
+      status: TributeToolsWebhookTxStatus;
+    };
+  };
+  version: string;
+};

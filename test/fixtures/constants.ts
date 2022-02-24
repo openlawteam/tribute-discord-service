@@ -5,3 +5,5 @@ export const BYTES32_FIXTURE: string =
   '0xfe837a5e727dacac34d8070a94918f13335f255f9bbf958d876718aac64b299d';
 
 export const GUILD_ID_FIXTURE: string = '123123123123123123';
+
+export const UUID_FIXTURE: string = '02458ff0-4cc5-4137-bcf5-ef91053ab811';
