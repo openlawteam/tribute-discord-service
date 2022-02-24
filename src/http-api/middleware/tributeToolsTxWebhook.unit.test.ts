@@ -25,6 +25,14 @@ describe('tributeToolsTxWebhook unit tests', () => {
     );
   }
 
+  function zodErrorHelper(errorMessage: string): Record<string, any>[] {
+    const errors = errorMessage.split(
+      /Invalid JSON provided to webhook\/tribute-tools-tx:/i
+    )[1];
+
+    return JSON.parse(errors);
+  }
+
   const PAYLOAD = {
     data: {
       date: new Date(0),
@@ -154,6 +162,10 @@ describe('tributeToolsTxWebhook unit tests', () => {
       .spyOn(console, 'warn')
       .mockImplementation(() => {});
 
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
     const missingDataResponse = await requestHelper(
       {
         body: JSON.stringify({
@@ -163,43 +175,21 @@ describe('tributeToolsTxWebhook unit tests', () => {
       port
     );
 
-    // Assert `data` exists
+    // Assert `data` is not valid
     expect(missingDataResponse.status).toBe(400);
     expect(await missingDataResponse.json()).toEqual({
       error: {message: 'Incorrect `body` was provided.', status: 400},
     });
 
-    const missingTypeResponse = await requestHelper(
+    expect(zodErrorHelper(consoleErrorSpy.mock.calls[0][0])).toEqual([
       {
-        body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, type: undefined},
-        }),
+        code: 'invalid_type',
+        expected: 'object',
+        message: 'Required',
+        path: ['data'],
+        received: 'undefined',
       },
-      port
-    );
-
-    // Assert `type` exists
-    expect(missingTypeResponse.status).toBe(400);
-    expect(await missingTypeResponse.json()).toEqual({
-      error: {message: 'Incorrect `body` was provided.', status: 400},
-    });
-
-    const missingIDResponse = await requestHelper(
-      {
-        body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, id: undefined},
-        }),
-      },
-      port
-    );
-
-    // Assert `type` exists
-    expect(missingIDResponse.status).toBe(400);
-    expect(await missingIDResponse.json()).toEqual({
-      error: {message: 'Incorrect `body` was provided.', status: 400},
-    });
+    ]);
 
     const typeMatchResponse = await requestHelper(
       {
@@ -211,11 +201,45 @@ describe('tributeToolsTxWebhook unit tests', () => {
       port
     );
 
-    // Assert `type` matches
+    // Assert `type` is not valid
     expect(typeMatchResponse.status).toBe(400);
     expect(await typeMatchResponse.json()).toEqual({
       error: {message: 'Incorrect `body` was provided.', status: 400},
     });
+
+    expect(zodErrorHelper(consoleErrorSpy.mock.calls[1][0])).toEqual([
+      {
+        code: 'invalid_enum_value',
+        message: "Invalid enum value. Expected 'singleBuy' | 'fund' | 'sweep'",
+        options: ['singleBuy', 'fund', 'sweep'],
+        path: ['data', 'type'],
+      },
+    ]);
+
+    const missingIDResponse = await requestHelper(
+      {
+        body: JSON.stringify({
+          ...PAYLOAD,
+          data: {...PAYLOAD.data, id: '123'},
+        }),
+      },
+      port
+    );
+
+    // Assert `id` is not valid
+    expect(missingIDResponse.status).toBe(400);
+    expect(await missingIDResponse.json()).toEqual({
+      error: {message: 'Incorrect `body` was provided.', status: 400},
+    });
+
+    expect(zodErrorHelper(consoleErrorSpy.mock.calls[2][0])).toEqual([
+      {
+        code: 'invalid_string',
+        message: 'Invalid uuid',
+        path: ['data', 'id'],
+        validation: 'uuid',
+      },
+    ]);
 
     const missingTxResponse = await requestHelper(
       {
@@ -227,77 +251,80 @@ describe('tributeToolsTxWebhook unit tests', () => {
       port
     );
 
-    // Assert `tx` exists
+    // Assert `tx` is not valid
     expect(missingTxResponse.status).toBe(400);
     expect(await missingTxResponse.json()).toEqual({
       error: {message: 'Incorrect `body` was provided.', status: 400},
     });
 
-    const emptyTxResponse = await requestHelper(
+    expect(zodErrorHelper(consoleErrorSpy.mock.calls[3][0])).toEqual([
+      {
+        code: 'invalid_type',
+        expected: 'object',
+        message: 'Required',
+        path: ['data', 'tx'],
+        received: 'undefined',
+      },
+    ]);
+
+    const malformedTxHashResponse = await requestHelper(
       {
         body: JSON.stringify({
           ...PAYLOAD,
-          data: {...PAYLOAD.data, tx: {}},
+          data: {
+            ...PAYLOAD.data,
+            tx: {...PAYLOAD.data.tx, hash: 'abc123def456'},
+          },
         }),
       },
       port
     );
 
-    // Assert `tx` is not empty
-    expect(emptyTxResponse.status).toBe(400);
-    expect(await emptyTxResponse.json()).toEqual({
+    // Assert `tx.status` is not valid
+    expect(malformedTxHashResponse.status).toBe(400);
+    expect(await malformedTxHashResponse.json()).toEqual({
       error: {message: 'Incorrect `body` was provided.', status: 400},
     });
 
-    const emptyTxHashResponse = await requestHelper(
+    expect(zodErrorHelper(consoleErrorSpy.mock.calls[4][0])).toEqual([
+      {
+        code: 'invalid_string',
+        message: 'Invalid',
+        path: ['data', 'tx', 'hash'],
+        validation: 'regex',
+      },
+    ]);
+
+    const invalidTxStatusResponse = await requestHelper(
       {
         body: JSON.stringify({
           ...PAYLOAD,
-          data: {...PAYLOAD.data, tx: {hash: 'abc123def456'}},
+          data: {...PAYLOAD.data, tx: {...PAYLOAD.data.tx, status: 'BAD'}},
         }),
       },
       port
     );
 
-    // Assert `tx.status` is not empty
-    expect(emptyTxHashResponse.status).toBe(400);
-    expect(await emptyTxHashResponse.json()).toEqual({
+    // Assert `tx.status` is invalid
+    expect(invalidTxStatusResponse.status).toBe(400);
+    expect(await invalidTxStatusResponse.json()).toEqual({
       error: {message: 'Incorrect `body` was provided.', status: 400},
     });
 
-    const emptyTxStatusResponse = await requestHelper(
+    expect(zodErrorHelper(consoleErrorSpy.mock.calls[5][0])).toEqual([
       {
-        body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, tx: {status: 'sweep'}},
-        }),
+        code: 'invalid_enum_value',
+        message: "Invalid enum value. Expected 'failed' | 'success'",
+        options: ['failed', 'success'],
+        path: ['data', 'tx', 'status'],
       },
-      port
-    );
+    ]);
 
-    // Assert `tx.hash` is not empty
-    expect(emptyTxStatusResponse.status).toBe(400);
-    expect(await emptyTxStatusResponse.json()).toEqual({
-      error: {message: 'Incorrect `body` was provided.', status: 400},
-    });
-
-    const txStatusMatchResponse = await requestHelper(
-      {
-        body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, tx: {status: 'BAD'}},
-        }),
-      },
-      port
-    );
-
-    // Assert `tx.status` matches
-    expect(txStatusMatchResponse.status).toBe(400);
-    expect(await txStatusMatchResponse.json()).toEqual({
-      error: {message: 'Incorrect `body` was provided.', status: 400},
-    });
+    // Assert `console.error` messages
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(6);
 
     // Cleanup
+    consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
   });
 

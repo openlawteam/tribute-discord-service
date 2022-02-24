@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client';
+import {z} from 'zod';
 import Application from 'koa';
 
 import {
@@ -16,6 +17,30 @@ const PATH: string = 'webhook/tribute-tools-tx';
 
 const NO_BODY_ERROR: string = 'No `body` was provided.';
 const INVALID_BODY_ERROR: string = 'Incorrect `body` was provided.';
+
+const RequiredPayloadSchema = z.object({
+  data: z.object({
+    id: z.string().uuid(),
+    type: z.nativeEnum(TributeToolsWebhookTxType),
+    tx: z.object({
+      hash: z.string().regex(/^0x/),
+      status: z.nativeEnum(TributeToolsWebhookTxStatus),
+    }),
+  }),
+});
+
+/**
+ * Validate JSON Schema
+ *
+ * @param data
+ * @returns `TributeToolsWebhookPayload`
+ * @see https://github.com/colinhacks/zod
+ * @see https://2ality.com/2020/06/validating-data-typescript.html#example%3A-validating-data-via-the-library-zod
+ */
+function validatePayload(data: unknown): TributeToolsWebhookPayload {
+  // Return data, or throw.
+  return RequiredPayloadSchema.parse(data);
+}
 
 async function storeTxData(
   payload: TributeToolsWebhookPayload
@@ -97,26 +122,21 @@ export function tributeToolsTxWebhook(): Application.Middleware {
       return;
     }
 
-    const doesTypeMatch: boolean = Object.values(
-      TributeToolsWebhookTxType
-    ).some((t) => t === body?.data?.type);
+    let validatedPayload: TributeToolsWebhookPayload;
 
-    const doesTxStatusMatch: boolean = Object.values(
-      TributeToolsWebhookTxStatus
-    ).some((s) => s === body?.data?.tx?.status);
+    try {
+      validatedPayload = validatePayload(body);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error(
+          `Invalid JSON provided to ${PATH}: ${JSON.stringify(
+            error.issues,
+            null,
+            2
+          )}`
+        );
+      }
 
-    // Check body payload
-    if (
-      !body?.data ||
-      !body?.data?.id ||
-      !body?.data?.tx ||
-      !body?.data?.tx?.hash ||
-      !body?.data?.tx?.status ||
-      !body?.data?.type ||
-      !doesTxStatusMatch ||
-      !doesTypeMatch ||
-      !Object.keys(body?.data?.tx).length
-    ) {
       createHTTPError({ctx, message: INVALID_BODY_ERROR, status: 400});
 
       return;
@@ -124,12 +144,12 @@ export function tributeToolsTxWebhook(): Application.Middleware {
 
     // Store data in database
     try {
-      const updateResult = await storeTxData(body);
+      const updateResult = await storeTxData(validatedPayload);
 
       if (updateResult === null) {
         createHTTPError({
           ctx,
-          message: `Could not find uuid \`${body.data.id}\``,
+          message: `Could not find uuid \`${validatedPayload.data.id}\``,
           status: 404,
         });
 
