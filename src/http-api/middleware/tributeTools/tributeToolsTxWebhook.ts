@@ -7,11 +7,11 @@ import {
   TributeToolsWebhookPayload,
   TributeToolsWebhookTxStatus,
   TributeToolsWebhookTxType,
-} from '../types';
-import {createHTTPError} from '../helpers';
-import {HTTP_API_BASE_PATH} from '../config';
-import {normalizeString} from '../../helpers';
-import {prisma} from '../../singletons';
+} from '../../types';
+import {createHTTPError} from '../../helpers';
+import {HTTP_API_BASE_PATH} from '../../config';
+import {normalizeString} from '../../../helpers';
+import {prisma} from '../../../singletons';
 
 const PATH: string = 'webhook/tribute-tools-tx';
 
@@ -104,65 +104,66 @@ async function storeTxData(
   }
 }
 
-export function tributeToolsTxWebhook(): Application.Middleware {
-  return async (ctx, next): Promise<void> => {
-    if (
-      ctx.path !== `${HTTP_API_BASE_PATH}/${PATH}` ||
-      normalizeString(ctx.method) !== normalizeString(HTTPMethod.POST)
-    ) {
-      return await next();
+export const tributeToolsTxWebhook: Application.Middleware = async (
+  ctx,
+  next
+): Promise<void> => {
+  if (
+    ctx.path !== `${HTTP_API_BASE_PATH}/${PATH}` ||
+    normalizeString(ctx.method) !== normalizeString(HTTPMethod.POST)
+  ) {
+    return await next();
+  }
+
+  const body = ctx.request.body as TributeToolsWebhookPayload;
+
+  // Check body
+  if (!body || !Object.keys(body).length) {
+    createHTTPError({ctx, message: NO_BODY_ERROR, status: 400});
+
+    return;
+  }
+
+  let validatedPayload: TributeToolsWebhookPayload;
+
+  try {
+    validatedPayload = validatePayload(body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error(
+        `Invalid JSON provided to ${PATH}: ${JSON.stringify(
+          error.issues,
+          null,
+          2
+        )}`
+      );
     }
 
-    const body = ctx.request.body as TributeToolsWebhookPayload;
+    createHTTPError({ctx, message: INVALID_BODY_ERROR, status: 400});
 
-    // Check body
-    if (!body || !Object.keys(body).length) {
-      createHTTPError({ctx, message: NO_BODY_ERROR, status: 400});
+    return;
+  }
+
+  // Store data in database
+  try {
+    const updateResult = await storeTxData(validatedPayload);
+
+    if (updateResult === null) {
+      createHTTPError({
+        ctx,
+        message: `Could not find uuid \`${validatedPayload.data.id}\``,
+        status: 404,
+      });
 
       return;
     }
-
-    let validatedPayload: TributeToolsWebhookPayload;
-
-    try {
-      validatedPayload = validatePayload(body);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.error(
-          `Invalid JSON provided to ${PATH}: ${JSON.stringify(
-            error.issues,
-            null,
-            2
-          )}`
-        );
-      }
-
-      createHTTPError({ctx, message: INVALID_BODY_ERROR, status: 400});
-
-      return;
+  } catch (error) {
+    if (error instanceof Error) {
+      createHTTPError({ctx, message: error.message, status: 500});
     }
 
-    // Store data in database
-    try {
-      const updateResult = await storeTxData(validatedPayload);
+    return;
+  }
 
-      if (updateResult === null) {
-        createHTTPError({
-          ctx,
-          message: `Could not find uuid \`${validatedPayload.data.id}\``,
-          status: 404,
-        });
-
-        return;
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        createHTTPError({ctx, message: error.message, status: 500});
-      }
-
-      return;
-    }
-
-    ctx.status = 204;
-  };
-}
+  ctx.status = 204;
+};

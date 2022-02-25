@@ -17,7 +17,7 @@ describe('errorHandler middleware unit tests', () => {
 
     const {port} = server?.address() as AddressInfo;
 
-    app.use(errorHandler());
+    app.use(errorHandler);
 
     app.use(async function badMiddleware(ctx, next) {
       if (ctx.path !== `${HTTP_API_BASE_PATH}/bad`) {
@@ -71,7 +71,7 @@ describe('errorHandler middleware unit tests', () => {
 
     const {port} = server?.address() as AddressInfo;
 
-    app.use(errorHandler());
+    app.use(errorHandler);
 
     app.use(async function badMiddleware(ctx, next) {
       if (ctx.path !== `${HTTP_API_BASE_PATH}/bad`) {

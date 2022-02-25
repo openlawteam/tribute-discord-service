@@ -31,12 +31,12 @@ export function httpServer(options?: HTTPServerOptions): Server {
      */
     app.use(bodyParser());
 
-    // Handle middlware errors
-    app.use(errorHandler());
+    // Handle middleware errors
+    app.use(errorHandler);
 
     // Use all provided HTTP API middleware
     middlewares.forEach((m) => {
-      app.use(m());
+      app.use(m);
     });
 
     // Handle errors from middleware
