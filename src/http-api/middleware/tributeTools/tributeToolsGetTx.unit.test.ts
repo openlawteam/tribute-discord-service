@@ -101,6 +101,8 @@ describe('tributeToolsGetTx unit tests', () => {
     // Cleanup
 
     buyNFTPollSpy.mockRestore();
+    fundNFTPollSpy.mockRestore();
+    sweepNFTPollSpy.mockRestore();
     consoleWarnSpy.mockRestore();
   });
 
