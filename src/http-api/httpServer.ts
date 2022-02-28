@@ -41,7 +41,7 @@ export function httpServer(options?: HTTPServerOptions): Server {
 
     // Handle errors from middleware
     app.on('error', (error, ctx) => {
-      console.error('HTTP API Error from', ctx?.path, error);
+      console.error(`HTTP API Error from ${ctx?.path} ${error}`);
     });
 
     // Start listening
