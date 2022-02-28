@@ -2,8 +2,8 @@ import {z} from 'zod';
 import Router from '@koa/router';
 
 import {createHTTPError} from '../../helpers';
-import {FundAddressPoll} from '@prisma/client';
 import {prisma} from '../../../singletons';
+import {TributeToolsTxStatus} from '@prisma/client';
 import {TributeToolsWebhookTxType} from '../../types';
 
 type TributeToolsGetTxParams = {
@@ -36,8 +36,8 @@ function validateParams(data: unknown): TributeToolsGetTxParams {
 
 async function getTxData(params: TributeToolsGetTxParams): Promise<
   | {
-      txStatus: FundAddressPoll['txStatus'] | null;
-      txHash: FundAddressPoll['txHash'] | null;
+      txStatus: TributeToolsTxStatus | null;
+      txHash: string | null;
     }
   | undefined
   | null
