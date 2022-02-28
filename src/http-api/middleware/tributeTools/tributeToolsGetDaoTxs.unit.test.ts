@@ -66,7 +66,7 @@ describe('tributeToolsGetDaoTx unit tests', () => {
 
     const getDaosSpy = jest
       .spyOn(getDaos, 'getDaos')
-      .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
@@ -143,7 +143,7 @@ describe('tributeToolsGetDaoTx unit tests', () => {
 
     const getDaosSpy = jest
       .spyOn(getDaos, 'getDaos')
-      .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
@@ -192,7 +192,7 @@ describe('tributeToolsGetDaoTx unit tests', () => {
 
     const getDaosSpy = jest
       .spyOn(getDaos, 'getDaos')
-      .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
@@ -257,7 +257,7 @@ describe('tributeToolsGetDaoTx unit tests', () => {
 
     const getDaosSpy = jest
       .spyOn(getDaos, 'getDaos')
-      .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
