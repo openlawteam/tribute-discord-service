@@ -29,6 +29,7 @@ export const DAO_NAMES_PRODUCTION = [
   'metaverse',
   'museo',
   'music',
+  'unicorn',
 ] as const;
 
 const SNAPSHOT_HUB_API_URL: string =
@@ -248,6 +249,43 @@ export const DAOS_PRODUCTION: Record<
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
       space: 'music',
+    },
+  },
+
+  unicorn: {
+    actions: [],
+    applications: {
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
+        commands: {
+          BUY: {
+            resultChannelID: '947877428129325056',
+            voteThresholds: new Map([
+              [[0, 5], 5],
+              [[5, 30], 10],
+              [[30, 100], 20],
+              [[100, 0], 25],
+            ]),
+          },
+          FUND: {
+            resultChannelID: '947877428129325056',
+            voteThreshold: 3,
+          },
+          SWEEP: {
+            resultChannelID: '947877428129325056',
+          },
+        },
+      },
+    },
+    baseURL: 'https://unicorndao.love',
+    events: [],
+    friendlyName: 'Unicorn DAO',
+    guildID: '933511427644354661',
+    internalName: 'unicorn',
+    registryContractAddress: '0x0DD75fe3Fd350b43a7F1184e6f340568A37b307B',
+    snapshotHub: {
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
+      space: 'unicorn',
     },
   },
 };
