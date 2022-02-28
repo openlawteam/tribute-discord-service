@@ -1,15 +1,10 @@
-import Application from 'koa';
-
-import {HTTP_API_BASE_PATH} from '../../config';
+import Router from '@koa/router';
 
 const PATH: string = '/tx/dao/:daoName/:type';
 
-export function tributeToolsGetDaoTxs(): Application.Middleware {
-  return async (ctx, next): Promise<void> => {
-    if (ctx.path !== `${HTTP_API_BASE_PATH}/${PATH}`) {
-      return await next();
-    }
-
+export const tributeToolsGetDaoTxs = (router: Router) => {
+  router.get(PATH, async (ctx, next) => {
     ctx.status = 200;
-  };
-}
+    ctx.body = 'DAO';
+  });
+};
