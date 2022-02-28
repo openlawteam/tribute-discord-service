@@ -17,7 +17,7 @@ describe('errorHandler middleware unit tests', () => {
 
     const {port} = server?.address() as AddressInfo;
 
-    app.use(errorHandler());
+    app.use(errorHandler);
 
     app.use(async function badMiddleware(ctx, next) {
       if (ctx.path !== `${HTTP_API_BASE_PATH}/bad`) {
@@ -43,7 +43,16 @@ describe('errorHandler middleware unit tests', () => {
       .spyOn(console, 'warn')
       .mockImplementation(() => {});
 
-    await fetch(`http://localhost:${port}${HTTP_API_BASE_PATH}/bad`);
+    expect(
+      await (
+        await fetch(`http://localhost:${port}${HTTP_API_BASE_PATH}/bad`)
+      ).json()
+    ).toEqual({
+      error: {
+        message: 'Yikes, an error!',
+        status: 500,
+      },
+    });
 
     // Assert error message matches
     expect(assertErrorMessage).toMatch(/yikes, an error!/i);
@@ -71,7 +80,7 @@ describe('errorHandler middleware unit tests', () => {
 
     const {port} = server?.address() as AddressInfo;
 
-    app.use(errorHandler());
+    app.use(errorHandler);
 
     app.use(async function badMiddleware(ctx, next) {
       if (ctx.path !== `${HTTP_API_BASE_PATH}/bad`) {

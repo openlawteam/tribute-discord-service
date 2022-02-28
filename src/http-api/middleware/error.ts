@@ -1,15 +1,17 @@
 import Application from 'koa';
 
-// @see https://github.com/koajs/koa/wiki/Error-Handling
-export function errorHandler(): Application.Middleware {
-  return async (ctx, next): Promise<void> => {
-    try {
-      await next();
-    } catch (error) {
-      ctx.status = 500;
-      ctx.body = (error as Error).message;
+import {createHTTPError} from '../helpers';
 
-      ctx.app.emit('error', error, ctx);
-    }
-  };
-}
+// @see https://github.com/koajs/koa/wiki/Error-Handling
+export const errorHandler: Application.Middleware = async (
+  ctx,
+  next
+): Promise<void> => {
+  try {
+    await next();
+  } catch (error) {
+    createHTTPError({ctx, message: (error as Error).message, status: 500});
+
+    ctx.app.emit('error', error, ctx);
+  }
+};
