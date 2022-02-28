@@ -1,5 +1,7 @@
 import Application from 'koa';
 
+import {createHTTPError} from '../helpers';
+
 // @see https://github.com/koajs/koa/wiki/Error-Handling
 export const errorHandler: Application.Middleware = async (
   ctx,
@@ -8,8 +10,7 @@ export const errorHandler: Application.Middleware = async (
   try {
     await next();
   } catch (error) {
-    ctx.status = 500;
-    ctx.body = (error as Error).message;
+    createHTTPError({ctx, message: (error as Error).message, status: 500});
 
     ctx.app.emit('error', error, ctx);
   }
