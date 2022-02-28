@@ -188,6 +188,12 @@ describe('tributeToolsGetDaoTx unit tests', () => {
       },
     });
 
+    const getDaos = await import('../../../services/dao/getDaos');
+
+    const getDaosSpy = jest
+      .spyOn(getDaos, 'getDaos')
+      .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
+
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
@@ -230,6 +236,7 @@ describe('tributeToolsGetDaoTx unit tests', () => {
     buyNFTPollSpy.mockRestore();
     consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
+    getDaosSpy.mockRestore();
   });
 
   test('should return server error', async () => {
@@ -245,6 +252,12 @@ describe('tributeToolsGetDaoTx unit tests', () => {
     ).findMany.mockImplementation(() => {
       throw new Error('Some bad error.');
     });
+
+    const getDaos = await import('../../../services/dao/getDaos');
+
+    const getDaosSpy = jest
+      .spyOn(getDaos, 'getDaos')
+      .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
@@ -285,5 +298,6 @@ describe('tributeToolsGetDaoTx unit tests', () => {
     buyNFTPollSpy.mockRestore();
     consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
+    getDaosSpy.mockRestore();
   });
 });
