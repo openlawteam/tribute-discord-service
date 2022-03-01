@@ -5,7 +5,7 @@ import {URL} from 'url';
 import fetch from 'node-fetch';
 
 import {Command} from '../../types';
-import {getDaoDataByGuildID} from '../../../helpers';
+import {getDaoDataByGuildID, getEnv} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {getVoteThreshold} from '../helpers';
 import {prisma} from '../../../singletons';
@@ -35,6 +35,9 @@ const POLL_SETUP_ERROR_MESSAGE: string =
 
 const NO_PRICE_ERROR_MESSAGE: string =
   'Asset has no price information in Gem. It may be a brand new listing, or not for sale?';
+
+const NO_GEM_API_KEY_ERROR_MESSAGE: string =
+  'A required Gem API key was not found.';
 
 function isValidURL(url: string): boolean {
   try {
@@ -140,10 +143,25 @@ async function execute(interaction: CommandInteraction) {
     return;
   }
 
+  const GEM_API_KEY = getEnv('GEM_API_KEY');
+
+  if (!GEM_API_KEY) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: NO_GEM_API_KEY_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
   const assetResponse = await fetch(
     'https://gem-public-api.herokuapp.com/assets',
     {
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': GEM_API_KEY,
+      },
       body: JSON.stringify({
         filters: {
           tokenIds: [tokenID],

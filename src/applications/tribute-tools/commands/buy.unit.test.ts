@@ -397,6 +397,46 @@ describe('buy unit tests', () => {
     });
   });
 
+  test('should reply with error if no `GEM_API_KEY` found', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA
+    );
+
+    const getEnv = await import('../../../helpers/getEnv');
+
+    const getEnvSpy = jest
+      .spyOn(getEnv, 'getEnv')
+      .mockImplementation(() => undefined);
+
+    const reactSpy = jest.fn();
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {guildId: '722525233755717762', react: reactSpy}) as any
+      );
+
+    const buyResult = await buy.execute(interaction);
+
+    expect(buyResult).toBe(undefined);
+    expect(getEnvSpy).toHaveBeenCalledTimes(1);
+    expect(getEnvSpy).toHaveBeenNthCalledWith(1, 'GEM_API_KEY');
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+
+    expect(interactionReplySpy.mock.calls[0][0]).toEqual({
+      content: 'A required Gem API key was not found.',
+      ephemeral: true,
+    });
+
+    // Cleanup
+
+    getEnvSpy.mockRestore();
+  });
+
   test('should reply with error if Gem response has no price information', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
