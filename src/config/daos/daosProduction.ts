@@ -188,10 +188,9 @@ export const DAOS_PRODUCTION: Record<
           BUY: {
             resultChannelID: '936184076107415602',
             voteThresholds: new Map([
-              [[0, 5], 5],
-              [[5, 30], 10],
+              [[0, 15], 5],
+              [[15, 30], 10],
               [[30, 100], 20],
-              [[100, 0], 25],
             ]),
           },
           FUND: {
