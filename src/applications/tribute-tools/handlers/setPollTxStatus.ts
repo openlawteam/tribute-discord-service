@@ -1,25 +1,11 @@
+import {BuyNFTPoll, FloorSweeperPoll, FundAddressPoll} from '@prisma/client';
 import {Client, MessageEmbed, TextChannel} from 'discord.js';
-import {
-  BuyNFTPoll,
-  FloorSweeperPoll,
-  FundAddressPoll,
-  TributeToolsTxStatus,
-} from '@prisma/client';
 
 import {
   TributeToolsWebhookPayload,
   TributeToolsWebhookTxStatus,
   TributeToolsWebhookTxType,
 } from '../../../http-api/types';
-
-type SetPollTxStatusParams = {
-  channelID: string;
-  client: Client;
-  messageID: string;
-  txHash: string;
-  txStatus: TributeToolsWebhookTxStatus;
-  type: TributeToolsWebhookTxType;
-};
 
 function getTitle(type: TributeToolsWebhookTxType): 'Buy' | 'Sweep' | 'Fund' {
   switch (type) {
@@ -87,7 +73,7 @@ export async function setPollTxStatus({
   dbEntry: FloorSweeperPoll | FundAddressPoll | BuyNFTPoll;
   payload: TributeToolsWebhookPayload;
 }): Promise<void> {
-  const {channelID, messageID, txHash, txStatus} = dbEntry;
+  const {channelID, messageID, txHash} = dbEntry;
   const {
     data: {
       tx: {status},
