@@ -11,6 +11,7 @@
   "scripts": {
     "build": "npm run generate-abi-types && npx prisma generate && npx tsc",
     "docker:down": "docker-compose -f docker-compose.dev.yml down --remove-orphans",
+    "docker:migrate:dev": "docker-compose -f docker-compose.dev.yml start db && npm run migrate:dev && docker-compose -f docker-compose.dev.yml stop db",
     "docker:teardown": "npm run docker:down -- -v",
     "docker:up": "docker-compose -f docker-compose.dev.yml up --build --remove-orphans",
     "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/**/*.json'",
