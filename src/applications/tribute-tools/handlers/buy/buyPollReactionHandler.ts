@@ -228,6 +228,21 @@ export async function buyPollReactionHandler({
         await message.reply({
           embeds: [pollEndEmbed],
         });
+
+        /**
+         * Store result channel message ID in database.
+         *
+         * Placing at end in case of failure, the rest of the flow will work.
+         * This message ID is needed for later to report transaction status to the result channel.
+         */
+        await prisma.buyNFTPoll.update({
+          where: {
+            messageID: reaction.message.id,
+          },
+          data: {
+            actionMessageID: buyChannelMessage.id,
+          },
+        });
       }
     }
   } catch (error) {

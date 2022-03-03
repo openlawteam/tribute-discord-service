@@ -56,6 +56,15 @@ describe('sweepEndedPollsHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findMany.mockResolvedValue([DB_ENTRY, DB_ENTRY_1]);
 
+    /**
+     * Mock db update
+     *
+     * @todo fix types
+     */
+    const dbUpdateSpy = (
+      prismaMock.floorSweeperPoll as any
+    ).update.mockImplementation(async () => {});
+
     // Mock `getDaos`
     const getDaosSpy = jest
       .spyOn(await import('../../../../services/dao/getDaos'), 'getDaos')
@@ -73,9 +82,6 @@ describe('sweepEndedPollsHandler unit tests', () => {
     // `Client` needs a token to make a REST call
     client.token = 'abc123';
 
-    // Mock `setInterval`
-    // const setIntervalSpy = jest.spyOn(global, 'setInterval');
-
     const messagesReplySpy = jest.fn();
 
     const messagesFetchSpy = jest.fn().mockImplementation(() => ({
@@ -91,6 +97,7 @@ describe('sweepEndedPollsHandler unit tests', () => {
     }));
 
     const messagesSendSpy = jest.fn().mockImplementation(() => ({
+      id: 'xyz456',
       url: 'https://discord.com/some/message/url',
     }));
 
@@ -229,6 +236,58 @@ describe('sweepEndedPollsHandler unit tests', () => {
     expect(messagesReplySpy.mock.calls[1][0].embeds[0]).toBeInstanceOf(
       MessageEmbed
     );
+
+    // Assert DB update
+
+    expect(dbUpdateSpy).toHaveBeenCalledTimes(8);
+
+    // Call 1
+    expect(dbUpdateSpy).toHaveBeenNthCalledWith(1, {
+      data: {processed: true, result: 100},
+      where: {id: 1},
+    });
+
+    // Call 2
+    expect(dbUpdateSpy).toHaveBeenNthCalledWith(2, {
+      data: {processed: true, result: 200},
+      where: {id: 2},
+    });
+
+    // Call 3
+    expect(dbUpdateSpy).toHaveBeenNthCalledWith(3, {
+      data: {processed: true, result: 100},
+      where: {id: 1},
+    });
+
+    // Call 4
+    expect(dbUpdateSpy).toHaveBeenNthCalledWith(4, {
+      data: {processed: true, result: 200},
+      where: {id: 2},
+    });
+
+    // Call 5
+    expect(dbUpdateSpy).toHaveBeenNthCalledWith(5, {
+      data: {actionMessageID: 'xyz456'},
+      where: {id: 1},
+    });
+
+    // Call 6
+    expect(dbUpdateSpy).toHaveBeenNthCalledWith(6, {
+      data: {actionMessageID: 'xyz456'},
+      where: {id: 2},
+    });
+
+    // Call 7
+    expect(dbUpdateSpy).toHaveBeenNthCalledWith(7, {
+      data: {actionMessageID: 'xyz456'},
+      where: {id: 1},
+    });
+
+    // Call 8
+    expect(dbUpdateSpy).toHaveBeenNthCalledWith(8, {
+      data: {actionMessageID: 'xyz456'},
+      where: {id: 2},
+    });
 
     // Cleanup
 

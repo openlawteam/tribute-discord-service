@@ -85,7 +85,7 @@ describe('fundPollReactionHandler unit tests', () => {
   test('should handle poll threshold reached', async () => {
     const channelSendSpy = jest
       .fn()
-      .mockImplementation(async () => ({url: FUND_EXTERNAL_URL}));
+      .mockImplementation(async () => ({id: 'xyz456', url: FUND_EXTERNAL_URL}));
 
     const messageReplySpy = jest.fn();
 
@@ -168,7 +168,7 @@ describe('fundPollReactionHandler unit tests', () => {
 
     expect(dbFindSpy).toHaveBeenCalledTimes(1);
     expect(dbFindSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
-    expect(dbUpdateSpy).toHaveBeenCalledTimes(2);
+    expect(dbUpdateSpy).toHaveBeenCalledTimes(3);
 
     expect(dbUpdateSpy.mock.calls[0][0]).toEqual({
       data: {upvoteCount: 3},
@@ -177,6 +177,11 @@ describe('fundPollReactionHandler unit tests', () => {
 
     expect(dbUpdateSpy.mock.calls[1][0]).toEqual({
       data: {processed: true},
+      where: {messageID: 'abc123'},
+    });
+
+    expect(dbUpdateSpy.mock.calls[2][0]).toEqual({
+      data: {actionMessageID: 'xyz456'},
       where: {messageID: 'abc123'},
     });
 
