@@ -296,7 +296,7 @@ export const DAOS_PRODUCTION: Record<
         name: 'TRIBUTE_TOOLS_BOT',
         commands: {
           BUY: {
-            resultChannelID: '',
+            resultChannelID: '949332207162507384',
             voteThresholds: new Map([
               [[0, 15], 5],
               [[15, 30], 10],
@@ -304,11 +304,11 @@ export const DAOS_PRODUCTION: Record<
             ]),
           },
           FUND: {
-            resultChannelID: '',
+            resultChannelID: '949332207162507384',
             voteThreshold: 3,
           },
           SWEEP: {
-            resultChannelID: '',
+            resultChannelID: '949332207162507384',
           },
         },
       },
