@@ -74,17 +74,25 @@ describe('tributeToolsTxWebhook unit tests', () => {
 
     const buyNFTPollSpy = (
       prismaMock.buyNFTPoll as any
-    ).update.mockResolvedValue({});
+    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
 
     const floorSweeperPollSpy = (
       prismaMock.floorSweeperPoll as any
-    ).update.mockResolvedValue({});
+    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
 
     const fundAddressPollSpy = (
       prismaMock.fundAddressPoll as any
-    ).update.mockResolvedValue({});
+    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
 
-    jest
+    const setPollTxStatus = await import(
+      '../../../applications/tribute-tools/handlers/setPollTxStatus'
+    );
+
+    const setPollTxStatusSpy = jest
+      .spyOn(setPollTxStatus, 'setPollTxStatus')
+      .mockImplementation(async () => {});
+
+    const discordLoginSpy = jest
       .spyOn((await import('discord.js')).Client.prototype, 'login')
       .mockImplementation(async () => '');
 
@@ -133,6 +141,8 @@ describe('tributeToolsTxWebhook unit tests', () => {
 
     // Cleanup
     consoleWarnSpy.mockRestore();
+    discordLoginSpy.mockRestore();
+    setPollTxStatusSpy.mockRestore();
   });
 
   test('should return `400` response when no `body`', async () => {
