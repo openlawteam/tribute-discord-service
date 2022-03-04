@@ -24,11 +24,12 @@ import {DaoData} from '../types';
  * @see `lao-backends` for most cases
  */
 export const DAO_NAMES_PRODUCTION = [
+  'darkhorse',
   'fashion',
-  'nft',
   'metaverse',
   'museo',
   'music',
+  'nft',
   'unicorn',
 ] as const;
 
@@ -285,6 +286,42 @@ export const DAOS_PRODUCTION: Record<
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
       space: 'unicorn',
+    },
+  },
+
+  darkhorse: {
+    actions: [],
+    applications: {
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
+        commands: {
+          BUY: {
+            resultChannelID: '949332207162507384',
+            voteThresholds: new Map([
+              [[0, 15], 5],
+              [[15, 30], 10],
+              [[30, 100], 20],
+            ]),
+          },
+          FUND: {
+            resultChannelID: '949332207162507384',
+            voteThreshold: 3,
+          },
+          SWEEP: {
+            resultChannelID: '949332207162507384',
+          },
+        },
+      },
+    },
+    baseURL: 'https://darkhorsedao.xyz',
+    events: [],
+    friendlyName: 'Dark Horse DAO',
+    guildID: '948659070922018886',
+    internalName: 'darkhorse',
+    registryContractAddress: '0xa6135BD74c3bfcC58080255E207277f578Ee7C74',
+    snapshotHub: {
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
+      space: 'darkhorse',
     },
   },
 };
