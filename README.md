@@ -89,23 +89,3 @@ Any push to `main` will run a development environment release to Tribute Labs' G
 It is recommended to use [`bump`](https://github.com/mroth/bump) locally to deploy a production release; the formatting is nice! Bump will determine the next semantic version and open a page to create a new GitHub release. The tag will be created once the GitHub release is published, not when `bump` is run.
 
 Any tags (`v*`) pushed to `main` will run a production environment release to Tribute Labs' Google Cloud->Kubernetes Engine. The `deploy-prod.yml` GitHub Action will run and, if successful, will push a commit to `infrastructure`, which will complete the deployment to Google Cloud.
-
----
-
-⚠️ Warnings for the current datasource:
-
-• A unique constraint covering the columns `[actionMessageID]` on the table `buy_nft_poll` will be added. If there are existing duplicate values, this will fail.
-• A unique constraint covering the columns `[actionMessageID]` on the table `floor_sweeper_poll` will be added. If there are existing duplicate values, this will fail.
-• A unique constraint covering the columns `[actionMessageID]` on the table `fund_address_poll` will be added. If there are existing duplicate values, this will fail.
-
-✔ Are you sure you want create and apply this migration? … yes
-✔ Enter a name for the new migration: …
-Applying migration `20220303135522_`
-
-The following migration(s) have been created and applied from new schema changes:
-
-migrations/
-└─ 20220303135522\_/
-└─ migration.sql
-
-Your database is now in sync with your schema.
