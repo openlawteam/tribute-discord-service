@@ -84,6 +84,10 @@ describe('tributeToolsTxWebhook unit tests', () => {
       prismaMock.fundAddressPoll as any
     ).update.mockResolvedValue({});
 
+    jest
+      .spyOn((await import('discord.js')).Client.prototype, 'login')
+      .mockImplementation(async () => '');
+
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
@@ -460,7 +464,7 @@ describe('tributeToolsTxWebhook unit tests', () => {
 
     expect(await sweepResponse.json()).toEqual({
       error: {
-        message: `Something went wrong while saving the transaction data for type \`${TributeToolsWebhookTxType.SWEEP}\` uuid \`${UUID_FIXTURE}\`\.`,
+        message: `Something went wrong while processing the webhook.`,
         status: 500,
       },
     });
@@ -468,10 +472,14 @@ describe('tributeToolsTxWebhook unit tests', () => {
     expect(floorSweeperPollSpy).toHaveBeenCalledTimes(1);
     expect(floorSweeperPollSpy).toHaveBeenNthCalledWith(1, DB_PAYLOAD);
 
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
 
     expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
       /some bad error/i
+    );
+
+    expect(consoleErrorSpy.mock.calls[1][0]?.message).toMatch(
+      /something went wrong while saving the transaction data for type `sweep` uuid `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
     );
 
     // Cleanup
