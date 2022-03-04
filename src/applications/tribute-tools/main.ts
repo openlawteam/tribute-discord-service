@@ -70,10 +70,6 @@ export async function tributeToolsBot(): Promise<
       buyPollRemoveReactionHandler({reaction, user});
     });
 
-    // const stop = async (): Promise<void> => {
-    //   await destroyClientHandler(client, 'TRIBUTE_TOOLS_BOT');
-    // };
-
     return {
       client,
       name: 'TRIBUTE_TOOLS_BOT',
