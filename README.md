@@ -43,7 +43,7 @@ npm run docker:teardown -- --rmi=all
 
 ### Applying new Prisma database migrations
 
-When running `npm start` any migrations will be run which have not yet been applied to the database, or which are yet to be created as a result of a `schema.prisma` change. Database migrations do not automatically run during active local development (i.e. via `nodemon` watching for file changes). You will need to follow the instructions under _Updating migrations after schema changes_.
+When running `npm start` any migrations will be run which have not yet been applied to the database, or which are yet to be created as a result of a `schema.prisma` change. Database migrations do not automatically run during active local development (i.e. via `nodemon` watching for file changes). You will need to follow the instructions under _Creating migrations after schema changes_.
 
 ### Creating migrations after schema changes
 
