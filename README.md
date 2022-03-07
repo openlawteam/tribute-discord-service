@@ -41,15 +41,23 @@ npm run docker:teardown
 npm run docker:teardown -- --rmi=all
 ```
 
-### Updating Prisma database migrations
+### Applying new Prisma database migrations
 
-When running `npm start` any migrations will be run which have not yet been applied to the database, or which are yet to be created as a result of a `schema.prisma` change.
+When running `npm start` any migrations will be run which have not yet been applied to the database, or which are yet to be created as a result of a `schema.prisma` change. Database migrations do not automatically run during active local development (i.e. via `nodemon` watching for file changes). You will need to follow the instructions under _Creating migrations after schema changes_.
 
-#### Updating migrations after schema changes
+### Creating migrations after schema changes
 
-Make sure the Docker containers have started, or at least the `db` service, then create and/or run the migrations.
+Make sure the `db` container has started, then create and/or run the migrations.
 
 See [developing with Prisma `migrate`](https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate) for more information.
+
+There is a convenient npm command for this below. The `DATABASE_URL` will most likely be needed. This is because when using `npm start` the database container name, `db`, is used instead of `localhost` due to Docker container networking. The `DATABASE_URL` environment variable can be found in `/.env.dev`.
+
+```sh
+DATABASE_URL="postgresql://postgres:<PASSWORD>@localhost:<HOST_POST>/postgres" npm run docker:migrate:dev
+```
+
+Alternatively, the `migrate:dev` npm command is also available. Any arguments passed should be for Prisma's `prisma migrate dev`:
 
 ```sh
 # Creates a new migration, applies it to the database, and updates the generated Prisma Client

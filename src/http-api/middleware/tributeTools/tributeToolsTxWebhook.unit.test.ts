@@ -2,14 +2,11 @@ import {AddressInfo} from 'node:net';
 import {Prisma} from '@prisma/client';
 import fetch from 'node-fetch';
 
-import {
-  TributeToolsWebhookTxStatus,
-  TributeToolsWebhookTxType,
-} from '../../types';
 import {BYTES32_FIXTURE, UUID_FIXTURE} from '../../../../test/fixtures';
 import {HTTP_API_BASE_PATH} from '../../config';
 import {httpServer} from '../../httpServer';
 import {prismaMock} from '../../../../test/prismaMock';
+import {TributeToolsWebhookTxStatus} from '../../types';
 
 describe('tributeToolsTxWebhook unit tests', () => {
   const server = httpServer({noLog: true, useAnyAvailablePort: true});
@@ -74,15 +71,27 @@ describe('tributeToolsTxWebhook unit tests', () => {
 
     const buyNFTPollSpy = (
       prismaMock.buyNFTPoll as any
-    ).update.mockResolvedValue({});
+    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
 
     const floorSweeperPollSpy = (
       prismaMock.floorSweeperPoll as any
-    ).update.mockResolvedValue({});
+    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
 
     const fundAddressPollSpy = (
       prismaMock.fundAddressPoll as any
-    ).update.mockResolvedValue({});
+    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
+
+    const setPollTxStatus = await import(
+      '../../../applications/tribute-tools/handlers/notifyPollTxStatus'
+    );
+
+    const setPollTxStatusSpy = jest
+      .spyOn(setPollTxStatus, 'notifyPollTxStatus')
+      .mockImplementation(async () => {});
+
+    const discordLoginSpy = jest
+      .spyOn((await import('discord.js')).Client.prototype, 'login')
+      .mockImplementation(async () => '');
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
@@ -129,6 +138,8 @@ describe('tributeToolsTxWebhook unit tests', () => {
 
     // Cleanup
     consoleWarnSpy.mockRestore();
+    discordLoginSpy.mockRestore();
+    setPollTxStatusSpy.mockRestore();
   });
 
   test('should return `400` response when no `body`', async () => {
@@ -460,7 +471,7 @@ describe('tributeToolsTxWebhook unit tests', () => {
 
     expect(await sweepResponse.json()).toEqual({
       error: {
-        message: `Something went wrong while saving the transaction data for type \`${TributeToolsWebhookTxType.SWEEP}\` uuid \`${UUID_FIXTURE}\`\.`,
+        message: `Something went wrong while processing the webhook.`,
         status: 500,
       },
     });
@@ -468,10 +479,14 @@ describe('tributeToolsTxWebhook unit tests', () => {
     expect(floorSweeperPollSpy).toHaveBeenCalledTimes(1);
     expect(floorSweeperPollSpy).toHaveBeenNthCalledWith(1, DB_PAYLOAD);
 
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
 
     expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
       /some bad error/i
+    );
+
+    expect(consoleErrorSpy.mock.calls[1][0]?.message).toMatch(
+      /something went wrong while saving the transaction data for type `sweep` uuid `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
     );
 
     // Cleanup

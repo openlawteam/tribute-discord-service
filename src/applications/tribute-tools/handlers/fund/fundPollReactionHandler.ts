@@ -226,6 +226,21 @@ export async function fundPollReactionHandler({
         await message.reply({
           embeds: [pollEndEmbed],
         });
+
+        /**
+         * Store result channel message ID in database.
+         *
+         * Placing at end in case of failure, the rest of the flow will work.
+         * This message ID is needed for later to report transaction status to the result channel.
+         */
+        await prisma.fundAddressPoll.update({
+          where: {
+            messageID: reaction.message.id,
+          },
+          data: {
+            actionMessageID: fundChannelMessage.id,
+          },
+        });
       }
     }
   } catch (error) {

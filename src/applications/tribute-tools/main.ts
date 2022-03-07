@@ -1,5 +1,3 @@
-import {Client, Intents} from 'discord.js';
-
 import {
   sweepEndedPollsHandler,
   sweepPollReactionHandler,
@@ -14,6 +12,7 @@ import {
 import {ApplicationReturn} from '../types';
 import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
+import {getTributeToolsClient} from '.';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
 
 export async function tributeToolsBot(): Promise<
@@ -42,18 +41,8 @@ export async function tributeToolsBot(): Promise<
       return;
     }
 
-    // Create a new Discord client instance
-    const client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-    });
-
-    // Login to Discord with the bot's token
-    client.login(getEnv('BOT_TOKEN_TRIBUTE_TOOLS'));
+    // Get client and log in
+    const {client, stop} = await getTributeToolsClient();
 
     // When the Discord client is ready, run this code (only once)
     client.once('ready', (): void => {
@@ -80,10 +69,6 @@ export async function tributeToolsBot(): Promise<
       fundPollRemoveReactionHandler({reaction, user});
       buyPollRemoveReactionHandler({reaction, user});
     });
-
-    const stop = async (): Promise<void> => {
-      await destroyClientHandler(client, 'TRIBUTE_TOOLS_BOT');
-    };
 
     return {
       client,

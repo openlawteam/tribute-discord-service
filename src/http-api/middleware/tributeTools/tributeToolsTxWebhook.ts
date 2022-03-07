@@ -3,6 +3,10 @@ import {z} from 'zod';
 import Application from 'koa';
 
 import {
+  getTributeToolsClient,
+  notifyPollTxStatus,
+} from '../../../applications/tribute-tools';
+import {
   HTTPMethod,
   TributeToolsWebhookPayload,
   TributeToolsWebhookTxStatus,
@@ -15,8 +19,12 @@ import {prisma} from '../../../singletons';
 
 const PATH: string = 'webhook/tribute-tools-tx';
 
-const NO_BODY_ERROR: string = 'No `body` was provided.';
 const INVALID_BODY_ERROR: string = 'Incorrect `body` was provided.';
+const NO_BODY_ERROR: string = 'No `body` was provided.';
+const TX_MISSING_DATA_ERROR: string = 'Missing tx data.';
+const TX_SAVE_ERROR: string = 'Something went wrong while saving the tx data.';
+const SERVER_ERROR: string =
+  'Something went wrong while processing the webhook.';
 
 const RequiredPayloadSchema = z.object({
   data: z.object({
@@ -82,7 +90,7 @@ async function storeTxData(
         });
 
       default:
-        break;
+        return undefined;
     }
   } catch (error) {
     console.error(error);
@@ -144,10 +152,11 @@ export const tributeToolsTxWebhook: Application.Middleware = async (
     return;
   }
 
-  // Store data in database
   try {
+    // Store data in database
     const updateResult = await storeTxData(validatedPayload);
 
+    // If `uuid` was not found
     if (updateResult === null) {
       createHTTPError({
         ctx,
@@ -157,9 +166,31 @@ export const tributeToolsTxWebhook: Application.Middleware = async (
 
       return;
     }
+
+    // If the switch `default` case was chosen
+    if (updateResult === undefined) {
+      throw new Error(TX_SAVE_ERROR);
+    }
+
+    const {txHash, txStatus} = updateResult;
+
+    const {client} = await getTributeToolsClient();
+
+    if (!txHash || !txStatus) {
+      throw new Error(TX_MISSING_DATA_ERROR);
+    }
+
+    // Handle tx status in discord application
+    await notifyPollTxStatus({
+      client,
+      dbEntry: updateResult,
+      payload: validatedPayload,
+    });
   } catch (error) {
+    console.error(error);
+
     if (error instanceof Error) {
-      createHTTPError({ctx, message: error.message, status: 500});
+      createHTTPError({ctx, message: SERVER_ERROR, status: 500});
     }
 
     return;

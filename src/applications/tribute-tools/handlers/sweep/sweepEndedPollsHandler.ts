@@ -181,6 +181,21 @@ export function sweepEndedPollsHandler({
           await message.reply({
             embeds: [pollEndEmbed],
           });
+
+          /**
+           * Store result channel message ID in database.
+           *
+           * Placing at end in case of failure, the rest of the flow will work.
+           * This message ID is needed for later to report transaction status to the result channel.
+           */
+          await prisma.floorSweeperPoll.update({
+            where: {
+              id,
+            },
+            data: {
+              actionMessageID: sweepChannelMessage?.id,
+            },
+          });
         } catch (error) {
           console.error(
             `There was an error while processing an ended poll: ${error}`

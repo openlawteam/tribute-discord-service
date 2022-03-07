@@ -40,6 +40,7 @@ describe('tribute-tools/main unit tests', () => {
 
     loginSpy.mockRestore();
     deployCommandsSpy.mockRestore();
+    await returnValue?.stop?.();
   });
 
   test('should call `ready` handlers', async () => {
@@ -80,6 +81,7 @@ describe('tribute-tools/main unit tests', () => {
     deployCommandsSpy.mockRestore();
     endedPollsHandlerSpy.mockRestore();
     loginSpy.mockRestore();
+    await returnValue?.stop?.();
   });
 
   test('should call `interactionCreate` handlers', async () => {
@@ -124,6 +126,7 @@ describe('tribute-tools/main unit tests', () => {
     deployCommandsSpy.mockRestore();
     interactionExecuteHandlerSpy.mockRestore();
     loginSpy.mockRestore();
+    await returnValue?.stop?.();
   });
 
   test('should call `messageReactionAdd` handlers', async () => {
@@ -136,6 +139,9 @@ describe('tribute-tools/main unit tests', () => {
     const buyPollReactionHandler = await import(
       './handlers/buy/buyPollReactionHandler'
     );
+    const fundPollReactionHandler = await import(
+      './handlers/fund/fundPollReactionHandler'
+    );
 
     const loginSpy = jest
       .spyOn(discord.Client.prototype, 'login')
@@ -147,6 +153,10 @@ describe('tribute-tools/main unit tests', () => {
 
     const buyPollReactionHandlerSpy = jest
       .spyOn(buyPollReactionHandler, 'buyPollReactionHandler')
+      .mockImplementation(() => null as any);
+
+    const fundPollReactionHandlerSpy = jest
+      .spyOn(fundPollReactionHandler, 'fundPollReactionHandler')
       .mockImplementation(() => null as any);
 
     const {tributeToolsBot} = await import('../tribute-tools/main');
@@ -184,8 +194,65 @@ describe('tribute-tools/main unit tests', () => {
 
     deployCommandsSpy.mockRestore();
     buyPollReactionHandlerSpy.mockRestore();
+    fundPollReactionHandlerSpy.mockRestore();
     sweepPollReactionHandlerSpy.mockRestore();
     loginSpy.mockRestore();
+    await returnValue?.stop?.();
+  });
+
+  test('should call `messageReactionRemove` handlers', async () => {
+    const discord = await import('discord.js');
+
+    const buyPollRemoveReactionHandler = await import(
+      './handlers/buy/buyPollRemoveReactionHandler'
+    );
+    const fundPollRemoveReactionHandler = await import(
+      './handlers/fund/fundPollRemoveReactionHandler'
+    );
+
+    const loginSpy = jest
+      .spyOn(discord.Client.prototype, 'login')
+      .mockImplementation(async () => '');
+
+    const buyPollRemoveReactionHandlerSpy = jest
+      .spyOn(buyPollRemoveReactionHandler, 'buyPollRemoveReactionHandler')
+      .mockImplementation(() => null as any);
+
+    const fundPollRemoveReactionHandlerSpy = jest
+      .spyOn(fundPollRemoveReactionHandler, 'fundPollRemoveReactionHandler')
+      .mockImplementation(() => null as any);
+
+    const {tributeToolsBot} = await import('../tribute-tools/main');
+
+    const deployCommands = await import('../helpers/deployCommands');
+
+    const deployCommandsSpy = jest
+      .spyOn(deployCommands, 'deployCommands')
+      .mockImplementation(async () => {});
+
+    const returnValue = await tributeToolsBot();
+
+    // Emit `messageReactionAdd` event
+    returnValue?.client?.emit(
+      'messageReactionRemove' as any,
+      {reactionTest: 'test'},
+      {userTest: 'test'}
+    );
+
+    expect(buyPollRemoveReactionHandlerSpy).toHaveBeenCalledTimes(1);
+
+    expect(buyPollRemoveReactionHandlerSpy).toHaveBeenCalledWith({
+      reaction: {reactionTest: 'test'},
+      user: {userTest: 'test'},
+    });
+
+    // Cleanup
+
+    deployCommandsSpy.mockRestore();
+    buyPollRemoveReactionHandlerSpy.mockRestore();
+    fundPollRemoveReactionHandlerSpy.mockRestore();
+    loginSpy.mockRestore();
+    await returnValue?.stop?.();
   });
 
   test('should destroy `Client` on `stop()`', async () => {
@@ -222,6 +289,7 @@ describe('tribute-tools/main unit tests', () => {
     deployCommandsSpy.mockRestore();
     destroyClientHandlerSpy.mockRestore();
     loginSpy.mockRestore();
+    await returnValue?.stop?.();
   });
 
   test('should handle `deployCommands` error', async () => {
@@ -245,7 +313,7 @@ describe('tribute-tools/main unit tests', () => {
         throw new Error('Some bad error.');
       });
 
-    await tributeToolsBot();
+    const returnValue = await tributeToolsBot();
 
     expect(loginSpy).toHaveBeenCalledTimes(0);
 
@@ -269,5 +337,6 @@ describe('tribute-tools/main unit tests', () => {
     consoleErrorSpy.mockRestore();
     deployCommandsSpy.mockRestore();
     loginSpy.mockRestore();
+    await returnValue?.stop?.();
   });
 });
