@@ -2,14 +2,11 @@ import {AddressInfo} from 'node:net';
 import {Prisma} from '@prisma/client';
 import fetch from 'node-fetch';
 
-import {
-  TributeToolsWebhookTxStatus,
-  TributeToolsWebhookTxType,
-} from '../../types';
 import {BYTES32_FIXTURE, UUID_FIXTURE} from '../../../../test/fixtures';
 import {HTTP_API_BASE_PATH} from '../../config';
 import {httpServer} from '../../httpServer';
 import {prismaMock} from '../../../../test/prismaMock';
+import {TributeToolsWebhookTxStatus} from '../../types';
 
 describe('tributeToolsTxWebhook unit tests', () => {
   const server = httpServer({noLog: true, useAnyAvailablePort: true});
@@ -85,11 +82,11 @@ describe('tributeToolsTxWebhook unit tests', () => {
     ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
 
     const setPollTxStatus = await import(
-      '../../../applications/tribute-tools/handlers/setPollTxStatus'
+      '../../../applications/tribute-tools/handlers/notifyPollTxStatus'
     );
 
     const setPollTxStatusSpy = jest
-      .spyOn(setPollTxStatus, 'setPollTxStatus')
+      .spyOn(setPollTxStatus, 'notifyPollTxStatus')
       .mockImplementation(async () => {});
 
     const discordLoginSpy = jest
