@@ -13,6 +13,7 @@ import {
 import {
   BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
+  FAKE_DAOS_FIXTURE,
   GUILD_ID_FIXTURE,
   UUID_FIXTURE,
 } from '../../../../test/fixtures';
@@ -73,6 +74,14 @@ describe('notifyPollTxStatus unit tests', () => {
     voteThreshold: 5,
   };
 
+  async function mockDaosHelper() {
+    const getDaos = await import('../../../services/dao/getDaos');
+
+    return jest
+      .spyOn(getDaos, 'getDaos')
+      .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
+  }
+
   test('should notify Discord when a successful transaction is sent', async () => {
     const client = new Client({
       intents: [
@@ -86,10 +95,13 @@ describe('notifyPollTxStatus unit tests', () => {
     // `Client` needs a token to make a REST call
     client.token = 'abc123';
 
-    const messagesReplySpy = jest.fn();
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
 
     const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      reply: messagesReplySpy,
+      edit: messageEditSpy,
+      reply: messageReplySpy,
     }));
 
     const channelsFetchSpy = jest
@@ -119,14 +131,16 @@ describe('notifyPollTxStatus unit tests', () => {
     });
 
     expect(result).toBe(undefined);
-    expect(channelsFetchSpy).toHaveBeenCalledTimes(1);
-    expect(messagesFetchSpy).toHaveBeenCalledTimes(1);
-    expect(messagesReplySpy).toHaveBeenCalledTimes(1);
-
+    expect(channelsFetchSpy).toHaveBeenCalledTimes(2);
+    expect(messagesFetchSpy).toHaveBeenCalledTimes(2);
+    expect(messageReplySpy).toHaveBeenCalledTimes(1);
+    expect(messageEditSpy).toHaveBeenCalledTimes(1);
     expect(channelsFetchSpy).toHaveBeenNthCalledWith(1, '123456789');
+    expect(channelsFetchSpy).toHaveBeenNthCalledWith(2, '123123123123123123');
     expect(messagesFetchSpy).toHaveBeenNthCalledWith(1, '567890123');
+    expect(messagesFetchSpy).toHaveBeenNthCalledWith(2, '987654321');
 
-    expect(messagesReplySpy).toHaveBeenNthCalledWith(1, {
+    expect(messageReplySpy).toHaveBeenNthCalledWith(1, {
       embeds: [
         new MessageEmbed()
           .setTitle('Sweep')
@@ -136,6 +150,20 @@ describe('notifyPollTxStatus unit tests', () => {
           ),
       ],
     });
+
+    expect(messageEditSpy).toHaveBeenNthCalledWith(1, {
+      components: [],
+      embeds: [
+        new MessageEmbed().setDescription(
+          '[✅ Transaction succeeded](https://etherscan.io/tx/0xfe837a5e727dacac34d8070a94918f13335f255f9bbf958d876718aac64b299d)'
+        ),
+      ],
+    });
+
+    // Cleanup
+
+    daosSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
   });
 
   test('should notify Discord when a failed transaction is sent', async () => {
@@ -151,10 +179,13 @@ describe('notifyPollTxStatus unit tests', () => {
     // `Client` needs a token to make a REST call
     client.token = 'abc123';
 
-    const messagesReplySpy = jest.fn();
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
 
     const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      reply: messagesReplySpy,
+      edit: messageEditSpy,
+      reply: messageReplySpy,
     }));
 
     const channelsFetchSpy = jest
@@ -184,14 +215,13 @@ describe('notifyPollTxStatus unit tests', () => {
     });
 
     expect(result).toBe(undefined);
-    expect(channelsFetchSpy).toHaveBeenCalledTimes(1);
-    expect(messagesFetchSpy).toHaveBeenCalledTimes(1);
-    expect(messagesReplySpy).toHaveBeenCalledTimes(1);
-
+    expect(channelsFetchSpy).toHaveBeenCalledTimes(2);
+    expect(messagesFetchSpy).toHaveBeenCalledTimes(2);
+    expect(messageReplySpy).toHaveBeenCalledTimes(1);
     expect(channelsFetchSpy).toHaveBeenNthCalledWith(1, '123456789');
     expect(messagesFetchSpy).toHaveBeenNthCalledWith(1, '567890123');
 
-    expect(messagesReplySpy).toHaveBeenNthCalledWith(1, {
+    expect(messageReplySpy).toHaveBeenNthCalledWith(1, {
       embeds: [
         new MessageEmbed()
           .setTitle('Sweep')
@@ -201,6 +231,19 @@ describe('notifyPollTxStatus unit tests', () => {
           ),
       ],
     });
+
+    expect(messageEditSpy).toHaveBeenNthCalledWith(1, {
+      embeds: [
+        new MessageEmbed().setDescription(
+          '[❌ Transaction failed](https://etherscan.io/tx/0xfe837a5e727dacac34d8070a94918f13335f255f9bbf958d876718aac64b299d)'
+        ),
+      ],
+    });
+
+    // Cleanup
+
+    daosSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
   });
 
   test('should notify Discord when a `/buy` transaction is sent', async () => {
@@ -216,10 +259,13 @@ describe('notifyPollTxStatus unit tests', () => {
     // `Client` needs a token to make a REST call
     client.token = 'abc123';
 
-    const messagesReplySpy = jest.fn();
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
 
     const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      reply: messagesReplySpy,
+      edit: messageEditSpy,
+      reply: messageReplySpy,
     }));
 
     const channelsFetchSpy = jest
@@ -248,15 +294,9 @@ describe('notifyPollTxStatus unit tests', () => {
       },
     });
 
-    expect(result).toBe(undefined);
-    expect(channelsFetchSpy).toHaveBeenCalledTimes(1);
-    expect(messagesFetchSpy).toHaveBeenCalledTimes(1);
-    expect(messagesReplySpy).toHaveBeenCalledTimes(1);
+    expect(messageReplySpy).toHaveBeenCalledTimes(1);
 
-    expect(channelsFetchSpy).toHaveBeenNthCalledWith(1, '123456789');
-    expect(messagesFetchSpy).toHaveBeenNthCalledWith(1, '567890123');
-
-    expect(messagesReplySpy).toHaveBeenNthCalledWith(1, {
+    expect(messageReplySpy).toHaveBeenNthCalledWith(1, {
       embeds: [
         new MessageEmbed()
           .setTitle('Buy')
@@ -266,6 +306,11 @@ describe('notifyPollTxStatus unit tests', () => {
           ),
       ],
     });
+
+    // Cleanup
+
+    daosSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
   });
 
   test('should notify Discord when a `/fund` transaction is sent', async () => {
@@ -281,10 +326,13 @@ describe('notifyPollTxStatus unit tests', () => {
     // `Client` needs a token to make a REST call
     client.token = 'abc123';
 
-    const messagesReplySpy = jest.fn();
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
 
     const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      reply: messagesReplySpy,
+      edit: messageEditSpy,
+      reply: messageReplySpy,
     }));
 
     const channelsFetchSpy = jest
@@ -313,15 +361,9 @@ describe('notifyPollTxStatus unit tests', () => {
       },
     });
 
-    expect(result).toBe(undefined);
-    expect(channelsFetchSpy).toHaveBeenCalledTimes(1);
-    expect(messagesFetchSpy).toHaveBeenCalledTimes(1);
-    expect(messagesReplySpy).toHaveBeenCalledTimes(1);
+    expect(messageReplySpy).toHaveBeenCalledTimes(1);
 
-    expect(channelsFetchSpy).toHaveBeenNthCalledWith(1, '123456789');
-    expect(messagesFetchSpy).toHaveBeenNthCalledWith(1, '567890123');
-
-    expect(messagesReplySpy).toHaveBeenNthCalledWith(1, {
+    expect(messageReplySpy).toHaveBeenNthCalledWith(1, {
       embeds: [
         new MessageEmbed()
           .setTitle('Fund')
@@ -331,5 +373,139 @@ describe('notifyPollTxStatus unit tests', () => {
           ),
       ],
     });
+
+    // Cleanup
+
+    daosSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
+  });
+
+  test('should throw error when no `actionMessageID` found', async () => {
+    const client = new Client({
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      ],
+      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+    });
+
+    // `Client` needs a token to make a REST call
+    client.token = 'abc123';
+
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
+
+    const messagesFetchSpy = jest.fn().mockImplementation(() => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
+
+    const channelsFetchSpy = jest
+      .spyOn(client.channels, 'fetch')
+      .mockImplementation(
+        () =>
+          ({
+            messages: {
+              fetch: messagesFetchSpy,
+            },
+          } as any)
+      );
+
+    try {
+      await notifyPollTxStatus({
+        client,
+        dbEntry: {...BUY_DB_ENTRY, actionMessageID: null},
+        payload: {
+          data: {
+            id: UUID_FIXTURE,
+            type: TributeToolsWebhookTxType.BUY,
+            tx: {
+              hash: BYTES32_FIXTURE,
+              status: TributeToolsWebhookTxStatus.SUCCESS,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+
+      expect((error as any)?.message).toMatch(
+        /No `actionMessageID` was found\./i
+      );
+    }
+
+    // Cleanup
+
+    daosSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
+  });
+
+  test('should throw error when no `actionChannelID` found', async () => {
+    const client = new Client({
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      ],
+      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+    });
+
+    // `Client` needs a token to make a REST call
+    client.token = 'abc123';
+
+    const getDaos = await import('../../../services/dao/getDaos');
+
+    const daosSpy = jest
+      .spyOn(getDaos, 'getDaos')
+      .mockImplementationOnce(async () => ({}));
+
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
+
+    const messagesFetchSpy = jest.fn().mockImplementation(() => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
+
+    const channelsFetchSpy = jest
+      .spyOn(client.channels, 'fetch')
+      .mockImplementation(
+        () =>
+          ({
+            messages: {
+              fetch: messagesFetchSpy,
+            },
+          } as any)
+      );
+
+    try {
+      await notifyPollTxStatus({
+        client,
+        dbEntry: BUY_DB_ENTRY,
+        payload: {
+          data: {
+            id: UUID_FIXTURE,
+            type: TributeToolsWebhookTxType.BUY,
+            tx: {
+              hash: BYTES32_FIXTURE,
+              status: TributeToolsWebhookTxStatus.SUCCESS,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+
+      expect((error as any)?.message).toMatch(
+        /No `actionChannelID` was found\./i
+      );
+    }
+
+    // Cleanup
+
+    daosSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
   });
 });
