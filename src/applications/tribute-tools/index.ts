@@ -1,3 +1,3 @@
 export * from './getTributeToolsClient';
-export * from './handlers/setPollTxStatus';
+export * from './handlers/notifyPollTxStatus';
 export * from './main';

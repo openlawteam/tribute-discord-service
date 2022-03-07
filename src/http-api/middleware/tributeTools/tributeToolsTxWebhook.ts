@@ -4,7 +4,7 @@ import Application from 'koa';
 
 import {
   getTributeToolsClient,
-  setPollTxStatus,
+  notifyPollTxStatus,
 } from '../../../applications/tribute-tools';
 import {
   HTTPMethod,
@@ -181,7 +181,7 @@ export const tributeToolsTxWebhook: Application.Middleware = async (
     }
 
     // Handle tx status in discord application
-    await setPollTxStatus({
+    await notifyPollTxStatus({
       client,
       dbEntry: updateResult,
       payload: validatedPayload,

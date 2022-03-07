@@ -64,7 +64,7 @@ function getStatus({
   }
 }
 
-export async function setPollTxStatus({
+export async function notifyPollTxStatus({
   client,
   dbEntry,
   payload,
@@ -74,6 +74,7 @@ export async function setPollTxStatus({
   payload: TributeToolsWebhookPayload;
 }): Promise<void> {
   const {channelID, messageID, txHash} = dbEntry;
+
   const {
     data: {
       tx: {status},
