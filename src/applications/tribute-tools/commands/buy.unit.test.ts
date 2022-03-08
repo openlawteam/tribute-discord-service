@@ -32,7 +32,7 @@ describe('buy unit tests', () => {
       name: 'url',
       type: 3 /* `STRING` */,
       value:
-        'https://opensea.io/assets/0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8/4079',
+        'https://opensea.io/assets/0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8/5314',
     },
   ];
 
@@ -138,15 +138,16 @@ describe('buy unit tests', () => {
   };
 
   const DB_INSERT_DATA = {
+    amountWEI: GEM_RESPONSE_FIXTURE.data[0].priceInfo.price,
     channelID: '886976610018934824',
-    contractAddress: ETH_ADDRESS_FIXTURE,
+    contractAddress: GEM_RESPONSE_FIXTURE.data[0].address,
     createdAt: new Date(0),
     guildID: '722525233755717762',
     id: 1,
     messageID: '123456789',
     name: 'Sad Girl #5314',
     processed: false,
-    tokenID: '5314',
+    tokenID: GEM_RESPONSE_FIXTURE.data[0].tokenId,
     upvoteCount: 0,
     voteThreshold: 3,
   };
@@ -166,7 +167,9 @@ describe('buy unit tests', () => {
      *
      * @todo fix types
      */
-    (prismaMock.buyNFTPoll as any).create.mockResolvedValue(DB_INSERT_DATA);
+    const dbCreateMock = (
+      prismaMock.buyNFTPoll as any
+    ).create.mockResolvedValue(DB_INSERT_DATA);
 
     server.use(
       rest.post(
@@ -184,7 +187,12 @@ describe('buy unit tests', () => {
       .spyOn(interaction, 'reply')
       .mockImplementation(
         async (_o) =>
-          (await {guildId: '722525233755717762', react: reactSpy}) as any
+          (await {
+            channelId: DB_INSERT_DATA.channelID,
+            guildId: DB_INSERT_DATA.guildID,
+            id: DB_INSERT_DATA.messageID,
+            react: reactSpy,
+          }) as any
       );
 
     const buyResult = await buy.execute(interaction);
@@ -221,9 +229,24 @@ describe('buy unit tests', () => {
 
     expect(reactSpy.mock.calls.length).toBe(2);
     expect(reactSpy.mock.calls).toEqual([['👍'], ['👎']]);
+    expect(dbCreateMock).toHaveBeenCalledTimes(1);
+
+    expect(dbCreateMock).toHaveBeenNthCalledWith(1, {
+      data: {
+        amountWEI: GEM_RESPONSE_FIXTURE.data[0].priceInfo.price,
+        channelID: DB_INSERT_DATA.channelID,
+        contractAddress: GEM_RESPONSE_FIXTURE.data[0].address,
+        guildID: DB_INSERT_DATA.guildID,
+        messageID: DB_INSERT_DATA.messageID,
+        name: GEM_RESPONSE_FIXTURE.data[0].name,
+        tokenID: GEM_RESPONSE_FIXTURE.data[0].tokenId,
+        voteThreshold: DB_INSERT_DATA.voteThreshold,
+      },
+    });
 
     // Cleanup
 
+    dbCreateMock.mockRestore();
     getDaosSpy.mockRestore();
     interactionReplySpy.mockRestore();
   });
