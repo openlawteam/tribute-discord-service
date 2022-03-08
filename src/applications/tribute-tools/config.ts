@@ -32,7 +32,7 @@ export const POLL_REACTION_EMOJIS: Record<
 export const TRIBUTE_TOOLS_URL: string =
   APP_ENV === 'production'
     ? 'https://tools.tributelabs.xyz'
-    : 'https://develop--tools-tributelabs.netlify.app';
+    : 'https://tools.dev.tributelabs.xyz';
 
 export const BUY_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/single-buy`;
 export const FUND_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/fund`;
