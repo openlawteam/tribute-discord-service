@@ -2,6 +2,7 @@ import {
   BuyNFTPoll,
   FloorSweeperPoll,
   FundAddressPoll,
+  Prisma,
   TributeToolsTxStatus,
 } from '@prisma/client';
 import {Client, Intents, MessageEmbed} from 'discord.js';
@@ -39,6 +40,7 @@ describe('notifyPollTxStatus unit tests', () => {
   };
 
   const BUY_DB_ENTRY: BuyNFTPoll = {
+    amountWEI: new Prisma.Decimal('2200000000000000000'),
     actionMessageID: '987654321',
     channelID: '123456789',
     contractAddress: ETH_ADDRESS_FIXTURE,

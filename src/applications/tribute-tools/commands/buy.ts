@@ -298,6 +298,7 @@ async function execute(interaction: CommandInteraction) {
     // Store poll data in DB
     await prisma.buyNFTPoll.create({
       data: {
+        amountWEI: priceInfo.price,
         channelID,
         contractAddress,
         guildID,

@@ -9,6 +9,7 @@ import {
   User,
 } from 'discord.js';
 import {channelMention, time} from '@discordjs/builders';
+import {fromWei, toBN} from 'web3-utils';
 
 import {THUMBS_EMOJIS, BUY_EXTERNAL_URL} from '../../config';
 import {getDaoDataByGuildID} from '../../../../helpers';
@@ -128,6 +129,7 @@ export async function buyPollReactionHandler({
     });
 
     const {
+      amountWEI,
       channelID,
       contractAddress,
       guildID,
@@ -199,7 +201,10 @@ export async function buyPollReactionHandler({
             .setEmoji('💸')
         );
 
-        const content: string = `The poll for "*${name}*" ended ${time(
+        const content: string = `The poll for "*${name}*" @ ${fromWei(
+          toBN(amountWEI.toString()),
+          'ether'
+        )} ETH ended ${time(
           Math.floor(Date.now() / 1000),
           'R'
         )}. The threshold of ${voteThreshold} vote${

@@ -57,6 +57,7 @@ model BuyNFTPoll {
   name            String                @db.VarChar(255)
   contractAddress String                @db.VarChar(255)
   tokenID         String                @db.VarChar(255)
+  amountWEI       Decimal               @default(0) @db.Decimal(78, 0)
   processed       Boolean               @default(false) @db.Boolean
   voteThreshold   Int                   @default(0) @db.Integer
   upvoteCount     Int                   @default(0) @db.Integer
