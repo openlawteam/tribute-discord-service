@@ -6,8 +6,10 @@ import {
   PartialUser,
   User,
 } from 'discord.js';
+import {BuyNFTPoll, Prisma} from '@prisma/client';
 
 import {
+  BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
   GUILD_ID_FIXTURE,
@@ -115,7 +117,9 @@ describe('buyPollReactionHandler unit tests', () => {
 
     const USER: User | PartialUser = {bot: false, id: '123'} as any;
 
-    const DB_ENTRY = {
+    const DB_ENTRY: BuyNFTPoll = {
+      actionMessageID: 'abc123',
+      amountWEI: new Prisma.Decimal('2200000000000000000'),
       channelID: '886976610018934824',
       contractAddress: ETH_ADDRESS_FIXTURE,
       createdAt: new Date(0),
@@ -125,6 +129,8 @@ describe('buyPollReactionHandler unit tests', () => {
       name: 'Test Punk #123',
       processed: false,
       tokenID: '123',
+      txHash: BYTES32_FIXTURE,
+      txStatus: 'success',
       upvoteCount: 4,
       uuid: 'abc123def456',
       voteThreshold: 5,
@@ -190,7 +196,7 @@ describe('buyPollReactionHandler unit tests', () => {
     expect(channelSendSpy).toHaveBeenCalledTimes(1);
 
     expect(channelSendSpy.mock.calls[0][0].content).toMatch(
-      /The poll for "\*Test Punk #123\*" ended <t:\d+:R>\. The threshold of 5 votes has been reached\./i
+      /The poll for "\*Test Punk #123\*" @ 2.2 ETH ended <t:\d+:R>\. The threshold of 5 votes has been reached\./i
     );
 
     expect(channelSendSpy.mock.calls[0][0].components).toEqual([BUY_BUTTON]);
@@ -205,7 +211,7 @@ describe('buyPollReactionHandler unit tests', () => {
     );
 
     expect(messageReplySpy.mock.calls[0][0].embeds[0].description).toMatch(
-      /The poll for "\*Test Punk #123\*" ended <t:\d+:R>\. The threshold of 5 votes has been reached\./i
+      /The poll for "\*Test Punk #123\*" @ 2.2 ETH ended <t:\d+:R>\. The threshold of 5 votes has been reached\./i
     );
 
     // Cleanup
