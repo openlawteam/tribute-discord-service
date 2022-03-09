@@ -14,6 +14,7 @@ import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 import {getTributeToolsClient} from '.';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
+import {cancelPollHandler} from './handlers/cancelPollHandler';
 
 export async function tributeToolsBot(): Promise<
   ApplicationReturn | undefined
@@ -55,6 +56,7 @@ export async function tributeToolsBot(): Promise<
     // Listen for interactions and possibly run commands
     client.on('interactionCreate', (interaction) => {
       interactionExecuteHandler({commands, interaction});
+      cancelPollHandler(interaction);
     });
 
     // Listen to reactions on messages, and possibly handle.

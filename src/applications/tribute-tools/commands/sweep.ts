@@ -8,12 +8,15 @@ import {
   CommandInteraction,
   CommandInteractionOption,
   Message,
+  MessageActionRow,
+  MessageButton,
   MessageEmbed,
 } from 'discord.js';
 import dayjs from 'dayjs';
 import duration, {DurationUnitType} from 'dayjs/plugin/duration';
 
 import {
+  CANCEL_POLL_SWEEP_CUSTOM_ID,
   NO_ENTRY_SIGN_EMOJI,
   POLL_REACTION_EMOJIS,
   REGIONAL_INDICATOR_PREFIX,
@@ -261,8 +264,16 @@ async function execute(interaction: CommandInteraction) {
       value: time(dateEnd, 'F'),
     });
 
+  const cancelButton = new MessageActionRow().addComponents(
+    new MessageButton()
+      .setCustomId(CANCEL_POLL_SWEEP_CUSTOM_ID)
+      .setLabel('Cancel poll')
+      .setStyle('SECONDARY')
+  );
+
   // Reply with user's title and options chosen
   const message = (await interaction.reply({
+    components: [cancelButton],
     content: `📊 ${bold(question)}\n`,
     embeds: [pollOptionsEmbed],
     fetchReply: true,
