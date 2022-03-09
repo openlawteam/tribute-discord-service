@@ -134,6 +134,7 @@ export async function fundPollReactionHandler({
       messageID,
       purpose,
       upvoteCount,
+      uuid,
       voteThreshold,
     } = pollEntry;
 
@@ -192,7 +193,7 @@ export async function fundPollReactionHandler({
             .setLabel('Fund')
             .setStyle('LINK')
             .setURL(
-              `${FUND_EXTERNAL_URL}/?daoName=${dao.internalName}&amount=${amountUSDC}`
+              `${FUND_EXTERNAL_URL}/?daoName=${dao.internalName}&amount=${amountUSDC}&id=${uuid}`
             )
             .setEmoji('💸')
         );

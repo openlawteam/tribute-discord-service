@@ -159,7 +159,7 @@ describe('fundPollReactionHandler unit tests', () => {
         .setLabel('Fund')
         .setStyle('LINK')
         .setURL(
-          `${FUND_EXTERNAL_URL}/?daoName=test&amount=${DB_ENTRY.amountUSDC}`
+          `${FUND_EXTERNAL_URL}/?daoName=test&amount=${DB_ENTRY.amountUSDC}&id=${DB_ENTRY.uuid}`
         )
         .setEmoji('💸')
     );
