@@ -6,6 +6,7 @@ import {
   buyPollReactionHandler,
   buyPollRemoveReactionHandler,
   cancelPollHandler,
+  confirmCancelPollHandler,
   fundPollReactionHandler,
   fundPollRemoveReactionHandler,
   interactionExecuteHandler,
@@ -57,6 +58,7 @@ export async function tributeToolsBot(): Promise<
     client.on('interactionCreate', (interaction) => {
       interactionExecuteHandler({commands, interaction});
       cancelPollHandler(interaction);
+      confirmCancelPollHandler(interaction);
     });
 
     // Listen to reactions on messages, and possibly handle.

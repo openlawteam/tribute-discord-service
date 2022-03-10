@@ -111,6 +111,7 @@ export async function notifyPollTxStatus({
     const name = getName({dbEntry, type});
     const description = getStatus({name, status});
     const etherscanURL: string = `https://etherscan.io/tx/${txHash}`;
+    const txSucceeded: boolean = status === TributeToolsWebhookTxStatus.SUCCESS;
 
     const pollStatusEmbed = new MessageEmbed()
       .setTitle(title)
@@ -122,11 +123,15 @@ export async function notifyPollTxStatus({
       embeds: [pollStatusEmbed],
     });
 
+    // Edit the poll message to remove the cancel button
+    if (txSucceeded) {
+      await pollMessage.edit({components: []});
+    }
+
     if (!actionMessageID) {
       throw new Error(`No \`actionMessageID\` was found.`);
     }
 
-    const txSucceeded: boolean = status === TributeToolsWebhookTxStatus.SUCCESS;
     const dao = getDaoDataByGuildID(guildID, await getDaos());
     const command = getCommand(type);
 

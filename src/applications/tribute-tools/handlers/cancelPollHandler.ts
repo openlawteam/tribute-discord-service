@@ -29,14 +29,14 @@ function getCommandFromCustomID(
 }
 
 async function getPollTitle({
-  applicationCommand,
+  applicationCommandName,
   messageID,
 }: {
-  applicationCommand: ApplicationCommands;
+  applicationCommandName: ApplicationCommands;
   messageID: string;
 }): Promise<string | undefined> {
   try {
-    switch (applicationCommand) {
+    switch (applicationCommandName) {
       case 'BUY':
         return (
           await prisma.buyNFTPoll.findUnique({
@@ -60,14 +60,14 @@ async function getPollTitle({
 
       default:
         throw new Error(
-          `Could not find \`APPLICATION_COMMANDS\`: \`${applicationCommand}\`.`
+          `Could not find \`APPLICATION_COMMANDS\`: \`${applicationCommandName}\`.`
         );
     }
   } catch (error) {
     console.error(error);
 
     throw new Error(
-      `Something went wrong while getting the poll data for application command \`${applicationCommand}\`.`
+      `Something went wrong while getting the poll data for application command \`${applicationCommandName}\`.`
     );
   }
 }
@@ -78,15 +78,15 @@ export async function cancelPollHandler(
   // If the interaction is not from a button, exit.
   if (!interaction.isButton()) return;
 
-  const applicationCommand = getCommandFromCustomID(interaction.customId);
+  const applicationCommandName = getCommandFromCustomID(interaction.customId);
 
   // If no matching `customId` is found, exit.
-  if (!applicationCommand) return;
+  if (!applicationCommandName) return;
 
   try {
     const messageID: string = interaction.message.id;
 
-    const pollTitle = await getPollTitle({applicationCommand, messageID});
+    const pollTitle = await getPollTitle({applicationCommandName, messageID});
 
     if (!pollTitle) {
       throw new Error(
@@ -94,7 +94,7 @@ export async function cancelPollHandler(
       );
     }
 
-    const customId: ConfirmCancelPollCustomID = `confirmCancelPoll-${applicationCommand}-${messageID}`;
+    const customId: ConfirmCancelPollCustomID = `confirmCancelPoll-${applicationCommandName}-${messageID}`;
 
     const confirmCancelButton = new MessageActionRow().addComponents(
       new MessageButton()
