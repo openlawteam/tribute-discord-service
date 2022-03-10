@@ -5,16 +5,16 @@ import {
 import {
   buyPollReactionHandler,
   buyPollRemoveReactionHandler,
+  cancelPollHandler,
   fundPollReactionHandler,
   fundPollRemoveReactionHandler,
   interactionExecuteHandler,
 } from './handlers';
 import {ApplicationReturn} from '../types';
-import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
+import {deployCommands, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 import {getTributeToolsClient} from '.';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
-import {cancelPollHandler} from './handlers/cancelPollHandler';
 
 export async function tributeToolsBot(): Promise<
   ApplicationReturn | undefined
