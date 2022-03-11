@@ -22,31 +22,33 @@ import {notifyPollTxStatus} from './notifyPollTxStatus';
 
 describe('notifyPollTxStatus unit tests', () => {
   const SWEEP_DB_ENTRY: FloorSweeperPoll = {
-    id: 1,
-    uuid: UUID_FIXTURE,
-    createdAt: new Date(0),
-    question: 'How much in punks should we sweep?',
+    actionMessageID: '987654321',
+    channelID: '123456789',
     contractAddress: ETH_ADDRESS_FIXTURE,
+    createdAt: new Date(0),
     dateEnd: new Date(10000),
+    guildID: GUILD_ID_FIXTURE,
+    id: 1,
+    isCancelled: false,
+    messageID: '567890123',
     options: {'🇦': 50, '🇧': 100, '🇨': 150, '🚫': 'None'},
     processed: true,
+    question: 'How much in punks should we sweep?',
     result: 100,
-    guildID: GUILD_ID_FIXTURE,
-    channelID: '123456789',
-    messageID: '567890123',
-    actionMessageID: '987654321',
-    txStatus: TributeToolsTxStatus.success,
     txHash: BYTES32_FIXTURE,
+    txStatus: TributeToolsTxStatus.success,
+    uuid: UUID_FIXTURE,
   };
 
   const BUY_DB_ENTRY: BuyNFTPoll = {
-    amountWEI: new Prisma.Decimal('2200000000000000000'),
     actionMessageID: '987654321',
+    amountWEI: new Prisma.Decimal('2200000000000000000'),
     channelID: '123456789',
     contractAddress: ETH_ADDRESS_FIXTURE,
     createdAt: new Date(0),
     guildID: GUILD_ID_FIXTURE,
     id: 1,
+    isCancelled: false,
     messageID: '567890123',
     name: 'Should we buy Dexter Funky Xavier?',
     processed: true,
@@ -66,6 +68,7 @@ describe('notifyPollTxStatus unit tests', () => {
     createdAt: new Date(0),
     guildID: GUILD_ID_FIXTURE,
     id: 1,
+    isCancelled: false,
     messageID: '567890123',
     processed: true,
     purpose: 'Seed round for Tribute Labs',
@@ -136,7 +139,7 @@ describe('notifyPollTxStatus unit tests', () => {
     expect(channelsFetchSpy).toHaveBeenCalledTimes(2);
     expect(messagesFetchSpy).toHaveBeenCalledTimes(2);
     expect(messageReplySpy).toHaveBeenCalledTimes(1);
-    expect(messageEditSpy).toHaveBeenCalledTimes(1);
+    expect(messageEditSpy).toHaveBeenCalledTimes(2);
     expect(channelsFetchSpy).toHaveBeenNthCalledWith(1, '123456789');
     expect(channelsFetchSpy).toHaveBeenNthCalledWith(2, '123123123123123123');
     expect(messagesFetchSpy).toHaveBeenNthCalledWith(1, '567890123');
@@ -154,6 +157,10 @@ describe('notifyPollTxStatus unit tests', () => {
     });
 
     expect(messageEditSpy).toHaveBeenNthCalledWith(1, {
+      components: [],
+    });
+
+    expect(messageEditSpy).toHaveBeenNthCalledWith(2, {
       components: [],
       embeds: [
         new MessageEmbed().setDescription(
