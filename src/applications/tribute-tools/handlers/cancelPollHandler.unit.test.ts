@@ -115,6 +115,38 @@ describe('cancelPollHandler unit tests', () => {
     dbfindMock.mockRestore();
   });
 
+  test('should exit if `interaction` is not a button', async () => {
+    const replySpy = jest.fn();
+
+    const FAKE_INTERACTION = {
+      customId: CANCEL_POLL_SWEEP_CUSTOM_ID,
+      guildId: GUILD_ID_FIXTURE,
+      isButton: () => false,
+      message: {
+        id: '123456789',
+      },
+      reply: replySpy,
+    } as any as CommandInteraction;
+
+    /**
+     * Mock db update
+     *
+     * @todo fix types
+     */
+    const dbfindMock = (
+      prismaMock.floorSweeperPoll as any
+    ).findUnique.mockResolvedValue(DEFAULT_DB_ENTRY);
+
+    await cancelPollHandler(FAKE_INTERACTION);
+
+    expect(replySpy).toHaveBeenCalledTimes(0);
+    expect(dbfindMock).toHaveBeenCalledTimes(0);
+
+    // Cleanup
+
+    dbfindMock.mockRestore();
+  });
+
   test('should handle error if `findUnique` throws', async () => {
     const replySpy = jest.fn();
 
