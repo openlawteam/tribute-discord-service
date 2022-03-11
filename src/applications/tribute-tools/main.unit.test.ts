@@ -85,10 +85,18 @@ describe('tribute-tools/main unit tests', () => {
   });
 
   test('should call `interactionCreate` handlers', async () => {
+    const DEFAULT_INTERACTION = {interactionTest: 'test'};
+
     const discord = await import('discord.js');
 
     const interactionExecuteHandler = await import(
       './handlers/interactionExecuteHandler'
+    );
+
+    const cancelPollHandler = await import('./handlers/cancelPollHandler');
+
+    const confirmCancelPollHandler = await import(
+      './handlers/confirmCancelPollHandler'
     );
 
     const loginSpy = jest
@@ -99,8 +107,15 @@ describe('tribute-tools/main unit tests', () => {
       .spyOn(interactionExecuteHandler, 'interactionExecuteHandler')
       .mockImplementation(() => null as any);
 
-    const {tributeToolsBot} = await import('../tribute-tools/main');
+    const cancelPollHandlerSpy = jest
+      .spyOn(cancelPollHandler, 'cancelPollHandler')
+      .mockImplementation(() => null as any);
 
+    const confirmCancelPollHandlerSpy = jest
+      .spyOn(confirmCancelPollHandler, 'confirmCancelPollHandler')
+      .mockImplementation(() => null as any);
+
+    const {tributeToolsBot} = await import('../tribute-tools/main');
     const deployCommands = await import('../helpers/deployCommands');
 
     const deployCommandsSpy = jest
@@ -118,8 +133,16 @@ describe('tribute-tools/main unit tests', () => {
 
     expect(interactionExecuteHandlerSpy).toHaveBeenCalledWith({
       commands: await getCommands(async () => await import('./commands')),
-      interaction: {interactionTest: 'test'},
+      interaction: DEFAULT_INTERACTION,
     });
+
+    expect(cancelPollHandlerSpy).toHaveBeenCalledTimes(1);
+    expect(cancelPollHandlerSpy).toHaveBeenCalledWith(DEFAULT_INTERACTION);
+    expect(confirmCancelPollHandlerSpy).toHaveBeenCalledTimes(1);
+
+    expect(confirmCancelPollHandlerSpy).toHaveBeenCalledWith(
+      DEFAULT_INTERACTION
+    );
 
     // Cleanup
 
