@@ -125,6 +125,7 @@ describe('buyPollReactionHandler unit tests', () => {
       createdAt: new Date(0),
       guildID: GUILD_ID_FIXTURE,
       id: 1,
+      isCancelled: false,
       messageID: 'abc123',
       name: 'Test Punk #123',
       processed: false,
