@@ -30,6 +30,13 @@ describe('cancelPollHandler unit tests', () => {
     uuid: 'abc123def456',
   };
 
+  const DEFAULT_CANCEL_BUTTON = new MessageActionRow().addComponents(
+    new MessageButton()
+      .setCustomId('confirmCancelPoll-SWEEP-123456789')
+      .setLabel('Cancel poll')
+      .setStyle('DANGER')
+  );
+
   test('should send user ephemeral message to cancel a poll', async () => {
     const replySpy = jest.fn();
 
@@ -42,13 +49,6 @@ describe('cancelPollHandler unit tests', () => {
       },
       reply: replySpy,
     } as any as CommandInteraction;
-
-    const CONFIRM_CANCEL_BUTTON = new MessageActionRow().addComponents(
-      new MessageButton()
-        .setCustomId('confirmCancelPoll-SWEEP-123456789')
-        .setLabel('Cancel poll')
-        .setStyle('DANGER')
-    );
 
     /**
      * Mock db update
@@ -64,7 +64,7 @@ describe('cancelPollHandler unit tests', () => {
     expect(replySpy).toHaveBeenCalledTimes(1);
 
     expect(replySpy).toHaveBeenNthCalledWith(1, {
-      components: [CONFIRM_CANCEL_BUTTON],
+      components: [DEFAULT_CANCEL_BUTTON],
       content: `You're about to cancel and remove the poll, *${DEFAULT_DB_ENTRY.question}*`,
       ephemeral: true,
     });
@@ -164,6 +164,142 @@ describe('cancelPollHandler unit tests', () => {
 
     expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
       /No poll title was found for message `123456789` in guild `123123123123123123`\./i
+    );
+
+    // Cleanup
+
+    dbfindMock.mockRestore();
+    consoleErrorSpy.mockRestore();
+  });
+
+  test('should handle error if `interaction.reply` throws', async () => {
+    // Mock only once
+    const replySpy = jest.fn().mockImplementationOnce(() => {
+      throw Error('Some bad error.');
+    });
+
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    const FAKE_INTERACTION = {
+      customId: CANCEL_POLL_SWEEP_CUSTOM_ID,
+      guildId: GUILD_ID_FIXTURE,
+      isButton: () => true,
+      message: {
+        id: '123456789',
+      },
+      reply: replySpy,
+    } as any as CommandInteraction;
+
+    /**
+     * Mock db error
+     *
+     * @todo fix types
+     */
+    const dbfindMock = (
+      prismaMock.floorSweeperPoll as any
+    ).findUnique.mockResolvedValue(DEFAULT_DB_ENTRY);
+
+    await cancelPollHandler(FAKE_INTERACTION);
+
+    expect(replySpy).toHaveBeenCalledTimes(2);
+
+    expect(replySpy).toHaveBeenNthCalledWith(1, {
+      components: [DEFAULT_CANCEL_BUTTON],
+      content: `You're about to cancel and remove the poll, *${DEFAULT_DB_ENTRY.question}*`,
+      ephemeral: true,
+    });
+
+    expect(replySpy).toHaveBeenNthCalledWith(2, {
+      content: `There was an error while trying to cancel the poll.`,
+      ephemeral: true,
+    });
+
+    expect(dbfindMock).toHaveBeenCalledTimes(1);
+
+    expect(dbfindMock).toHaveBeenNthCalledWith(1, {
+      where: {
+        messageID: '123456789',
+      },
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
+      /some bad error\./i
+    );
+
+    // Cleanup
+
+    dbfindMock.mockRestore();
+    consoleErrorSpy.mockRestore();
+  });
+
+  test('should handle error if `interaction.reply` in `catch` block throws', async () => {
+    const replySpy = jest
+      .fn()
+      .mockImplementationOnce(() => {
+        throw Error('Some bad error.');
+      })
+      .mockImplementationOnce(() => {
+        throw Error('Another bad error.');
+      });
+
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    const FAKE_INTERACTION = {
+      customId: CANCEL_POLL_SWEEP_CUSTOM_ID,
+      guildId: GUILD_ID_FIXTURE,
+      isButton: () => true,
+      message: {
+        id: '123456789',
+      },
+      reply: replySpy,
+    } as any as CommandInteraction;
+
+    /**
+     * Mock db error
+     *
+     * @todo fix types
+     */
+    const dbfindMock = (
+      prismaMock.floorSweeperPoll as any
+    ).findUnique.mockResolvedValue(DEFAULT_DB_ENTRY);
+
+    await cancelPollHandler(FAKE_INTERACTION);
+
+    expect(replySpy).toHaveBeenCalledTimes(2);
+
+    expect(replySpy).toHaveBeenNthCalledWith(1, {
+      components: [DEFAULT_CANCEL_BUTTON],
+      content: `You're about to cancel and remove the poll, *${DEFAULT_DB_ENTRY.question}*`,
+      ephemeral: true,
+    });
+
+    expect(replySpy).toHaveBeenNthCalledWith(2, {
+      content: `There was an error while trying to cancel the poll.`,
+      ephemeral: true,
+    });
+
+    expect(dbfindMock).toHaveBeenCalledTimes(1);
+
+    expect(dbfindMock).toHaveBeenNthCalledWith(1, {
+      where: {
+        messageID: '123456789',
+      },
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+
+    expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
+      /some bad error\./i
+    );
+
+    expect(consoleErrorSpy.mock.calls[1][0]?.message).toMatch(
+      /another bad error\./i
     );
 
     // Cleanup
