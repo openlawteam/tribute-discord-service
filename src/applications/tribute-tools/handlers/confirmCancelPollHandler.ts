@@ -7,10 +7,10 @@ import {
 import {Interaction, MessageEmbed, TextChannel} from 'discord.js';
 
 import {APPLICATION_COMMANDS} from '../../../config';
-import {getTributeToolsClient} from '..';
-import {prisma} from '../../../singletons';
 import {getDaoDataByGuildID} from '../../../helpers';
 import {getDaos} from '../../../services';
+import {getTributeToolsClient} from '..';
+import {prisma} from '../../../singletons';
 
 type ApplicationCommands = typeof APPLICATION_COMMANDS[number];
 
