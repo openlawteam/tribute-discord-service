@@ -10,12 +10,12 @@ import {SlashCommandBuilder} from '@discordjs/builders';
 import {URL} from 'url';
 import fetch from 'node-fetch';
 
+import {CANCEL_POLL_BUY_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
 import {Command} from '../../types';
 import {getDaoDataByGuildID, getEnv} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {getVoteThreshold} from '../helpers';
 import {prisma} from '../../../singletons';
-import {CANCEL_POLL_BUY_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
 
 const COMMAND_NAME: string = 'buy';
 
