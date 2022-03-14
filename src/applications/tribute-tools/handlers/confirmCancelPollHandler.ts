@@ -177,12 +177,12 @@ export async function confirmCancelPollHandler(
       if (!resultChannelID) return;
 
       // Get channel the action button is in
-      const pollChannel = (await client.channels.fetch(
+      const actionChannel = (await client.channels.fetch(
         resultChannelID
       )) as TextChannel;
 
       // Get poll Discord message
-      const pollMessage = await pollChannel.messages.fetch(
+      const actionMessage = await actionChannel.messages.fetch(
         pollEntry.actionMessageID
       );
 
@@ -191,7 +191,7 @@ export async function confirmCancelPollHandler(
       );
 
       // Edit the original action message to show the cancelled status
-      await pollMessage.edit({
+      await actionMessage.edit({
         // Removes button
         components: [],
         embeds: [actionStatusEmbed],
