@@ -78,9 +78,23 @@ describe('cancelPollHandler unit tests', () => {
     voteThreshold: 3,
   };
 
-  const DEFAULT_CANCEL_BUTTON = new MessageActionRow().addComponents(
+  const DEFAULT_CANCEL_SWEEP_BUTTON = new MessageActionRow().addComponents(
     new MessageButton()
       .setCustomId('confirmCancelPoll-SWEEP-123456789')
+      .setLabel('Cancel poll')
+      .setStyle('DANGER')
+  );
+
+  const DEFAULT_CANCEL_BUY_BUTTON = new MessageActionRow().addComponents(
+    new MessageButton()
+      .setCustomId('confirmCancelPoll-BUY-123456789')
+      .setLabel('Cancel poll')
+      .setStyle('DANGER')
+  );
+
+  const DEFAULT_CANCEL_FUND_BUTTON = new MessageActionRow().addComponents(
+    new MessageButton()
+      .setCustomId('confirmCancelPoll-FUND-123456789')
       .setLabel('Cancel poll')
       .setStyle('DANGER')
   );
@@ -134,8 +148,20 @@ describe('cancelPollHandler unit tests', () => {
     expect(replySpy).toHaveBeenCalledTimes(3);
 
     expect(replySpy).toHaveBeenNthCalledWith(1, {
-      components: [DEFAULT_CANCEL_BUTTON],
+      components: [DEFAULT_CANCEL_SWEEP_BUTTON],
       content: `You're about to cancel and remove the poll, *${DEFAULT_SWEEP_DB_ENTRY.question}*`,
+      ephemeral: true,
+    });
+
+    expect(replySpy).toHaveBeenNthCalledWith(2, {
+      components: [DEFAULT_CANCEL_BUY_BUTTON],
+      content: `You're about to cancel and remove the poll, *${DEFAULT_BUY_DB_ENTRY.name}*`,
+      ephemeral: true,
+    });
+
+    expect(replySpy).toHaveBeenNthCalledWith(3, {
+      components: [DEFAULT_CANCEL_FUND_BUTTON],
+      content: `You're about to cancel and remove the poll, *${DEFAULT_FUND_DB_ENTRY.purpose}*`,
       ephemeral: true,
     });
 
@@ -326,7 +352,7 @@ describe('cancelPollHandler unit tests', () => {
     expect(replySpy).toHaveBeenCalledTimes(2);
 
     expect(replySpy).toHaveBeenNthCalledWith(1, {
-      components: [DEFAULT_CANCEL_BUTTON],
+      components: [DEFAULT_CANCEL_SWEEP_BUTTON],
       content: `You're about to cancel and remove the poll, *${DEFAULT_SWEEP_DB_ENTRY.question}*`,
       ephemeral: true,
     });
@@ -394,7 +420,7 @@ describe('cancelPollHandler unit tests', () => {
     expect(replySpy).toHaveBeenCalledTimes(2);
 
     expect(replySpy).toHaveBeenNthCalledWith(1, {
-      components: [DEFAULT_CANCEL_BUTTON],
+      components: [DEFAULT_CANCEL_SWEEP_BUTTON],
       content: `You're about to cancel and remove the poll, *${DEFAULT_SWEEP_DB_ENTRY.question}*`,
       ephemeral: true,
     });
