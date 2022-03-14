@@ -19,7 +19,7 @@ describe('cancelPollHandler unit tests', () => {
     dateEnd: new Date(10),
     guildID: GUILD_ID_FIXTURE,
     id: 1,
-    isCancelled: true,
+    isCancelled: false,
     messageID: '123456789',
     options: {'🇦': 50, '🇧': 100, '🇨': 150, '🚫': 'None'},
     processed: false,
