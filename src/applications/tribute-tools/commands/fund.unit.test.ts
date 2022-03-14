@@ -3,6 +3,8 @@ import {
   ClientOptions,
   Intents,
   InteractionReplyOptions,
+  MessageActionRow,
+  MessageButton,
 } from 'discord.js';
 import {RawInteractionData} from 'discord.js/typings/rawDataTypes';
 
@@ -12,10 +14,10 @@ import {
   FakeDiscordCommandInteraction,
   GUILD_ID_FIXTURE,
 } from '../../../../test';
-import {prismaMock} from '../../../../test/prismaMock';
+import {CANCEL_POLL_FUND_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
 import {DaoData} from '../../../config';
-import {THUMBS_EMOJIS} from '../config';
 import {fund} from './fund';
+import {prismaMock} from '../../../../test/prismaMock';
 
 describe('fund unit tests', () => {
   const CLIENT_OPTIONS: ClientOptions = {
@@ -166,6 +168,18 @@ describe('fund unit tests', () => {
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.fields?.[0].value
     ).toMatch(/3 upvotes/i);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .components
+    ).toEqual([
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setCustomId(CANCEL_POLL_FUND_CUSTOM_ID)
+          .setLabel('Cancel poll')
+          .setStyle('SECONDARY')
+      ),
+    ]);
 
     expect(reactSpy).toHaveBeenCalledTimes(2);
     expect(reactSpy).toHaveBeenNthCalledWith(1, THUMBS_EMOJIS[0]);
