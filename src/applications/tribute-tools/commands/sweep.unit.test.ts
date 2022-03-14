@@ -3,6 +3,8 @@ import {
   ClientOptions,
   Intents,
   InteractionReplyOptions,
+  MessageActionRow,
+  MessageButton,
 } from 'discord.js';
 import {RawInteractionData} from 'discord.js/typings/rawDataTypes';
 
@@ -10,6 +12,7 @@ import {
   ETH_ADDRESS_FIXTURE,
   FakeDiscordCommandInteraction,
 } from '../../../../test';
+import {CANCEL_POLL_SWEEP_CUSTOM_ID} from '../config';
 import {prismaMock} from '../../../../test/prismaMock';
 import {sweep} from './sweep';
 
@@ -155,6 +158,18 @@ describe('sweep unit tests', () => {
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.fields?.[0].name
     ).toMatch(/⏱ poll ends:/i);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .components
+    ).toEqual([
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setCustomId(CANCEL_POLL_SWEEP_CUSTOM_ID)
+          .setLabel('Cancel poll')
+          .setStyle('SECONDARY')
+      ),
+    ]);
 
     expect(reactSpy.mock.calls.length).toBe(4);
     expect(reactSpy.mock.calls).toEqual([['🇦'], ['🇧'], ['🇨'], ['🚫']]);

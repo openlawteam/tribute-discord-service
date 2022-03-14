@@ -46,6 +46,7 @@ model FloorSweeperPoll {
   actionMessageID String?               @unique @db.VarChar(255)
   txStatus        TributeToolsTxStatus?
   txHash          String?               @db.VarChar(255)
+  isCancelled     Boolean               @default(false) @db.Boolean
 
   @@map("floor_sweeper_poll")
 }
@@ -67,6 +68,7 @@ model BuyNFTPoll {
   actionMessageID String?               @unique @db.VarChar(255)
   txStatus        TributeToolsTxStatus?
   txHash          String?               @db.VarChar(255)
+  isCancelled     Boolean               @default(false) @db.Boolean
 
   @@map("buy_nft_poll")
 }
@@ -87,6 +89,7 @@ model FundAddressPoll {
   actionMessageID String?               @unique @db.VarChar(255)
   txStatus        TributeToolsTxStatus?
   txHash          String?               @db.VarChar(255)
+  isCancelled     Boolean               @default(false) @db.Boolean
 
   @@map("fund_address_poll")
 }

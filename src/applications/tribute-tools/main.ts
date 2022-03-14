@@ -5,12 +5,14 @@ import {
 import {
   buyPollReactionHandler,
   buyPollRemoveReactionHandler,
+  cancelPollHandler,
+  confirmCancelPollHandler,
   fundPollReactionHandler,
   fundPollRemoveReactionHandler,
   interactionExecuteHandler,
 } from './handlers';
 import {ApplicationReturn} from '../types';
-import {deployCommands, destroyClientHandler, getCommands} from '../helpers';
+import {deployCommands, getCommands} from '../helpers';
 import {getEnv} from '../../helpers';
 import {getTributeToolsClient} from '.';
 import {TRIBUTE_TOOLS_BOT_ID} from '../../config';
@@ -55,6 +57,8 @@ export async function tributeToolsBot(): Promise<
     // Listen for interactions and possibly run commands
     client.on('interactionCreate', (interaction) => {
       interactionExecuteHandler({commands, interaction});
+      cancelPollHandler(interaction);
+      confirmCancelPollHandler(interaction);
     });
 
     // Listen to reactions on messages, and possibly handle.

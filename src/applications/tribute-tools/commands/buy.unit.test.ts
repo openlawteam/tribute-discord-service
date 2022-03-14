@@ -3,6 +3,8 @@ import {
   ClientOptions,
   Intents,
   InteractionReplyOptions,
+  MessageActionRow,
+  MessageButton,
 } from 'discord.js';
 import {RawInteractionData} from 'discord.js/typings/rawDataTypes';
 
@@ -13,6 +15,7 @@ import {
   GUILD_ID_FIXTURE,
 } from '../../../../test';
 import {buy} from './buy';
+import {CANCEL_POLL_BUY_CUSTOM_ID} from '../config';
 import {prismaMock} from '../../../../test/prismaMock';
 import {rest, server} from '../../../../test/msw/server';
 
@@ -226,6 +229,18 @@ describe('buy unit tests', () => {
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.fields
     ).toEqual([{inline: false, name: 'Vote Threshold', value: '3 upvotes'}]);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .components
+    ).toEqual([
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setCustomId(CANCEL_POLL_BUY_CUSTOM_ID)
+          .setLabel('Cancel poll')
+          .setStyle('SECONDARY')
+      ),
+    ]);
 
     expect(reactSpy.mock.calls.length).toBe(2);
     expect(reactSpy.mock.calls).toEqual([['👍'], ['👎']]);

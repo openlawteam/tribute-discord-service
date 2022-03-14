@@ -54,9 +54,9 @@ async function storeTxData(
   payload: TributeToolsWebhookPayload
 ): Promise<
   | ReturnType<
+      | typeof prisma.buyNFTPoll.update
       | typeof prisma.floorSweeperPoll.update
       | typeof prisma.fundAddressPoll.update
-      | typeof prisma.buyNFTPoll.update
     >
   | null
   | undefined

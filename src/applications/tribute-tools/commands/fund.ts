@@ -1,4 +1,10 @@
-import {CommandInteraction, Message, MessageEmbed} from 'discord.js';
+import {
+  CommandInteraction,
+  Message,
+  MessageActionRow,
+  MessageButton,
+  MessageEmbed,
+} from 'discord.js';
 import {SlashCommandBuilder} from '@discordjs/builders';
 
 import {Command} from '../../types';
@@ -6,7 +12,7 @@ import {DEV_COMMAND_NOT_READY} from '../helpers';
 import {getDaoDataByGuildID, normalizeString} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {prisma, web3} from '../../../singletons';
-import {THUMBS_EMOJIS} from '../config';
+import {CANCEL_POLL_FUND_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
 
 const COMMAND_NAME: string = 'fund';
 
@@ -135,8 +141,16 @@ async function execute(interaction: CommandInteraction) {
       text: 'After a threshold has been reached the vote is final,\neven if you change your vote.',
     });
 
+  const cancelButton = new MessageActionRow().addComponents(
+    new MessageButton()
+      .setCustomId(CANCEL_POLL_FUND_CUSTOM_ID)
+      .setLabel('Cancel poll')
+      .setStyle('SECONDARY')
+  );
+
   // Reply to user
   const message = (await interaction.reply({
+    components: [cancelButton],
     embeds: [embed],
     fetchReply: true,
   })) as Message;

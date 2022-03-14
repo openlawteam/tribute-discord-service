@@ -38,3 +38,6 @@ export const BUY_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/single-buy`;
 export const FUND_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/fund`;
 export const SWEEP_EXTERNAL_URL: string = `${TRIBUTE_TOOLS_URL}/floor-sweeper`;
 export const THUMBS_EMOJIS = ['👍', '👎'] as const;
+export const CANCEL_POLL_BUY_CUSTOM_ID: string = 'cancelBuyPoll';
+export const CANCEL_POLL_FUND_CUSTOM_ID: string = 'cancelFundPoll';
+export const CANCEL_POLL_SWEEP_CUSTOM_ID: string = 'cancelSweepPoll';
