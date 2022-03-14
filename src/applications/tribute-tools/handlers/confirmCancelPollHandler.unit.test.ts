@@ -1,5 +1,10 @@
 import {CommandInteraction, MessageEmbed} from 'discord.js';
-import {FloorSweeperPoll, Prisma} from '@prisma/client';
+import {
+  BuyNFTPoll,
+  FloorSweeperPoll,
+  FundAddressPoll,
+  Prisma,
+} from '@prisma/client';
 
 import {
   BYTES32_FIXTURE,
@@ -11,8 +16,8 @@ import {confirmCancelPollHandler} from './confirmCancelPollHandler';
 import {prismaMock} from '../../../../test/prismaMock';
 
 describe('confirmCancelPollHandler unit tests', () => {
-  const DEFAULT_DB_ENTRY: FloorSweeperPoll = {
-    actionMessageID: '987654321',
+  const DEFAULT_SWEEP_DB_ENTRY: FloorSweeperPoll = {
+    actionMessageID: '123456789',
     channelID: '886976610018934824',
     contractAddress: ETH_ADDRESS_FIXTURE,
     createdAt: new Date(0),
@@ -30,6 +35,45 @@ describe('confirmCancelPollHandler unit tests', () => {
     uuid: 'abc123def456',
   };
 
+  const DEFAULT_BUY_DB_ENTRY: BuyNFTPoll = {
+    actionMessageID: '123456789',
+    amountWEI: '1000000000000000000' as any as Prisma.Decimal,
+    channelID: '886976610018934824',
+    contractAddress: ETH_ADDRESS_FIXTURE,
+    createdAt: new Date(0),
+    guildID: GUILD_ID_FIXTURE,
+    id: 1,
+    isCancelled: false,
+    messageID: '123456789',
+    name: 'Conductive the Showy',
+    processed: false,
+    tokenID: '1234',
+    txHash: BYTES32_FIXTURE,
+    txStatus: 'success',
+    upvoteCount: 0,
+    uuid: 'abc123def456',
+    voteThreshold: 3,
+  };
+
+  const DEFAULT_FUND_DB_ENTRY: FundAddressPoll = {
+    actionMessageID: '123456789',
+    addressToFund: ETH_ADDRESS_FIXTURE,
+    amountUSDC: 50000,
+    channelID: '886976610018934824',
+    createdAt: new Date(0),
+    guildID: GUILD_ID_FIXTURE,
+    id: 1,
+    isCancelled: false,
+    messageID: '123456789',
+    processed: false,
+    purpose: 'XYZ Seed Round',
+    txHash: BYTES32_FIXTURE,
+    txStatus: 'success',
+    upvoteCount: 0,
+    uuid: 'abc123def456',
+    voteThreshold: 3,
+  };
+
   test('should cancel a poll', async () => {
     const interactionUpdateSpy = jest.fn();
     const interactionFollowUpSpy = jest.fn();
@@ -39,7 +83,7 @@ describe('confirmCancelPollHandler unit tests', () => {
       .fn()
       .mockImplementation(() => ({delete: pollChannelDeleteSpy}));
 
-    const pollChannelFetchSpy = jest.fn().mockImplementationOnce(async () => ({
+    const pollChannelFetchSpy = jest.fn().mockImplementation(async () => ({
       messages: {fetch: pollChannelMessagesFetchSpy},
     }));
 
@@ -70,15 +114,34 @@ describe('confirmCancelPollHandler unit tests', () => {
      *
      * @todo fix types
      */
-    const dbUpdateMock = (
+
+    const dbUpdateSweepMock = (
       prismaMock.floorSweeperPoll as any
-    ).update.mockResolvedValue(DEFAULT_DB_ENTRY);
+    ).update.mockResolvedValue(DEFAULT_SWEEP_DB_ENTRY);
+
+    const dbUpdateBuyMock = (
+      prismaMock.buyNFTPoll as any
+    ).update.mockResolvedValue(DEFAULT_BUY_DB_ENTRY);
+
+    const dbUpdateFundMock = (
+      prismaMock.fundAddressPoll as any
+    ).update.mockResolvedValue(DEFAULT_FUND_DB_ENTRY);
 
     await confirmCancelPollHandler(FAKE_INTERACTION);
 
-    expect(dbUpdateMock).toHaveBeenCalledTimes(1);
+    await confirmCancelPollHandler({
+      ...FAKE_INTERACTION,
+      customId: 'confirmCancelPoll-BUY-123456789',
+    } as any as CommandInteraction);
 
-    expect(dbUpdateMock).toHaveBeenNthCalledWith(1, {
+    await confirmCancelPollHandler({
+      ...FAKE_INTERACTION,
+      customId: 'confirmCancelPoll-FUND-123456789',
+    } as any as CommandInteraction);
+
+    expect(dbUpdateSweepMock).toHaveBeenCalledTimes(1);
+
+    expect(dbUpdateSweepMock).toHaveBeenNthCalledWith(1, {
       data: {
         isCancelled: true,
       },
@@ -87,40 +150,106 @@ describe('confirmCancelPollHandler unit tests', () => {
       },
     });
 
-    expect(pollChannelFetchSpy).toHaveBeenCalledTimes(1);
+    expect(dbUpdateBuyMock).toHaveBeenCalledTimes(1);
+
+    expect(dbUpdateBuyMock).toHaveBeenNthCalledWith(1, {
+      data: {
+        isCancelled: true,
+      },
+      where: {
+        messageID: '123456789',
+      },
+    });
+
+    expect(dbUpdateFundMock).toHaveBeenCalledTimes(1);
+
+    expect(dbUpdateFundMock).toHaveBeenNthCalledWith(1, {
+      data: {
+        isCancelled: true,
+      },
+      where: {
+        messageID: '123456789',
+      },
+    });
+
+    expect(pollChannelFetchSpy).toHaveBeenCalledTimes(3);
 
     expect(pollChannelFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.channelID
+      DEFAULT_SWEEP_DB_ENTRY.channelID
     );
 
-    expect(pollChannelMessagesFetchSpy).toHaveBeenCalledTimes(1);
+    expect(pollChannelFetchSpy).toHaveBeenNthCalledWith(
+      2,
+      DEFAULT_BUY_DB_ENTRY.channelID
+    );
+
+    expect(pollChannelFetchSpy).toHaveBeenNthCalledWith(
+      3,
+      DEFAULT_FUND_DB_ENTRY.channelID
+    );
+
+    expect(pollChannelMessagesFetchSpy).toHaveBeenCalledTimes(3);
 
     expect(pollChannelMessagesFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.messageID
+      DEFAULT_SWEEP_DB_ENTRY.messageID
     );
 
-    expect(pollChannelDeleteSpy).toHaveBeenCalledTimes(1);
-    expect(pollChannelDeleteSpy).toHaveBeenNthCalledWith(1);
+    expect(pollChannelMessagesFetchSpy).toHaveBeenNthCalledWith(
+      2,
+      DEFAULT_BUY_DB_ENTRY.messageID
+    );
 
-    expect(interactionUpdateSpy).toHaveBeenCalledTimes(1);
+    expect(pollChannelMessagesFetchSpy).toHaveBeenNthCalledWith(
+      3,
+      DEFAULT_FUND_DB_ENTRY.messageID
+    );
+
+    expect(pollChannelDeleteSpy).toHaveBeenCalledTimes(3);
+    expect(pollChannelDeleteSpy).toHaveBeenNthCalledWith(1);
+    expect(pollChannelDeleteSpy).toHaveBeenNthCalledWith(2);
+    expect(pollChannelDeleteSpy).toHaveBeenNthCalledWith(3);
+
+    expect(interactionUpdateSpy).toHaveBeenCalledTimes(3);
 
     expect(interactionUpdateSpy).toHaveBeenNthCalledWith(1, {
       components: [],
       content: `You've removed the poll, *How much to sweep larvalads fam?*.`,
     });
 
-    expect(interactionFollowUpSpy).toHaveBeenCalledTimes(1);
+    expect(interactionUpdateSpy).toHaveBeenNthCalledWith(2, {
+      components: [],
+      content: `You've removed the poll, *Conductive the Showy*.`,
+    });
+
+    expect(interactionUpdateSpy).toHaveBeenNthCalledWith(3, {
+      components: [],
+      content: `You've removed the poll, *XYZ Seed Round*.`,
+    });
+
+    expect(interactionFollowUpSpy).toHaveBeenCalledTimes(3);
 
     expect(interactionFollowUpSpy).toHaveBeenNthCalledWith(1, {
       content:
         'The following poll has been cancelled and removed: *How much to sweep larvalads fam?*.',
     });
 
+    expect(interactionFollowUpSpy).toHaveBeenNthCalledWith(2, {
+      content:
+        'The following poll has been cancelled and removed: *Conductive the Showy*.',
+    });
+
+    expect(interactionFollowUpSpy).toHaveBeenNthCalledWith(3, {
+      content:
+        'The following poll has been cancelled and removed: *XYZ Seed Round*.',
+    });
+
     // Cleanup
 
-    dbUpdateMock.mockRestore();
+    dbUpdateBuyMock.mockRestore();
+    dbUpdateFundMock.mockRestore();
+    dbUpdateSweepMock.mockRestore();
     discordClientSpy.mockRestore();
   });
 
@@ -176,7 +305,7 @@ describe('confirmCancelPollHandler unit tests', () => {
      */
     const dbUpdateMock = (
       prismaMock.floorSweeperPoll as any
-    ).update.mockResolvedValue({...DEFAULT_DB_ENTRY, processed: true});
+    ).update.mockResolvedValue({...DEFAULT_SWEEP_DB_ENTRY, processed: true});
 
     const getDaosSpy = jest
       .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
@@ -199,7 +328,7 @@ describe('confirmCancelPollHandler unit tests', () => {
 
     expect(channelFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.channelID
+      DEFAULT_SWEEP_DB_ENTRY.channelID
     );
 
     expect(channelFetchSpy).toHaveBeenNthCalledWith(
@@ -211,14 +340,14 @@ describe('confirmCancelPollHandler unit tests', () => {
     expect(pollChannelMessagesFetchSpy).toHaveBeenCalledTimes(1);
     expect(pollChannelMessagesFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.messageID
+      DEFAULT_SWEEP_DB_ENTRY.messageID
     );
 
     expect(actionChannelMessagesFetchSpy).toHaveBeenCalledTimes(1);
 
     expect(actionChannelMessagesFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.actionMessageID
+      DEFAULT_SWEEP_DB_ENTRY.actionMessageID
     );
 
     expect(pollChannelDeleteSpy).toHaveBeenCalledTimes(1);
@@ -271,7 +400,7 @@ describe('confirmCancelPollHandler unit tests', () => {
      */
     const dbUpdateMock = (
       prismaMock.floorSweeperPoll as any
-    ).update.mockResolvedValue(DEFAULT_DB_ENTRY);
+    ).update.mockResolvedValue(DEFAULT_SWEEP_DB_ENTRY);
 
     await confirmCancelPollHandler(FAKE_INTERACTION);
 
@@ -300,7 +429,7 @@ describe('confirmCancelPollHandler unit tests', () => {
      */
     const dbUpdateMock = (
       prismaMock.floorSweeperPoll as any
-    ).update.mockResolvedValue(DEFAULT_DB_ENTRY);
+    ).update.mockResolvedValue(DEFAULT_SWEEP_DB_ENTRY);
 
     await confirmCancelPollHandler(FAKE_INTERACTION);
 
@@ -364,7 +493,7 @@ describe('confirmCancelPollHandler unit tests', () => {
     const dbUpdateMock = (
       prismaMock.floorSweeperPoll as any
     ).update.mockResolvedValue({
-      ...DEFAULT_DB_ENTRY,
+      ...DEFAULT_SWEEP_DB_ENTRY,
       actionMessageID: null,
       processed: true,
     });
@@ -386,13 +515,13 @@ describe('confirmCancelPollHandler unit tests', () => {
 
     expect(channelFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.channelID
+      DEFAULT_SWEEP_DB_ENTRY.channelID
     );
 
     expect(pollChannelMessagesFetchSpy).toHaveBeenCalledTimes(1);
     expect(pollChannelMessagesFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.messageID
+      DEFAULT_SWEEP_DB_ENTRY.messageID
     );
 
     expect(actionChannelMessagesFetchSpy).toHaveBeenCalledTimes(0);
@@ -479,7 +608,7 @@ describe('confirmCancelPollHandler unit tests', () => {
      */
     const dbUpdateMock = (
       prismaMock.floorSweeperPoll as any
-    ).update.mockResolvedValue({...DEFAULT_DB_ENTRY, processed: true});
+    ).update.mockResolvedValue({...DEFAULT_SWEEP_DB_ENTRY, processed: true});
 
     await confirmCancelPollHandler(FAKE_INTERACTION);
 
@@ -498,13 +627,13 @@ describe('confirmCancelPollHandler unit tests', () => {
 
     expect(channelFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.channelID
+      DEFAULT_SWEEP_DB_ENTRY.channelID
     );
 
     expect(pollChannelMessagesFetchSpy).toHaveBeenCalledTimes(1);
     expect(pollChannelMessagesFetchSpy).toHaveBeenNthCalledWith(
       1,
-      DEFAULT_DB_ENTRY.messageID
+      DEFAULT_SWEEP_DB_ENTRY.messageID
     );
 
     expect(actionChannelMessagesFetchSpy).toHaveBeenCalledTimes(0);
