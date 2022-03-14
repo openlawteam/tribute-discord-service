@@ -1,3 +1,9 @@
+import {
+  BuyNFTPoll,
+  FloorSweeperPoll,
+  FundAddressPoll,
+  Prisma,
+} from '@prisma/client';
 import {CommandInteraction, MessageActionRow, MessageButton} from 'discord.js';
 
 import {
@@ -5,13 +11,16 @@ import {
   ETH_ADDRESS_FIXTURE,
   GUILD_ID_FIXTURE,
 } from '../../../../test';
-import {CANCEL_POLL_SWEEP_CUSTOM_ID} from '../config';
+import {
+  CANCEL_POLL_BUY_CUSTOM_ID,
+  CANCEL_POLL_FUND_CUSTOM_ID,
+  CANCEL_POLL_SWEEP_CUSTOM_ID,
+} from '../config';
 import {cancelPollHandler} from './cancelPollHandler';
-import {FloorSweeperPoll} from '@prisma/client';
 import {prismaMock} from '../../../../test/prismaMock';
 
 describe('cancelPollHandler unit tests', () => {
-  const DEFAULT_DB_ENTRY: FloorSweeperPoll = {
+  const DEFAULT_SWEEP_DB_ENTRY: FloorSweeperPoll = {
     actionMessageID: '123456789',
     channelID: '886976610018934824',
     contractAddress: ETH_ADDRESS_FIXTURE,
@@ -28,6 +37,45 @@ describe('cancelPollHandler unit tests', () => {
     txHash: BYTES32_FIXTURE,
     txStatus: 'success',
     uuid: 'abc123def456',
+  };
+
+  const DEFAULT_BUY_DB_ENTRY: BuyNFTPoll = {
+    actionMessageID: '123456789',
+    amountWEI: '1000000000000000000' as any as Prisma.Decimal,
+    channelID: '886976610018934824',
+    contractAddress: ETH_ADDRESS_FIXTURE,
+    createdAt: new Date(0),
+    guildID: GUILD_ID_FIXTURE,
+    id: 1,
+    isCancelled: false,
+    messageID: '123456789',
+    name: 'Conductive the Showy',
+    processed: false,
+    tokenID: '1234',
+    txHash: BYTES32_FIXTURE,
+    txStatus: 'success',
+    upvoteCount: 0,
+    uuid: 'abc123def456',
+    voteThreshold: 3,
+  };
+
+  const DEFAULT_FUND_DB_ENTRY: FundAddressPoll = {
+    actionMessageID: '123456789',
+    addressToFund: ETH_ADDRESS_FIXTURE,
+    amountUSDC: 50000,
+    channelID: '886976610018934824',
+    createdAt: new Date(0),
+    guildID: GUILD_ID_FIXTURE,
+    id: 1,
+    isCancelled: false,
+    messageID: '123456789',
+    processed: false,
+    purpose: 'XYZ Seed Round',
+    txHash: BYTES32_FIXTURE,
+    txStatus: 'success',
+    upvoteCount: 0,
+    uuid: 'abc123def456',
+    voteThreshold: 3,
   };
 
   const DEFAULT_CANCEL_BUTTON = new MessageActionRow().addComponents(
@@ -55,23 +103,61 @@ describe('cancelPollHandler unit tests', () => {
      *
      * @todo fix types
      */
-    const dbfindMock = (
-      prismaMock.floorSweeperPoll as any
-    ).findUnique.mockResolvedValue(DEFAULT_DB_ENTRY);
 
+    const dbFindSweepMock = (
+      prismaMock.floorSweeperPoll as any
+    ).findUnique.mockResolvedValue(DEFAULT_SWEEP_DB_ENTRY);
+
+    const dbFindBuyMock = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(DEFAULT_BUY_DB_ENTRY);
+
+    const dbFindFundMock = (
+      prismaMock.fundAddressPoll as any
+    ).findUnique.mockResolvedValue(DEFAULT_FUND_DB_ENTRY);
+
+    // `/sweep`
     await cancelPollHandler(FAKE_INTERACTION);
 
-    expect(replySpy).toHaveBeenCalledTimes(1);
+    // `/buy`
+    await cancelPollHandler({
+      ...FAKE_INTERACTION,
+      customId: CANCEL_POLL_BUY_CUSTOM_ID,
+    } as any as CommandInteraction);
+
+    // `/fund`
+    await cancelPollHandler({
+      ...FAKE_INTERACTION,
+      customId: CANCEL_POLL_FUND_CUSTOM_ID,
+    } as any as CommandInteraction);
+
+    expect(replySpy).toHaveBeenCalledTimes(3);
 
     expect(replySpy).toHaveBeenNthCalledWith(1, {
       components: [DEFAULT_CANCEL_BUTTON],
-      content: `You're about to cancel and remove the poll, *${DEFAULT_DB_ENTRY.question}*`,
+      content: `You're about to cancel and remove the poll, *${DEFAULT_SWEEP_DB_ENTRY.question}*`,
       ephemeral: true,
     });
 
-    expect(dbfindMock).toHaveBeenCalledTimes(1);
+    expect(dbFindSweepMock).toHaveBeenCalledTimes(1);
 
-    expect(dbfindMock).toHaveBeenNthCalledWith(1, {
+    expect(dbFindSweepMock).toHaveBeenNthCalledWith(1, {
+      where: {
+        messageID: '123456789',
+      },
+    });
+
+    expect(dbFindBuyMock).toHaveBeenCalledTimes(1);
+
+    expect(dbFindBuyMock).toHaveBeenNthCalledWith(1, {
+      where: {
+        messageID: '123456789',
+      },
+    });
+
+    expect(dbFindFundMock).toHaveBeenCalledTimes(1);
+
+    expect(dbFindFundMock).toHaveBeenNthCalledWith(1, {
       where: {
         messageID: '123456789',
       },
@@ -79,7 +165,9 @@ describe('cancelPollHandler unit tests', () => {
 
     // Cleanup
 
-    dbfindMock.mockRestore();
+    dbFindBuyMock.mockRestore();
+    dbFindFundMock.mockRestore();
+    dbFindSweepMock.mockRestore();
   });
 
   test('should exit if no matching `customId` was found', async () => {
@@ -101,18 +189,18 @@ describe('cancelPollHandler unit tests', () => {
      *
      * @todo fix types
      */
-    const dbfindMock = (
+    const dbFindMock = (
       prismaMock.floorSweeperPoll as any
-    ).findUnique.mockResolvedValue(DEFAULT_DB_ENTRY);
+    ).findUnique.mockResolvedValue(DEFAULT_SWEEP_DB_ENTRY);
 
     await cancelPollHandler(FAKE_INTERACTION);
 
     expect(replySpy).toHaveBeenCalledTimes(0);
-    expect(dbfindMock).toHaveBeenCalledTimes(0);
+    expect(dbFindMock).toHaveBeenCalledTimes(0);
 
     // Cleanup
 
-    dbfindMock.mockRestore();
+    dbFindMock.mockRestore();
   });
 
   test('should exit if `interaction` is not a button', async () => {
@@ -133,18 +221,18 @@ describe('cancelPollHandler unit tests', () => {
      *
      * @todo fix types
      */
-    const dbfindMock = (
+    const dbFindMock = (
       prismaMock.floorSweeperPoll as any
-    ).findUnique.mockResolvedValue(DEFAULT_DB_ENTRY);
+    ).findUnique.mockResolvedValue(DEFAULT_SWEEP_DB_ENTRY);
 
     await cancelPollHandler(FAKE_INTERACTION);
 
     expect(replySpy).toHaveBeenCalledTimes(0);
-    expect(dbfindMock).toHaveBeenCalledTimes(0);
+    expect(dbFindMock).toHaveBeenCalledTimes(0);
 
     // Cleanup
 
-    dbfindMock.mockRestore();
+    dbFindMock.mockRestore();
   });
 
   test('should handle error if `findUnique` throws', async () => {
@@ -169,7 +257,7 @@ describe('cancelPollHandler unit tests', () => {
      *
      * @todo fix types
      */
-    const dbfindMock = (
+    const dbFindMock = (
       prismaMock.floorSweeperPoll as any
     ).findUnique.mockImplementation(() => {
       new Error('Some bad error');
@@ -184,9 +272,9 @@ describe('cancelPollHandler unit tests', () => {
       ephemeral: true,
     });
 
-    expect(dbfindMock).toHaveBeenCalledTimes(1);
+    expect(dbFindMock).toHaveBeenCalledTimes(1);
 
-    expect(dbfindMock).toHaveBeenNthCalledWith(1, {
+    expect(dbFindMock).toHaveBeenNthCalledWith(1, {
       where: {
         messageID: '123456789',
       },
@@ -200,7 +288,7 @@ describe('cancelPollHandler unit tests', () => {
 
     // Cleanup
 
-    dbfindMock.mockRestore();
+    dbFindMock.mockRestore();
     consoleErrorSpy.mockRestore();
   });
 
@@ -229,9 +317,9 @@ describe('cancelPollHandler unit tests', () => {
      *
      * @todo fix types
      */
-    const dbfindMock = (
+    const dbFindMock = (
       prismaMock.floorSweeperPoll as any
-    ).findUnique.mockResolvedValue(DEFAULT_DB_ENTRY);
+    ).findUnique.mockResolvedValue(DEFAULT_SWEEP_DB_ENTRY);
 
     await cancelPollHandler(FAKE_INTERACTION);
 
@@ -239,7 +327,7 @@ describe('cancelPollHandler unit tests', () => {
 
     expect(replySpy).toHaveBeenNthCalledWith(1, {
       components: [DEFAULT_CANCEL_BUTTON],
-      content: `You're about to cancel and remove the poll, *${DEFAULT_DB_ENTRY.question}*`,
+      content: `You're about to cancel and remove the poll, *${DEFAULT_SWEEP_DB_ENTRY.question}*`,
       ephemeral: true,
     });
 
@@ -248,9 +336,9 @@ describe('cancelPollHandler unit tests', () => {
       ephemeral: true,
     });
 
-    expect(dbfindMock).toHaveBeenCalledTimes(1);
+    expect(dbFindMock).toHaveBeenCalledTimes(1);
 
-    expect(dbfindMock).toHaveBeenNthCalledWith(1, {
+    expect(dbFindMock).toHaveBeenNthCalledWith(1, {
       where: {
         messageID: '123456789',
       },
@@ -264,7 +352,7 @@ describe('cancelPollHandler unit tests', () => {
 
     // Cleanup
 
-    dbfindMock.mockRestore();
+    dbFindMock.mockRestore();
     consoleErrorSpy.mockRestore();
   });
 
@@ -297,9 +385,9 @@ describe('cancelPollHandler unit tests', () => {
      *
      * @todo fix types
      */
-    const dbfindMock = (
+    const dbFindMock = (
       prismaMock.floorSweeperPoll as any
-    ).findUnique.mockResolvedValue(DEFAULT_DB_ENTRY);
+    ).findUnique.mockResolvedValue(DEFAULT_SWEEP_DB_ENTRY);
 
     await cancelPollHandler(FAKE_INTERACTION);
 
@@ -307,7 +395,7 @@ describe('cancelPollHandler unit tests', () => {
 
     expect(replySpy).toHaveBeenNthCalledWith(1, {
       components: [DEFAULT_CANCEL_BUTTON],
-      content: `You're about to cancel and remove the poll, *${DEFAULT_DB_ENTRY.question}*`,
+      content: `You're about to cancel and remove the poll, *${DEFAULT_SWEEP_DB_ENTRY.question}*`,
       ephemeral: true,
     });
 
@@ -316,9 +404,9 @@ describe('cancelPollHandler unit tests', () => {
       ephemeral: true,
     });
 
-    expect(dbfindMock).toHaveBeenCalledTimes(1);
+    expect(dbFindMock).toHaveBeenCalledTimes(1);
 
-    expect(dbfindMock).toHaveBeenNthCalledWith(1, {
+    expect(dbFindMock).toHaveBeenNthCalledWith(1, {
       where: {
         messageID: '123456789',
       },
@@ -336,7 +424,7 @@ describe('cancelPollHandler unit tests', () => {
 
     // Cleanup
 
-    dbfindMock.mockRestore();
+    dbFindMock.mockRestore();
     consoleErrorSpy.mockRestore();
   });
 });

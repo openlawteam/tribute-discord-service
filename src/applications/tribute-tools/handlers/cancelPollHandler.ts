@@ -64,10 +64,8 @@ async function getPollTitle({
         );
     }
   } catch (error) {
-    console.error(error);
-
     throw new Error(
-      `Something went wrong while getting the poll data for application command \`${applicationCommandName}\`.`
+      `Something went wrong while getting the poll data for application command \`${applicationCommandName}\`: ${error}`
     );
   }
 }
