@@ -57,8 +57,6 @@ async function setCancelDB({
         return undefined;
     }
   } catch (error) {
-    console.error(error);
-
     /**
      * Handle return if record does not exist
      *
@@ -71,7 +69,7 @@ async function setCancelDB({
     }
 
     throw new Error(
-      `Something went wrong while saving the transaction data for command type \`${applicationCommandName}\`, \`messageID\` \`${messageID}\`.`
+      `Something went wrong while saving the transaction data for command type \`${applicationCommandName}\`, \`messageID\` \`${messageID}\`: ${error}`
     );
   }
 }
@@ -128,7 +126,7 @@ export async function confirmCancelPollHandler(
 
     if (!pollEntry) {
       throw new Error(
-        `No poll entry was found for command type \`${applicationCommandName}\`, \`messageID\` \`${messageID}\`.`
+        `No poll entry was found for command type \`${applicationCommandName}\`, \`messageID\` \`${messageID}\``
       );
     }
 
@@ -165,7 +163,6 @@ export async function confirmCancelPollHandler(
     // If the poll is already processed, then we need to update the action channel's message.
     if (pollEntry.processed) {
       if (!pollEntry.actionMessageID) return;
-
       const dao = getDaoDataByGuildID(pollEntry.guildID, await getDaos());
 
       if (!dao) return;
