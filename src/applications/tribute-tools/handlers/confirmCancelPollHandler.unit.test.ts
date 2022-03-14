@@ -718,4 +718,68 @@ describe('confirmCancelPollHandler unit tests', () => {
     consoleErrorSpy.mockRestore();
     dbUpdateMock.mockRestore();
   });
+
+  test('should handle error if `interaction.reply` in `catch` block throws', async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation((e) => e);
+
+    const interactionReplySpy = jest.fn().mockImplementation(async () => {
+      throw new Error('Reply error');
+    });
+
+    const FAKE_INTERACTION = {
+      customId: 'confirmCancelPoll-SWEEP-123456789',
+      guildId: GUILD_ID_FIXTURE,
+      isButton: () => true,
+      message: {
+        id: '123456789',
+      },
+      reply: interactionReplySpy,
+    } as any as CommandInteraction;
+
+    /**
+     * Mock db update
+     *
+     * @todo fix types
+     */
+    const dbUpdateMock = (
+      prismaMock.floorSweeperPoll as any
+    ).update.mockImplementation(async () => {
+      throw new Error('Some bad DB error');
+    });
+
+    await confirmCancelPollHandler(FAKE_INTERACTION);
+
+    expect(dbUpdateMock).toHaveBeenCalledTimes(1);
+
+    expect(dbUpdateMock).toHaveBeenNthCalledWith(1, {
+      data: {
+        isCancelled: true,
+      },
+      where: {
+        messageID: '123456789',
+      },
+    });
+
+    expect(interactionReplySpy).toHaveBeenCalledTimes(1);
+
+    expect(interactionReplySpy).toHaveBeenNthCalledWith(1, {
+      content: 'There was an error while trying to cancel the poll.',
+      ephemeral: true,
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+
+    expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
+      /Something went wrong while saving the transaction data for command type `SWEEP`, `messageID` `123456789`: Error: Some bad DB error/i
+    );
+
+    expect(consoleErrorSpy.mock.calls[1][0]?.message).toMatch(/Reply error/i);
+
+    // Cleanup
+
+    consoleErrorSpy.mockRestore();
+    dbUpdateMock.mockRestore();
+  });
 });
