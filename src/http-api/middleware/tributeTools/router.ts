@@ -1,8 +1,6 @@
 import Router from '@koa/router';
 
 import {HTTP_API_BASE_PATH} from '../../config';
-import {tributeToolsGetDaoTxs} from './tributeToolsGetDaoTxs';
-import {tributeToolsGetTx} from './tributeToolsGetTx';
 
 /**
  * Koa `Router` Instance
@@ -15,10 +13,9 @@ const tributeToolsRouter = new Router({
 
 /**
  * Register `@koa/router` routes
+ *
+ * (router: Router) => void
  */
-
-tributeToolsGetDaoTxs(tributeToolsRouter);
-tributeToolsGetTx(tributeToolsRouter);
 
 /**
  * Export `@koa/router` routes
