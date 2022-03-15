@@ -10,11 +10,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum TributeToolsTxStatus {
-  failed
-  success
-}
-
 // Models
 // ------
 // @see https://www.prisma.io/docs/concepts/components/prisma-schema/data-model
