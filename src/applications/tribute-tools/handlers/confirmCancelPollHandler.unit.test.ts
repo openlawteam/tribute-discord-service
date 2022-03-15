@@ -7,7 +7,6 @@ import {
 } from '@prisma/client';
 
 import {
-  BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
   GUILD_ID_FIXTURE,
@@ -30,8 +29,6 @@ describe('confirmCancelPollHandler unit tests', () => {
     processed: false,
     question: 'How much to sweep larvalads fam?',
     result: 0,
-    txHash: BYTES32_FIXTURE,
-    txStatus: 'success',
     uuid: 'abc123def456',
   };
 
@@ -48,8 +45,6 @@ describe('confirmCancelPollHandler unit tests', () => {
     name: 'Conductive the Showy',
     processed: false,
     tokenID: '1234',
-    txHash: BYTES32_FIXTURE,
-    txStatus: 'success',
     upvoteCount: 0,
     uuid: 'abc123def456',
     voteThreshold: 3,
@@ -67,8 +62,6 @@ describe('confirmCancelPollHandler unit tests', () => {
     messageID: '123456789',
     processed: false,
     purpose: 'XYZ Seed Round',
-    txHash: BYTES32_FIXTURE,
-    txStatus: 'success',
     upvoteCount: 0,
     uuid: 'abc123def456',
     voteThreshold: 3,
