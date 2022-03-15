@@ -1,8 +1,4 @@
 import {
-  sweepEndedPollsHandler,
-  sweepPollReactionHandler,
-} from './handlers/sweep';
-import {
   buyPollReactionHandler,
   buyPollRemoveReactionHandler,
   cancelPollHandler,
@@ -10,6 +6,8 @@ import {
   fundPollReactionHandler,
   fundPollRemoveReactionHandler,
   interactionExecuteHandler,
+  sweepEndedPollsHandler,
+  sweepPollReactionHandler,
 } from './handlers';
 import {ApplicationReturn} from '../types';
 import {deployCommands, getCommands} from '../helpers';
