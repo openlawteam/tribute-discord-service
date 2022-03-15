@@ -4,7 +4,7 @@ import {
   FundAddressPoll,
   Prisma,
 } from '@prisma/client';
-import {Client, Intents, MessageEmbed} from 'discord.js';
+import {MessageEmbed} from 'discord.js';
 
 import {
   TributeToolsWebhookTxStatus,
@@ -551,6 +551,65 @@ describe('notifyPollTxStatus unit tests', () => {
 
       expect((error as any)?.message).toMatch(
         /No DB entry was found for type `singleBuy`, UUID `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
+      );
+    }
+
+    // Cleanup
+
+    buyPollSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+  });
+
+  test('should throw error when wrong type is passed', async () => {
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
+
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(undefined);
+
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
+
+    try {
+      await notifyPollTxStatus({
+        data: {
+          id: UUID_FIXTURE,
+          // Use incorrect type
+          type: 'BAD' as any,
+          tx: {
+            hash: BYTES32_FIXTURE,
+            status: TributeToolsWebhookTxStatus.SUCCESS,
+          },
+        },
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+
+      expect((error as any)?.message).toMatch(
+        /No DB entry was found for type `BAD`, UUID `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
       );
     }
 
