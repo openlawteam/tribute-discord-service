@@ -1,11 +1,6 @@
-import {Prisma} from '@prisma/client';
 import {z} from 'zod';
 import Application from 'koa';
 
-import {
-  getTributeToolsClient,
-  notifyPollTxStatus,
-} from '../../../applications/tribute-tools';
 import {
   HTTPMethod,
   TributeToolsWebhookPayload,
@@ -15,14 +10,12 @@ import {
 import {createHTTPError} from '../../helpers';
 import {HTTP_API_BASE_PATH} from '../../config';
 import {normalizeString} from '../../../helpers';
-import {prisma} from '../../../singletons';
+import {notifyPollTxStatus} from '../../../applications/tribute-tools';
 
 const PATH: string = 'webhook/tribute-tools-tx';
 
 const INVALID_BODY_ERROR: string = 'Incorrect `body` was provided.';
 const NO_BODY_ERROR: string = 'No `body` was provided.';
-const TX_MISSING_DATA_ERROR: string = 'Missing tx data.';
-const TX_SAVE_ERROR: string = 'Something went wrong while saving the tx data.';
 const SERVER_ERROR: string =
   'Something went wrong while processing the webhook.';
 
@@ -50,68 +43,6 @@ function validatePayload(data: unknown): TributeToolsWebhookPayload {
   return RequiredPayloadSchema.parse(data);
 }
 
-async function storeTxData(
-  payload: TributeToolsWebhookPayload
-): Promise<
-  | ReturnType<
-      | typeof prisma.buyNFTPoll.update
-      | typeof prisma.floorSweeperPoll.update
-      | typeof prisma.fundAddressPoll.update
-    >
-  | null
-  | undefined
-> {
-  const {
-    data: {
-      id: uuid,
-      type,
-      tx: {hash: txHash, status: txStatus},
-    },
-  } = payload;
-
-  try {
-    switch (type) {
-      case 'fund':
-        return await prisma.fundAddressPoll.update({
-          data: {txHash, txStatus},
-          where: {uuid},
-        });
-
-      case 'singleBuy':
-        return await prisma.buyNFTPoll.update({
-          data: {txHash, txStatus},
-          where: {uuid},
-        });
-
-      case 'sweep':
-        return await prisma.floorSweeperPoll.update({
-          data: {txHash, txStatus},
-          where: {uuid},
-        });
-
-      default:
-        return undefined;
-    }
-  } catch (error) {
-    console.error(error);
-
-    /**
-     * Handle return if record does not exist
-     *
-     * @see https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
-     */
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error?.code === 'P2025') {
-        return null;
-      }
-    }
-
-    throw new Error(
-      `Something went wrong while saving the transaction data for type \`${type}\` uuid \`${uuid}\`.`
-    );
-  }
-}
-
 export const tributeToolsTxWebhook: Application.Middleware = async (
   ctx,
   next
@@ -135,6 +66,7 @@ export const tributeToolsTxWebhook: Application.Middleware = async (
   let validatedPayload: TributeToolsWebhookPayload;
 
   try {
+    // Validate payload
     validatedPayload = validatePayload(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -153,39 +85,8 @@ export const tributeToolsTxWebhook: Application.Middleware = async (
   }
 
   try {
-    // Store data in database
-    const updateResult = await storeTxData(validatedPayload);
-
-    // If `uuid` was not found
-    if (updateResult === null) {
-      createHTTPError({
-        ctx,
-        message: `Could not find uuid \`${validatedPayload.data.id}\``,
-        status: 404,
-      });
-
-      return;
-    }
-
-    // If the switch `default` case was chosen
-    if (updateResult === undefined) {
-      throw new Error(TX_SAVE_ERROR);
-    }
-
-    const {txHash, txStatus} = updateResult;
-
-    const {client} = await getTributeToolsClient();
-
-    if (!txHash || !txStatus) {
-      throw new Error(TX_MISSING_DATA_ERROR);
-    }
-
-    // Handle tx status in discord application
-    await notifyPollTxStatus({
-      client,
-      dbEntry: updateResult,
-      payload: validatedPayload,
-    });
+    // Handle tx status in Discord application
+    await notifyPollTxStatus(validatedPayload);
   } catch (error) {
     console.error(error);
 

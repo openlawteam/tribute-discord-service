@@ -1,11 +1,9 @@
 import {AddressInfo} from 'node:net';
-import {Prisma} from '@prisma/client';
 import fetch from 'node-fetch';
 
 import {BYTES32_FIXTURE, UUID_FIXTURE} from '../../../../test/fixtures';
 import {HTTP_API_BASE_PATH} from '../../config';
 import {httpServer} from '../../httpServer';
-import {prismaMock} from '../../../../test/prismaMock';
 import {TributeToolsWebhookTxStatus} from '../../types';
 
 describe('tributeToolsTxWebhook unit tests', () => {
@@ -33,9 +31,8 @@ describe('tributeToolsTxWebhook unit tests', () => {
     return JSON.parse(errors);
   }
 
-  const PAYLOAD = {
+  const SWEEP_PAYLOAD = {
     data: {
-      date: new Date(0),
       id: UUID_FIXTURE,
       type: 'sweep',
       tx: {
@@ -43,7 +40,16 @@ describe('tributeToolsTxWebhook unit tests', () => {
         status: TributeToolsWebhookTxStatus.SUCCESS,
       },
     },
-    version: '1.0',
+  };
+
+  const BUY_PAYLOAD = {
+    ...SWEEP_PAYLOAD,
+    data: {...SWEEP_PAYLOAD.data, type: 'singleBuy'},
+  };
+
+  const FUND_PAYLOAD = {
+    ...SWEEP_PAYLOAD,
+    data: {...SWEEP_PAYLOAD.data, type: 'fund'},
   };
 
   afterAll(async () => {
@@ -53,34 +59,6 @@ describe('tributeToolsTxWebhook unit tests', () => {
   test('should return response when `POST`', async () => {
     const {port} = server?.address() as AddressInfo;
 
-    const DB_PAYLOAD = {
-      data: {
-        txHash: BYTES32_FIXTURE,
-        txStatus: TributeToolsWebhookTxStatus.SUCCESS,
-      },
-      where: {
-        uuid: UUID_FIXTURE,
-      },
-    };
-
-    /**
-     * Mock results
-     *
-     * @todo Fix types
-     */
-
-    const buyNFTPollSpy = (
-      prismaMock.buyNFTPoll as any
-    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
-
-    const floorSweeperPollSpy = (
-      prismaMock.floorSweeperPoll as any
-    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
-
-    const fundAddressPollSpy = (
-      prismaMock.fundAddressPoll as any
-    ).update.mockResolvedValue({txHash: BYTES32_FIXTURE, txStatus: 'success'});
-
     const setPollTxStatus = await import(
       '../../../applications/tribute-tools/handlers/notifyPollTxStatus'
     );
@@ -89,36 +67,26 @@ describe('tributeToolsTxWebhook unit tests', () => {
       .spyOn(setPollTxStatus, 'notifyPollTxStatus')
       .mockImplementation(async () => {});
 
-    const discordLoginSpy = jest
-      .spyOn((await import('discord.js')).Client.prototype, 'login')
-      .mockImplementation(async () => '');
-
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
       .mockImplementation(() => {});
 
     const sweepResponse = await requestHelper(
-      {body: JSON.stringify(PAYLOAD)},
+      {body: JSON.stringify(SWEEP_PAYLOAD)},
       port
     );
 
     const singleBuyResponse = await requestHelper(
       {
-        body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, type: 'singleBuy'},
-        }),
+        body: JSON.stringify(BUY_PAYLOAD),
       },
       port
     );
 
     const fundResponse = await requestHelper(
       {
-        body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, type: 'fund'},
-        }),
+        body: JSON.stringify(FUND_PAYLOAD),
       },
       port
     );
@@ -126,19 +94,13 @@ describe('tributeToolsTxWebhook unit tests', () => {
     expect(sweepResponse.status).toBe(204);
     expect(singleBuyResponse.status).toBe(204);
     expect(fundResponse.status).toBe(204);
-
-    // Assert data was stored in correct tables
-
-    expect(floorSweeperPollSpy).toHaveBeenCalledTimes(1);
-    expect(buyNFTPollSpy).toHaveBeenCalledTimes(1);
-    expect(fundAddressPollSpy).toHaveBeenCalledTimes(1);
-    expect(floorSweeperPollSpy).toHaveBeenNthCalledWith(1, DB_PAYLOAD);
-    expect(buyNFTPollSpy).toHaveBeenNthCalledWith(1, DB_PAYLOAD);
-    expect(fundAddressPollSpy).toHaveBeenNthCalledWith(1, DB_PAYLOAD);
+    expect(setPollTxStatusSpy).toHaveBeenCalledTimes(3);
+    expect(setPollTxStatusSpy).toHaveBeenNthCalledWith(1, SWEEP_PAYLOAD);
+    expect(setPollTxStatusSpy).toHaveBeenNthCalledWith(2, BUY_PAYLOAD);
+    expect(setPollTxStatusSpy).toHaveBeenNthCalledWith(3, FUND_PAYLOAD);
 
     // Cleanup
     consoleWarnSpy.mockRestore();
-    discordLoginSpy.mockRestore();
     setPollTxStatusSpy.mockRestore();
   });
 
@@ -208,8 +170,8 @@ describe('tributeToolsTxWebhook unit tests', () => {
     const typeMatchResponse = await requestHelper(
       {
         body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, type: 'BAD'},
+          ...SWEEP_PAYLOAD,
+          data: {...SWEEP_PAYLOAD.data, type: 'BAD'},
         }),
       },
       port
@@ -233,8 +195,8 @@ describe('tributeToolsTxWebhook unit tests', () => {
     const missingIDResponse = await requestHelper(
       {
         body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, id: '123'},
+          ...SWEEP_PAYLOAD,
+          data: {...SWEEP_PAYLOAD.data, id: '123'},
         }),
       },
       port
@@ -258,8 +220,8 @@ describe('tributeToolsTxWebhook unit tests', () => {
     const missingTxResponse = await requestHelper(
       {
         body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, tx: undefined},
+          ...SWEEP_PAYLOAD,
+          data: {...SWEEP_PAYLOAD.data, tx: undefined},
         }),
       },
       port
@@ -284,10 +246,10 @@ describe('tributeToolsTxWebhook unit tests', () => {
     const malformedTxHashResponse = await requestHelper(
       {
         body: JSON.stringify({
-          ...PAYLOAD,
+          ...SWEEP_PAYLOAD,
           data: {
-            ...PAYLOAD.data,
-            tx: {...PAYLOAD.data.tx, hash: 'abc123def456'},
+            ...SWEEP_PAYLOAD.data,
+            tx: {...SWEEP_PAYLOAD.data.tx, hash: 'abc123def456'},
           },
         }),
       },
@@ -312,8 +274,11 @@ describe('tributeToolsTxWebhook unit tests', () => {
     const invalidTxStatusResponse = await requestHelper(
       {
         body: JSON.stringify({
-          ...PAYLOAD,
-          data: {...PAYLOAD.data, tx: {...PAYLOAD.data.tx, status: 'BAD'}},
+          ...SWEEP_PAYLOAD,
+          data: {
+            ...SWEEP_PAYLOAD.data,
+            tx: {...SWEEP_PAYLOAD.data.tx, status: 'BAD'},
+          },
         }),
       },
       port
@@ -357,141 +322,6 @@ describe('tributeToolsTxWebhook unit tests', () => {
     expect(response.status).toBe(404);
 
     // Cleanup
-    consoleWarnSpy.mockRestore();
-  });
-
-  test('should return `404` response when `id` not found in DB', async () => {
-    const {port} = server?.address() as AddressInfo;
-
-    const DB_PAYLOAD = {
-      data: {
-        txHash: BYTES32_FIXTURE,
-        txStatus: TributeToolsWebhookTxStatus.SUCCESS,
-      },
-      where: {
-        uuid: UUID_FIXTURE,
-      },
-    };
-
-    /**
-     * Mock results
-     *
-     * @todo Fix types
-     */
-
-    const sweepPollSpy = (
-      prismaMock.floorSweeperPoll as any
-    ).update.mockImplementation(async () => {
-      throw new Prisma.PrismaClientKnownRequestError(
-        'Some bad error',
-        // @see https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
-        'P2025',
-        '1.0'
-      );
-    });
-
-    // Temporarily hide warnings from `msw`
-    const consoleWarnSpy = jest
-      .spyOn(console, 'warn')
-      .mockImplementation(() => {});
-
-    const consoleErrorSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-
-    const sweepResponse = await requestHelper(
-      {body: JSON.stringify(PAYLOAD)},
-      port
-    );
-
-    expect(sweepResponse.status).toBe(404);
-
-    expect(await sweepResponse.json()).toEqual({
-      error: {
-        message: `Could not find uuid \`${UUID_FIXTURE}\``,
-        status: 404,
-      },
-    });
-
-    expect(sweepPollSpy).toHaveBeenCalledTimes(1);
-    expect(sweepPollSpy).toHaveBeenNthCalledWith(1, DB_PAYLOAD);
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-    expect(consoleErrorSpy.mock.calls[0][0]?.code).toBe('P2025');
-
-    expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
-      /some bad error/i
-    );
-
-    // Cleanup
-
-    consoleErrorSpy.mockRestore();
-    consoleWarnSpy.mockRestore();
-  });
-
-  test('should return `500` response when DB fails to save tx data', async () => {
-    const {port} = server?.address() as AddressInfo;
-
-    const DB_PAYLOAD = {
-      data: {
-        txHash: BYTES32_FIXTURE,
-        txStatus: TributeToolsWebhookTxStatus.SUCCESS,
-      },
-      where: {
-        uuid: UUID_FIXTURE,
-      },
-    };
-
-    /**
-     * Mock results
-     *
-     * @todo Fix types
-     */
-
-    const floorSweeperPollSpy = (
-      prismaMock.floorSweeperPoll as any
-    ).update.mockImplementation(() => {
-      throw new Error('Some bad error');
-    });
-
-    // Temporarily hide warnings from `msw`
-    const consoleWarnSpy = jest
-      .spyOn(console, 'warn')
-      .mockImplementation(() => {});
-
-    const consoleErrorSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation((e) => e);
-
-    const sweepResponse = await requestHelper(
-      {body: JSON.stringify(PAYLOAD)},
-      port
-    );
-
-    expect(sweepResponse.status).toBe(500);
-
-    expect(await sweepResponse.json()).toEqual({
-      error: {
-        message: `Something went wrong while processing the webhook.`,
-        status: 500,
-      },
-    });
-
-    expect(floorSweeperPollSpy).toHaveBeenCalledTimes(1);
-    expect(floorSweeperPollSpy).toHaveBeenNthCalledWith(1, DB_PAYLOAD);
-
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
-
-    expect(consoleErrorSpy.mock.calls[0][0]?.message).toMatch(
-      /some bad error/i
-    );
-
-    expect(consoleErrorSpy.mock.calls[1][0]?.message).toMatch(
-      /something went wrong while saving the transaction data for type `sweep` uuid `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
-    );
-
-    // Cleanup
-
-    consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
   });
 });
