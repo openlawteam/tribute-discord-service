@@ -73,24 +73,6 @@ describe('notifyPollTxStatus unit tests', () => {
     voteThreshold: 5,
   };
 
-  /**
-   * Mock results
-   *
-   * @todo Fix types
-   */
-
-  /*  const buyNFTPollSpy = (
-    prismaMock.buyNFTPoll as any
-  ).findUnique.mockResolvedValue({});
-
-  const floorSweeperPollSpy = (
-    prismaMock.floorSweeperPoll as any
-  ).findUnique.mockResolvedValue({});
-
-  const fundAddressPollSpy = (
-    prismaMock.fundAddressPoll as any
-  ).findUnique.mockResolvedValue({}); */
-
   async function mockDaosHelper() {
     const getDaos = await import('../../../services/dao/getDaos');
 
@@ -518,6 +500,136 @@ describe('notifyPollTxStatus unit tests', () => {
 
     buyPollSpy.mockRestore();
     channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+  });
+
+  test('should throw error when no db entry found', async () => {
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
+
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(undefined);
+
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
+
+    try {
+      await notifyPollTxStatus({
+        data: {
+          id: UUID_FIXTURE,
+          type: TributeToolsWebhookTxType.BUY,
+          tx: {
+            hash: BYTES32_FIXTURE,
+            status: TributeToolsWebhookTxStatus.SUCCESS,
+          },
+        },
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+
+      expect((error as any)?.message).toMatch(
+        /No DB entry was found for type `singleBuy`, UUID `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
+      );
+    }
+
+    // Cleanup
+
+    buyPollSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+  });
+
+  test('should throw error when db find fails', async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation((m) => m);
+
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
+
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockImplementation(() => {
+      throw new Error('Some bad db error.');
+    });
+
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
+
+    try {
+      await notifyPollTxStatus({
+        data: {
+          id: UUID_FIXTURE,
+          type: TributeToolsWebhookTxType.BUY,
+          tx: {
+            hash: BYTES32_FIXTURE,
+            status: TributeToolsWebhookTxStatus.SUCCESS,
+          },
+        },
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+
+      expect((error as any)?.message).toMatch(
+        /Something went wrong while getting the data for type `singleBuy` uuid `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
+      );
+    }
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy).toHaveBeenNthCalledWith(
+      1,
+      new Error('Some bad db error.')
+    );
+
+    // Cleanup
+
+    buyPollSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
     daosSpy.mockRestore();
     discordClientSpy.mockRestore();
   });
