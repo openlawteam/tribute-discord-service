@@ -1,5 +1,5 @@
 import {BuyNFTPoll, FloorSweeperPoll, FundAddressPoll} from '@prisma/client';
-import {Client, MessageEmbed, TextChannel} from 'discord.js';
+import {MessageEmbed, TextChannel} from 'discord.js';
 
 import {
   TributeToolsWebhookPayload,
@@ -9,9 +9,55 @@ import {
 import {APPLICATION_COMMANDS} from '../../../config';
 import {getDaoDataByGuildID} from '../../../helpers';
 import {getDaos} from '../../../services';
+import {getTributeToolsClient} from '../getTributeToolsClient';
+import {prisma} from '../../../singletons';
 
 const TX_SUCCEEDED_MESSAGE: string = '✅ Transaction succeeded';
 const TX_FAILED_MESSAGE: string = '❌ Transaction failed';
+
+async function getDBEntry(
+  payload: TributeToolsWebhookPayload
+): Promise<
+  | ReturnType<
+      | typeof prisma.buyNFTPoll.findUnique
+      | typeof prisma.floorSweeperPoll.findUnique
+      | typeof prisma.fundAddressPoll.findUnique
+    >
+  | null
+  | undefined
+> {
+  const {
+    data: {id: uuid, type},
+  } = payload;
+
+  try {
+    switch (type) {
+      case 'fund':
+        return await prisma.fundAddressPoll.findUnique({
+          where: {uuid},
+        });
+
+      case 'singleBuy':
+        return await prisma.buyNFTPoll.findUnique({
+          where: {uuid},
+        });
+
+      case 'sweep':
+        return await prisma.floorSweeperPoll.findUnique({
+          where: {uuid},
+        });
+
+      default:
+        return undefined;
+    }
+  } catch (error) {
+    console.error(error);
+
+    throw new Error(
+      `Something went wrong while getting the data for type \`${type}\` uuid \`${uuid}\`.`
+    );
+  }
+}
 
 function getTitle(type: TributeToolsWebhookTxType): 'Buy' | 'Sweep' | 'Fund' {
   switch (type) {
@@ -85,32 +131,37 @@ function getCommand(
   }
 }
 
-export async function notifyPollTxStatus({
-  client,
-  dbEntry,
-  payload,
-}: {
-  client: Client;
-  dbEntry: FloorSweeperPoll | FundAddressPoll | BuyNFTPoll;
-  payload: TributeToolsWebhookPayload;
-}): Promise<void> {
-  const {actionMessageID, channelID, guildID, messageID, txHash} = dbEntry;
-
-  const {
-    data: {
-      tx: {status},
-      type,
-    },
-  } = payload;
-
+export async function notifyPollTxStatus(
+  payload: TributeToolsWebhookPayload
+): Promise<void> {
   try {
+    const {
+      data: {
+        id,
+        tx: {hash, status},
+        type,
+      },
+    } = payload;
+
+    const dbEntry = await getDBEntry(payload);
+
+    if (!dbEntry) {
+      throw new Error(
+        `No DB entry was found for type \`${type}\`, UUID \`${id}\`.`
+      );
+    }
+
+    const {client} = await getTributeToolsClient();
+
+    const {actionMessageID, channelID, guildID, messageID} = dbEntry;
+
     const pollChannel = (await client.channels.fetch(channelID)) as TextChannel;
     const pollMessage = await pollChannel.messages.fetch(messageID);
 
     const title = getTitle(type);
     const name = getName({dbEntry, type});
     const description = getStatus({name, status});
-    const etherscanURL: string = `https://etherscan.io/tx/${txHash}`;
+    const etherscanURL: string = `https://etherscan.io/tx/${hash}`;
     const txSucceeded: boolean = status === TributeToolsWebhookTxStatus.SUCCESS;
 
     const pollStatusEmbed = new MessageEmbed()

@@ -3,9 +3,8 @@ import {
   FloorSweeperPoll,
   FundAddressPoll,
   Prisma,
-  TributeToolsTxStatus,
 } from '@prisma/client';
-import {Client, Intents, MessageEmbed} from 'discord.js';
+import {MessageEmbed} from 'discord.js';
 
 import {
   TributeToolsWebhookTxStatus,
@@ -19,6 +18,7 @@ import {
   UUID_FIXTURE,
 } from '../../../../test/fixtures';
 import {notifyPollTxStatus} from './notifyPollTxStatus';
+import {prismaMock} from '../../../../test/prismaMock';
 
 describe('notifyPollTxStatus unit tests', () => {
   const SWEEP_DB_ENTRY: FloorSweeperPoll = {
@@ -35,8 +35,6 @@ describe('notifyPollTxStatus unit tests', () => {
     processed: true,
     question: 'How much in punks should we sweep?',
     result: 100,
-    txHash: BYTES32_FIXTURE,
-    txStatus: TributeToolsTxStatus.success,
     uuid: UUID_FIXTURE,
   };
 
@@ -53,8 +51,6 @@ describe('notifyPollTxStatus unit tests', () => {
     name: 'Should we buy Dexter Funky Xavier?',
     processed: true,
     tokenID: '123',
-    txHash: BYTES32_FIXTURE,
-    txStatus: TributeToolsTxStatus.success,
     upvoteCount: 5,
     uuid: UUID_FIXTURE,
     voteThreshold: 5,
@@ -72,8 +68,6 @@ describe('notifyPollTxStatus unit tests', () => {
     messageID: '567890123',
     processed: true,
     purpose: 'Seed round for Tribute Labs',
-    txHash: BYTES32_FIXTURE,
-    txStatus: TributeToolsTxStatus.success,
     upvoteCount: 5,
     uuid: UUID_FIXTURE,
     voteThreshold: 5,
@@ -87,51 +81,53 @@ describe('notifyPollTxStatus unit tests', () => {
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
   }
 
-  test('should notify Discord when a successful transaction is sent', async () => {
-    const client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-    });
+  test('should notify Discord when a successful transaction is sent for `/sweep`', async () => {
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
 
-    // `Client` needs a token to make a REST call
-    client.token = 'abc123';
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const floorSweeperPollSpy = (
+      prismaMock.floorSweeperPoll as any
+    ).findUnique.mockResolvedValue(SWEEP_DB_ENTRY);
 
     const daosSpy = await mockDaosHelper();
     const messageEditSpy = jest.fn();
     const messageReplySpy = jest.fn();
 
-    const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      edit: messageEditSpy,
-      reply: messageReplySpy,
-    }));
-
-    const channelsFetchSpy = jest
-      .spyOn(client.channels, 'fetch')
-      .mockImplementation(
-        () =>
-          ({
-            messages: {
-              fetch: messagesFetchSpy,
-            },
-          } as any)
-      );
-
     const result = await notifyPollTxStatus({
-      client,
-      dbEntry: SWEEP_DB_ENTRY,
-      payload: {
-        data: {
-          id: UUID_FIXTURE,
-          type: TributeToolsWebhookTxType.SWEEP,
-          tx: {
-            hash: BYTES32_FIXTURE,
-            status: TributeToolsWebhookTxStatus.SUCCESS,
-          },
+      data: {
+        id: UUID_FIXTURE,
+        type: TributeToolsWebhookTxType.SWEEP,
+        tx: {
+          hash: BYTES32_FIXTURE,
+          status: TributeToolsWebhookTxStatus.SUCCESS,
         },
+      },
+    });
+
+    expect(floorSweeperPollSpy).toHaveBeenCalledTimes(1);
+
+    expect(floorSweeperPollSpy).toHaveBeenNthCalledWith(1, {
+      where: {
+        uuid: UUID_FIXTURE,
       },
     });
 
@@ -171,55 +167,59 @@ describe('notifyPollTxStatus unit tests', () => {
 
     // Cleanup
 
-    daosSpy.mockRestore();
     channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+    floorSweeperPollSpy.mockRestore();
   });
 
   test('should notify Discord when a failed transaction is sent', async () => {
-    const client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-    });
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
 
-    // `Client` needs a token to make a REST call
-    client.token = 'abc123';
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const floorSweeperPollSpy = (
+      prismaMock.floorSweeperPoll as any
+    ).findUnique.mockResolvedValue(SWEEP_DB_ENTRY);
 
     const daosSpy = await mockDaosHelper();
     const messageEditSpy = jest.fn();
     const messageReplySpy = jest.fn();
 
-    const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      edit: messageEditSpy,
-      reply: messageReplySpy,
-    }));
-
-    const channelsFetchSpy = jest
-      .spyOn(client.channels, 'fetch')
-      .mockImplementation(
-        () =>
-          ({
-            messages: {
-              fetch: messagesFetchSpy,
-            },
-          } as any)
-      );
-
     const result = await notifyPollTxStatus({
-      client,
-      dbEntry: SWEEP_DB_ENTRY,
-      payload: {
-        data: {
-          id: UUID_FIXTURE,
-          type: TributeToolsWebhookTxType.SWEEP,
-          tx: {
-            hash: BYTES32_FIXTURE,
-            status: TributeToolsWebhookTxStatus.FAILED,
-          },
+      data: {
+        id: UUID_FIXTURE,
+        type: TributeToolsWebhookTxType.SWEEP,
+        tx: {
+          hash: BYTES32_FIXTURE,
+          status: TributeToolsWebhookTxStatus.FAILED,
         },
+      },
+    });
+
+    expect(floorSweeperPollSpy).toHaveBeenCalledTimes(1);
+
+    expect(floorSweeperPollSpy).toHaveBeenNthCalledWith(1, {
+      where: {
+        uuid: UUID_FIXTURE,
       },
     });
 
@@ -251,54 +251,50 @@ describe('notifyPollTxStatus unit tests', () => {
 
     // Cleanup
 
-    daosSpy.mockRestore();
     channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+    floorSweeperPollSpy.mockRestore();
   });
 
   test('should notify Discord when a `/buy` transaction is sent', async () => {
-    const client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-    });
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
 
-    // `Client` needs a token to make a REST call
-    client.token = 'abc123';
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(BUY_DB_ENTRY);
 
     const daosSpy = await mockDaosHelper();
     const messageEditSpy = jest.fn();
     const messageReplySpy = jest.fn();
 
-    const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      edit: messageEditSpy,
-      reply: messageReplySpy,
-    }));
-
-    const channelsFetchSpy = jest
-      .spyOn(client.channels, 'fetch')
-      .mockImplementation(
-        () =>
-          ({
-            messages: {
-              fetch: messagesFetchSpy,
-            },
-          } as any)
-      );
-
-    const result = await notifyPollTxStatus({
-      client,
-      dbEntry: BUY_DB_ENTRY,
-      payload: {
-        data: {
-          id: UUID_FIXTURE,
-          type: TributeToolsWebhookTxType.BUY,
-          tx: {
-            hash: BYTES32_FIXTURE,
-            status: TributeToolsWebhookTxStatus.SUCCESS,
-          },
+    await notifyPollTxStatus({
+      data: {
+        id: UUID_FIXTURE,
+        type: TributeToolsWebhookTxType.BUY,
+        tx: {
+          hash: BYTES32_FIXTURE,
+          status: TributeToolsWebhookTxStatus.SUCCESS,
         },
       },
     });
@@ -318,54 +314,50 @@ describe('notifyPollTxStatus unit tests', () => {
 
     // Cleanup
 
-    daosSpy.mockRestore();
     channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+    buyPollSpy.mockRestore();
   });
 
   test('should notify Discord when a `/fund` transaction is sent', async () => {
-    const client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-    });
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
 
-    // `Client` needs a token to make a REST call
-    client.token = 'abc123';
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const fundPollSpy = (
+      prismaMock.fundAddressPoll as any
+    ).findUnique.mockResolvedValue(FUND_DB_ENTRY);
 
     const daosSpy = await mockDaosHelper();
     const messageEditSpy = jest.fn();
     const messageReplySpy = jest.fn();
 
-    const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      edit: messageEditSpy,
-      reply: messageReplySpy,
-    }));
-
-    const channelsFetchSpy = jest
-      .spyOn(client.channels, 'fetch')
-      .mockImplementation(
-        () =>
-          ({
-            messages: {
-              fetch: messagesFetchSpy,
-            },
-          } as any)
-      );
-
-    const result = await notifyPollTxStatus({
-      client,
-      dbEntry: FUND_DB_ENTRY,
-      payload: {
-        data: {
-          id: UUID_FIXTURE,
-          type: TributeToolsWebhookTxType.FUND,
-          tx: {
-            hash: BYTES32_FIXTURE,
-            status: TributeToolsWebhookTxStatus.SUCCESS,
-          },
+    await notifyPollTxStatus({
+      data: {
+        id: UUID_FIXTURE,
+        type: TributeToolsWebhookTxType.FUND,
+        tx: {
+          hash: BYTES32_FIXTURE,
+          status: TributeToolsWebhookTxStatus.SUCCESS,
         },
       },
     });
@@ -385,55 +377,51 @@ describe('notifyPollTxStatus unit tests', () => {
 
     // Cleanup
 
-    daosSpy.mockRestore();
     channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+    fundPollSpy.mockRestore();
   });
 
   test('should throw error when no `actionMessageID` found', async () => {
-    const client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-    });
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
 
-    // `Client` needs a token to make a REST call
-    client.token = 'abc123';
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(BUY_DB_ENTRY);
 
     const daosSpy = await mockDaosHelper();
     const messageEditSpy = jest.fn();
     const messageReplySpy = jest.fn();
 
-    const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      edit: messageEditSpy,
-      reply: messageReplySpy,
-    }));
-
-    const channelsFetchSpy = jest
-      .spyOn(client.channels, 'fetch')
-      .mockImplementation(
-        () =>
-          ({
-            messages: {
-              fetch: messagesFetchSpy,
-            },
-          } as any)
-      );
-
     try {
       await notifyPollTxStatus({
-        client,
-        dbEntry: {...BUY_DB_ENTRY, actionMessageID: null},
-        payload: {
-          data: {
-            id: UUID_FIXTURE,
-            type: TributeToolsWebhookTxType.BUY,
-            tx: {
-              hash: BYTES32_FIXTURE,
-              status: TributeToolsWebhookTxStatus.SUCCESS,
-            },
+        data: {
+          id: UUID_FIXTURE,
+          type: TributeToolsWebhookTxType.BUY,
+          tx: {
+            hash: BYTES32_FIXTURE,
+            status: TributeToolsWebhookTxStatus.SUCCESS,
           },
         },
       });
@@ -447,22 +435,38 @@ describe('notifyPollTxStatus unit tests', () => {
 
     // Cleanup
 
-    daosSpy.mockRestore();
+    buyPollSpy.mockRestore();
     channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
   });
 
   test('should throw error when no `actionChannelID` found', async () => {
-    const client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-      partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-    });
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
 
-    // `Client` needs a token to make a REST call
-    client.token = 'abc123';
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(BUY_DB_ENTRY);
 
     const getDaos = await import('../../../services/dao/getDaos');
 
@@ -473,34 +477,14 @@ describe('notifyPollTxStatus unit tests', () => {
     const messageEditSpy = jest.fn();
     const messageReplySpy = jest.fn();
 
-    const messagesFetchSpy = jest.fn().mockImplementation(() => ({
-      edit: messageEditSpy,
-      reply: messageReplySpy,
-    }));
-
-    const channelsFetchSpy = jest
-      .spyOn(client.channels, 'fetch')
-      .mockImplementation(
-        () =>
-          ({
-            messages: {
-              fetch: messagesFetchSpy,
-            },
-          } as any)
-      );
-
     try {
       await notifyPollTxStatus({
-        client,
-        dbEntry: BUY_DB_ENTRY,
-        payload: {
-          data: {
-            id: UUID_FIXTURE,
-            type: TributeToolsWebhookTxType.BUY,
-            tx: {
-              hash: BYTES32_FIXTURE,
-              status: TributeToolsWebhookTxStatus.SUCCESS,
-            },
+        data: {
+          id: UUID_FIXTURE,
+          type: TributeToolsWebhookTxType.BUY,
+          tx: {
+            hash: BYTES32_FIXTURE,
+            status: TributeToolsWebhookTxStatus.SUCCESS,
           },
         },
       });
@@ -514,7 +498,198 @@ describe('notifyPollTxStatus unit tests', () => {
 
     // Cleanup
 
-    daosSpy.mockRestore();
+    buyPollSpy.mockRestore();
     channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+  });
+
+  test('should throw error when no db entry found', async () => {
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
+
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(undefined);
+
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
+
+    try {
+      await notifyPollTxStatus({
+        data: {
+          id: UUID_FIXTURE,
+          type: TributeToolsWebhookTxType.BUY,
+          tx: {
+            hash: BYTES32_FIXTURE,
+            status: TributeToolsWebhookTxStatus.SUCCESS,
+          },
+        },
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+
+      expect((error as any)?.message).toMatch(
+        /No DB entry was found for type `singleBuy`, UUID `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
+      );
+    }
+
+    // Cleanup
+
+    buyPollSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+  });
+
+  test('should throw error when wrong type is passed', async () => {
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
+
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockResolvedValue(undefined);
+
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
+
+    try {
+      await notifyPollTxStatus({
+        data: {
+          id: UUID_FIXTURE,
+          // Use incorrect type
+          type: 'BAD' as any,
+          tx: {
+            hash: BYTES32_FIXTURE,
+            status: TributeToolsWebhookTxStatus.SUCCESS,
+          },
+        },
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+
+      expect((error as any)?.message).toMatch(
+        /No DB entry was found for type `BAD`, UUID `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
+      );
+    }
+
+    // Cleanup
+
+    buyPollSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
+  });
+
+  test('should throw error when db find fails', async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation((m) => m);
+
+    const messagesFetchSpy = jest.fn().mockImplementation(async () => ({
+      edit: messageEditSpy,
+      reply: messageReplySpy,
+    }));
+
+    const channelsFetchSpy = jest.fn().mockImplementation(async () => ({
+      messages: {
+        fetch: messagesFetchSpy,
+      },
+    }));
+
+    const discordClientSpy = jest
+      .spyOn(await import('../getTributeToolsClient'), 'getTributeToolsClient')
+      .mockImplementation(async () => ({
+        client: {
+          channels: {
+            fetch: channelsFetchSpy,
+          },
+        } as any,
+        stop: async () => undefined,
+      }));
+
+    const buyPollSpy = (
+      prismaMock.buyNFTPoll as any
+    ).findUnique.mockImplementation(() => {
+      throw new Error('Some bad db error.');
+    });
+
+    const daosSpy = await mockDaosHelper();
+    const messageEditSpy = jest.fn();
+    const messageReplySpy = jest.fn();
+
+    try {
+      await notifyPollTxStatus({
+        data: {
+          id: UUID_FIXTURE,
+          type: TributeToolsWebhookTxType.BUY,
+          tx: {
+            hash: BYTES32_FIXTURE,
+            status: TributeToolsWebhookTxStatus.SUCCESS,
+          },
+        },
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+
+      expect((error as any)?.message).toMatch(
+        /Something went wrong while getting the data for type `singleBuy` uuid `02458ff0-4cc5-4137-bcf5-ef91053ab811`\./i
+      );
+    }
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy).toHaveBeenNthCalledWith(
+      1,
+      new Error('Some bad db error.')
+    );
+
+    // Cleanup
+
+    buyPollSpy.mockRestore();
+    channelsFetchSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+    daosSpy.mockRestore();
+    discordClientSpy.mockRestore();
   });
 });
