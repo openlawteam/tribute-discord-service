@@ -9,7 +9,6 @@ import {
 import {BuyNFTPoll, Prisma} from '@prisma/client';
 
 import {
-  BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
   FAKE_DAOS_FIXTURE,
   GUILD_ID_FIXTURE,
@@ -130,8 +129,6 @@ describe('buyPollReactionHandler unit tests', () => {
       name: 'Test Punk #123',
       processed: false,
       tokenID: '123',
-      txHash: BYTES32_FIXTURE,
-      txStatus: 'success',
       upvoteCount: 4,
       uuid: 'abc123def456',
       voteThreshold: 5,

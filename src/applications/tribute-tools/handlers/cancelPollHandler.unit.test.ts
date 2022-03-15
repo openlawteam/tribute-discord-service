@@ -7,16 +7,12 @@ import {
 import {CommandInteraction, MessageActionRow, MessageButton} from 'discord.js';
 
 import {
-  BYTES32_FIXTURE,
-  ETH_ADDRESS_FIXTURE,
-  GUILD_ID_FIXTURE,
-} from '../../../../test';
-import {
   CANCEL_POLL_BUY_CUSTOM_ID,
   CANCEL_POLL_FUND_CUSTOM_ID,
   CANCEL_POLL_SWEEP_CUSTOM_ID,
 } from '../config';
 import {cancelPollHandler} from './cancelPollHandler';
+import {ETH_ADDRESS_FIXTURE, GUILD_ID_FIXTURE} from '../../../../test';
 import {prismaMock} from '../../../../test/prismaMock';
 
 describe('cancelPollHandler unit tests', () => {
@@ -34,8 +30,6 @@ describe('cancelPollHandler unit tests', () => {
     processed: false,
     question: 'How much to sweep larvalads fam?',
     result: 0,
-    txHash: BYTES32_FIXTURE,
-    txStatus: 'success',
     uuid: 'abc123def456',
   };
 
@@ -52,8 +46,6 @@ describe('cancelPollHandler unit tests', () => {
     name: 'Conductive the Showy',
     processed: false,
     tokenID: '1234',
-    txHash: BYTES32_FIXTURE,
-    txStatus: 'success',
     upvoteCount: 0,
     uuid: 'abc123def456',
     voteThreshold: 3,
@@ -71,8 +63,6 @@ describe('cancelPollHandler unit tests', () => {
     messageID: '123456789',
     processed: false,
     purpose: 'XYZ Seed Round',
-    txHash: BYTES32_FIXTURE,
-    txStatus: 'success',
     upvoteCount: 0,
     uuid: 'abc123def456',
     voteThreshold: 3,
