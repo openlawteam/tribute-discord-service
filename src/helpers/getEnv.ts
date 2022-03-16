@@ -1,11 +1,13 @@
 import {
   ENVIRONMENT_VARIABLE_KEYS,
   ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS,
+  ENVIRONMENT_VARIABLE_KEYS_OPTIONAL,
 } from '../config';
 
-type AvailableEnv = Partial<
-  typeof ENVIRONMENT_VARIABLE_KEYS | typeof ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS
->[number];
+type AvailableEnv =
+  | typeof ENVIRONMENT_VARIABLE_KEYS[number]
+  | typeof ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS[number]
+  | typeof ENVIRONMENT_VARIABLE_KEYS_OPTIONAL[number];
 
 /**
  * Returns the current environment variable value.
