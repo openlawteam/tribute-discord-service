@@ -1,37 +1,40 @@
 import {envCheck} from './envCheck';
 
 describe('envCheck unit tests', () => {
-  const testOptions = {noLog: true};
-
   test('should return `true` if all environment variables are set', () => {
-    process.env.ALCHEMY_API_KEY = 'abc123test';
-    process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
-    process.env.POSTGRES_DB = 'test';
-    process.env.POSTGRES_PASSWORD = 'test';
-    process.env.POSTGRES_USER = 'test';
+    const spy = jest.spyOn(console, 'log').mockImplementation((m) => m);
 
-    // Using default args; no logging
-    expect(envCheck(undefined, testOptions)).toBe(true);
+    // Uses `.env.test`
+    expect(envCheck()).toBe(true);
+    expect(spy).toHaveBeenCalledTimes(1);
 
-    process.env.SOME_VAR = 'test';
+    expect(spy.mock.calls[0][0]).toMatch(
+      /✔ All required environment variables are set\./i
+    );
 
-    // Using supplied args; no logging
-    expect(envCheck(['ALCHEMY_API_KEY'], testOptions)).toBe(true);
+    // Cleanup
 
-    // Reset env
-    delete process.env.ALCHEMY_API_KEY;
-    delete process.env.DATABASE_URL;
-    delete process.env.POSTGRES_DB;
-    delete process.env.POSTGRES_PASSWORD;
-    delete process.env.POSTGRES_USER;
-    delete process.env.SOME_VAR;
+    spy.mockRestore();
   });
 
-  test('should return `false` if some, or all, environment are not set', () => {
-    // Using default args; no logging
-    expect(envCheck(undefined, testOptions)).toBe(false);
+  test('should return `false` if some environment variables are not set', () => {
+    const spy = jest.spyOn(console, 'warn').mockImplementation((w) => w);
 
-    // Using supplied args; no logging
-    expect(envCheck(['ALCHEMY_API_KEY'], testOptions)).toBe(false);
+    const original = process.env.POSTGRES_USER;
+
+    process.env.POSTGRES_USER = undefined;
+
+    // Using default args; no logging
+    expect(envCheck()).toBe(false);
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    expect(spy.mock.calls[0][0]).toMatch(
+      /⚠️  Missing required environment variable for POSTGRES_USER\./i
+    );
+
+    // Cleanup
+
+    process.env.POSTGRES_USER = original;
+    spy.mockRestore();
   });
 });
