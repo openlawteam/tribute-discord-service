@@ -38,23 +38,25 @@ type RequiredGemAssetResponse = {
 };
 
 const RequiredResponseSchema = z.object({
-  data: z.array(
-    z.object({
-      address: z.string(),
-      name: z.string(),
-      priceInfo: z
-        .object({
-          price: z.string(),
-        })
-        .nullish(),
-      sellOrders: z
-        .array(z.object({quantity: z.string(), perItemEthPrice: z.string()}))
-        .optional(),
-      smallImageUrl: z.string(),
-      standard: z.nativeEnum(TokenStandard),
-      tokenId: z.string(),
-    })
-  ),
+  data: z
+    .array(
+      z.object({
+        address: z.string(),
+        name: z.string(),
+        priceInfo: z
+          .object({
+            price: z.string(),
+          })
+          .nullish(),
+        sellOrders: z
+          .array(z.object({quantity: z.string(), perItemEthPrice: z.string()}))
+          .optional(),
+        smallImageUrl: z.string(),
+        standard: z.nativeEnum(TokenStandard),
+        tokenId: z.string(),
+      })
+    )
+    .nonempty(),
 });
 
 const COMMAND_NAME: string = 'buy';
