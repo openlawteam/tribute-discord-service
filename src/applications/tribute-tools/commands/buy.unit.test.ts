@@ -758,6 +758,47 @@ describe('buy unit tests', () => {
     });
   });
 
+  test('should reply with error if Gem response has empty `data` array', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA_ERC721
+    );
+
+    const reactSpy = jest.fn();
+
+    server.use(
+      rest.post(
+        'https://gem-public-api.herokuapp.com/assets',
+        async (_req, res, ctx) =>
+          res(
+            ctx.json({
+              ...GEM_ERC721_RESPONSE_FIXTURE,
+              data: [],
+            })
+          )
+      )
+    );
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {guildId: '722525233755717762', react: reactSpy}) as any
+      );
+
+    const buyResult = await buy.execute(interaction);
+
+    expect(buyResult).toBe(undefined);
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+
+    expect(interactionReplySpy.mock.calls[0][0]).toEqual({
+      content: "The NFT's data was returned incomplete.",
+      ephemeral: true,
+    });
+  });
+
   test('should reply with error if Gem response has no `smallImageUrl`', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
