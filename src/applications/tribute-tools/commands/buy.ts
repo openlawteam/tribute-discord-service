@@ -8,6 +8,7 @@ import {
 import {isAddress, fromWei, toBN} from 'web3-utils';
 import {SlashCommandBuilder} from '@discordjs/builders';
 import {URL} from 'url';
+import {z} from 'zod';
 import fetch from 'node-fetch';
 
 import {CANCEL_POLL_BUY_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
@@ -16,6 +17,45 @@ import {getDaoDataByGuildID, getEnv} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {getVoteThreshold} from '../helpers';
 import {prisma} from '../../../singletons';
+
+enum TokenStandard {
+  ERC1155 = 'ERC1155',
+  ERC721 = 'ERC721',
+}
+
+type RequiredGemAssetResponse = {
+  data: {
+    address: string;
+    name: string;
+    // If ERC-1155 there will be no root-level `priceInfo`
+    priceInfo?: {price: string} | null;
+    // If ERC-721 there will be no root-level `sellOrders`
+    sellOrders?: {quantity: string; perItemEthPrice: string}[];
+    smallImageUrl: string;
+    standard: TokenStandard;
+    tokenId: string;
+  }[];
+};
+
+const RequiredResponseSchema = z.object({
+  data: z.array(
+    z.object({
+      address: z.string(),
+      name: z.string(),
+      priceInfo: z
+        .object({
+          price: z.string(),
+        })
+        .nullish(),
+      sellOrders: z
+        .array(z.object({quantity: z.string(), perItemEthPrice: z.string()}))
+        .optional(),
+      smallImageUrl: z.string(),
+      standard: z.nativeEnum(TokenStandard),
+      tokenId: z.string(),
+    })
+  ),
+});
 
 const COMMAND_NAME: string = 'buy';
 
@@ -101,6 +141,31 @@ const command = new SlashCommandBuilder()
   .setDescription(COMMAND_DESCRIPTION);
 
 /**
+ * Validate JSON Schema
+ *
+ * @param data
+ * @returns `RequiredGemAssetResponse`
+ * @see https://github.com/colinhacks/zod
+ * @see https://2ality.com/2020/06/validating-data-typescript.html#example%3A-validating-data-via-the-library-zod
+ */
+function validateResponse(data: unknown): RequiredGemAssetResponse {
+  // Return data, or throw.
+  return RequiredResponseSchema.parse(data);
+}
+
+function getPrice({data}: RequiredGemAssetResponse): string | undefined {
+  const [{priceInfo, sellOrders, standard}] = data;
+
+  if (standard === TokenStandard.ERC721) {
+    return priceInfo?.price;
+  }
+
+  if (standard === TokenStandard.ERC1155 && sellOrders) {
+    return sellOrders.filter((so) => so.quantity === '1')[0]?.perItemEthPrice;
+  }
+}
+
+/**
  * Sweep command reply logic
  *
  * @param interaction `CommandInteraction`
@@ -173,36 +238,21 @@ async function execute(interaction: CommandInteraction) {
           tokenIds: [tokenID],
           address: contractAddress,
         },
-        /**
-         * Not sure why removing some of these fields causes nothing to return?
-         * Leaving as is, for now.
-         */
         fields: {
           address: 1,
-          animationUrl: 1,
           collectionName: 1,
-          collectionSymbol: 1,
-          creator: 1,
           currentBasePrice: 1,
-          decimals: 1,
-          ethReserves: 1,
-          externalLink: 1,
+          currentEthPrice: 1,
           id: 1,
-          imageUrl: 1,
-          market: 1,
           marketplace: 1,
           marketUrl: 1,
           name: 1,
-          owner: 1,
           paymentToken: 1,
           priceInfo: 1,
-          rarityScore: 1,
           sellOrders: 1,
           smallImageUrl: 1,
           standard: 1,
           tokenId: 1,
-          tokenReserves: 1,
-          traits: 1,
           url: 1,
         },
         offset: 0,
@@ -224,23 +274,11 @@ async function execute(interaction: CommandInteraction) {
     return;
   }
 
-  const assetResponseJSON = await assetResponse.json();
+  let assetResponseJSON: RequiredGemAssetResponse;
 
-  const {name, priceInfo, smallImageUrl} = assetResponseJSON?.data?.[0] || {};
-
-  // Validate the NFT price - it may be a brand new listing (e.g. <= ~15min old)
-  if (!priceInfo) {
-    // Reply with an error/help message that only the user can see.
-    await interaction.reply({
-      content: NO_PRICE_ERROR_MESSAGE,
-      ephemeral: true,
-    });
-
-    return;
-  }
-
-  // Validate required information
-  if (!name || !smallImageUrl) {
+  try {
+    assetResponseJSON = validateResponse(await assetResponse.json());
+  } catch (error) {
     // Reply with an error/help message that only the user can see.
     await interaction.reply({
       content: MISSING_ASSET_DATA_ERROR_MESSAGE,
@@ -250,9 +288,26 @@ async function execute(interaction: CommandInteraction) {
     return;
   }
 
+  const {
+    data: [{name, smallImageUrl}],
+  } = assetResponseJSON;
+
+  const responsePriceWEI = getPrice(assetResponseJSON);
+
+  // Validate the NFT price - it may be a brand new listing (e.g. <= ~15min old)
+  if (!responsePriceWEI) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: NO_PRICE_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
   // Gem UI asset URL does not get returned, currently.
   const gemAssetURL: string = `https://www.gem.xyz/asset/${contractAddress}/${tokenID}`;
-  const price = fromWei(toBN(priceInfo.price), 'ether');
+  const price = fromWei(toBN(responsePriceWEI), 'ether');
   const dao = getDaoDataByGuildID(interaction.guildId || '', await getDaos());
 
   if (!dao) {
@@ -312,7 +367,7 @@ async function execute(interaction: CommandInteraction) {
     // Store poll data in DB
     await prisma.buyNFTPoll.create({
       data: {
-        amountWEI: priceInfo.price,
+        amountWEI: responsePriceWEI,
         channelID,
         contractAddress,
         guildID,
@@ -333,6 +388,8 @@ async function execute(interaction: CommandInteraction) {
       await fn();
     }
   } catch (error) {
+    console.error(error);
+
     // Reply with an error/help message that only the user can see.
     await interaction.followUp({
       content: POLL_SETUP_ERROR_MESSAGE,
