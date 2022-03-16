@@ -39,11 +39,21 @@ export const ENVIRONMENT_VARIABLE_KEYS = [
   'DATABASE_URL',
   'DEBUG',
   'ETH_NETWORK_NAME',
-  'GEM_API_KEY',
   'NODE_ENV',
   'POSTGRES_DB',
   'POSTGRES_PASSWORD',
   'POSTGRES_USER',
+] as const;
+
+/**
+ * Environment variable keys used in the app,
+ * but are optional.
+ */
+export const ENVIRONMENT_VARIABLE_KEYS_OPTIONAL = [
+  /**
+   * Used in `applications/tribute-tools`.
+   */
+  'GEM_API_KEY',
 ] as const;
 
 /**

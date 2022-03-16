@@ -13,9 +13,7 @@ import {getEnv} from './getEnv';
  * @returns `boolean`
  */
 export function envCheck(
-  envKeys: Partial<
-    typeof ENVIRONMENT_VARIABLE_KEYS
-  > = ENVIRONMENT_VARIABLE_KEYS,
+  envKeys: typeof ENVIRONMENT_VARIABLE_KEYS = ENVIRONMENT_VARIABLE_KEYS,
   options: {noLog?: boolean} = {}
 ): boolean {
   const {noLog} = options;
