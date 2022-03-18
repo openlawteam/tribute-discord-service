@@ -2,6 +2,7 @@ import {
   CommandInteraction,
   Message,
   MessageActionRow,
+  MessageAttachment,
   MessageButton,
   MessageEmbed,
 } from 'discord.js';
@@ -10,6 +11,7 @@ import {SlashCommandBuilder} from '@discordjs/builders';
 import {URL} from 'url';
 import {z} from 'zod';
 import fetch from 'node-fetch';
+import sharp from 'sharp';
 
 import {CANCEL_POLL_BUY_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
 import {Command} from '../../types';
@@ -128,20 +130,6 @@ function parseBuyURL(url: string): {contractAddress: string; tokenID: string} {
   return {contractAddress, tokenID};
 }
 
-// Sweep command structure
-const command = new SlashCommandBuilder()
-  // Position required arguments first for better UX
-  .addStringOption((option) =>
-    option
-      .setName(ARG_NAMES.url)
-      .setDescription(
-        "Set the NFT's OpenSea or Gem URL. e.g. https://.../0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b/5840"
-      )
-      .setRequired(true)
-  ) // Returning last for type check
-  .setName(COMMAND_NAME)
-  .setDescription(COMMAND_DESCRIPTION);
-
 /**
  * Validate JSON Schema
  *
@@ -166,6 +154,60 @@ function getPrice({data}: RequiredGemAssetResponse): string | undefined {
     return sellOrders.filter((so) => so.quantity === '1')[0]?.perItemEthPrice;
   }
 }
+
+async function getImage(
+  url: string
+): Promise<{file: MessageAttachment | undefined; url: string}> {
+  const DEFAULT_RETURN = {
+    file: undefined,
+    url,
+  };
+
+  try {
+    const response = await fetch(url, {method: 'GET'});
+
+    if (!response.ok) {
+      throw new Error('Something went wrong while fetching the asset image.');
+    }
+
+    const contentType: string | null = response.headers.get('Content-Type');
+
+    // Discord does not show SVG images natively
+    if (contentType === 'image/svg+xml') {
+      try {
+        // Convert to PNG data buffer
+        const buffer = await sharp(await response.buffer())
+          .png()
+          .toBuffer();
+
+        return {
+          file: new MessageAttachment(buffer, 'svg2png.png'),
+          url: 'attachment://svg2png.png',
+        };
+      } catch (error) {
+        return DEFAULT_RETURN;
+      }
+    }
+
+    return DEFAULT_RETURN;
+  } catch (error) {
+    return DEFAULT_RETURN;
+  }
+}
+
+// Sweep command structure
+const command = new SlashCommandBuilder()
+  // Position required arguments first for better UX
+  .addStringOption((option) =>
+    option
+      .setName(ARG_NAMES.url)
+      .setDescription(
+        "Set the NFT's OpenSea or Gem URL. e.g. https://.../0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b/5840"
+      )
+      .setRequired(true)
+  ) // Returning last for type check
+  .setName(COMMAND_NAME)
+  .setDescription(COMMAND_DESCRIPTION);
 
 /**
  * Sweep command reply logic
@@ -312,6 +354,8 @@ async function execute(interaction: CommandInteraction) {
   const price = fromWei(toBN(responsePriceWEI), 'ether');
   const dao = getDaoDataByGuildID(interaction.guildId || '', await getDaos());
 
+  const image = await getImage(smallImageUrl);
+
   if (!dao) {
     // Reply with an error/help message that only the user can see.
     await interaction.reply({
@@ -338,7 +382,7 @@ async function execute(interaction: CommandInteraction) {
       name: 'Vote Threshold',
       value: `${voteThreshold} upvote${voteThreshold > 1 ? 's' : ''}`,
     })
-    .setImage(smallImageUrl)
+    .setImage(image.url)
     .setFooter({
       text: 'After a threshold has been reached the vote is final,\neven if you change your vote.',
     });
@@ -355,6 +399,7 @@ async function execute(interaction: CommandInteraction) {
     components: [cancelButton],
     embeds: [embed],
     fetchReply: true,
+    files: image.file ? [image.file] : undefined,
   })) as Message;
 
   try {
