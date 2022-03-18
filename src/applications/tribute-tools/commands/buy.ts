@@ -158,8 +158,17 @@ function getPrice({data}: RequiredGemAssetResponse): string | undefined {
 async function getImage(
   url: string
 ): Promise<{file: MessageAttachment | undefined; url: string}> {
+  const DEFAULT_RETURN = {
+    file: undefined,
+    url,
+  };
+
   try {
     const response = await fetch(url, {method: 'GET'});
+
+    if (!response.ok) {
+      throw new Error('Something went wrong while fetching the asset image.');
+    }
 
     const contentType: string | null = response.headers.get('Content-Type');
 
@@ -176,19 +185,13 @@ async function getImage(
           url: 'attachment://svg2png.png',
         };
       } catch (error) {
-        return {
-          file: undefined,
-          url,
-        };
+        return DEFAULT_RETURN;
       }
     }
 
-    return {
-      file: undefined,
-      url,
-    };
+    return DEFAULT_RETURN;
   } catch (error) {
-    throw error;
+    return DEFAULT_RETURN;
   }
 }
 

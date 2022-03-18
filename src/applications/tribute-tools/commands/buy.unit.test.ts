@@ -4,6 +4,7 @@ import {
   Intents,
   InteractionReplyOptions,
   MessageActionRow,
+  MessageAttachment,
   MessageButton,
 } from 'discord.js';
 import {RawInteractionData} from 'discord.js/typings/rawDataTypes';
@@ -107,6 +108,9 @@ describe('buy unit tests', () => {
     },
   };
 
+  const GEM_SMALL_IMAGE_URL: string =
+    'https://lh3.googleusercontent.com/some-image';
+
   const GEM_ERC721_RESPONSE_FIXTURE = {
     data: [
       {
@@ -114,8 +118,7 @@ describe('buy unit tests', () => {
         id: '5314',
         name: 'Sad Girl #5314',
         address: '0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8',
-        smallImageUrl:
-          'https://lh3.googleusercontent.com/r3gMEx-kj7pCaXZDhOwdqkyr82t4UnjSWjrIMKBSyKixfQqFiju98RBUS3NRA6CP_eb6_Lc8Kd_YxTBjD9epzPF4ODv65ZKG7R0D=s250',
+        smallImageUrl: GEM_SMALL_IMAGE_URL,
         standard: 'ERC721',
         currentBasePrice: 285000000000000000,
         duration: 243082,
@@ -144,8 +147,7 @@ describe('buy unit tests', () => {
         id: '0',
         name: 'GUCCI GRAIL MINT PASS 🔮',
         address: '0xc3ae6e60a37a5f7d6d68e60c45b1ae50da233bd4',
-        smallImageUrl:
-          'https://lh3.googleusercontent.com/qJk9ReoBA-Vgf_KkQ2KexYN0gOSq-OMRGjmGv8OEyxR2QXtmlMzWZtBo6HbLvod9qLftDUprY2CpdkOAt6ynVps_0ngqbcLowSU8FA=s250',
+        smallImageUrl: GEM_SMALL_IMAGE_URL,
         standard: 'ERC1155',
         tokenId: '0',
         sellOrders: [
@@ -201,6 +203,19 @@ describe('buy unit tests', () => {
     voteThreshold: 3,
   };
 
+  beforeEach(() => {
+    server.use(
+      rest.post(
+        'https://gem-public-api.herokuapp.com/assets',
+        async (_req, res, ctx) => res(ctx.json(GEM_ERC721_RESPONSE_FIXTURE))
+      ),
+      // Set PNG image
+      rest.get(GEM_SMALL_IMAGE_URL, async (_req, res, ctx) =>
+        res(ctx.set('Content-Type', 'image/png'))
+      )
+    );
+  });
+
   test('should run execute for ERC-721', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
@@ -219,13 +234,6 @@ describe('buy unit tests', () => {
     const dbCreateMock = (
       prismaMock.buyNFTPoll as any
     ).create.mockResolvedValue(DB_INSERT_DATA_ERC_721);
-
-    server.use(
-      rest.post(
-        'https://gem-public-api.herokuapp.com/assets',
-        async (_req, res, ctx) => res(ctx.json(GEM_ERC721_RESPONSE_FIXTURE))
-      )
-    );
 
     // Mock `getDaos`
     const getDaosSpy = jest
@@ -416,6 +424,254 @@ describe('buy unit tests', () => {
         voteThreshold: DB_INSERT_DATA_ERC_1155.voteThreshold,
       },
     });
+
+    // Cleanup
+
+    dbCreateMock.mockRestore();
+    getDaosSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should get non-svg image from Gem response', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA_ERC721
+    );
+
+    const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    const dbCreateMock = (
+      prismaMock.buyNFTPoll as any
+    ).create.mockResolvedValue(DB_INSERT_DATA_ERC_721);
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            channelId: DB_INSERT_DATA_ERC_721.channelID,
+            guildId: DB_INSERT_DATA_ERC_721.guildID,
+            id: DB_INSERT_DATA_ERC_721.messageID,
+            react: reactSpy,
+          }) as any
+      );
+
+    await buy.execute(interaction);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.image?.url
+    ).toBe(GEM_ERC721_RESPONSE_FIXTURE.data[0].smallImageUrl);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .files?.[0]
+    ).toBe(undefined);
+
+    // Cleanup
+
+    dbCreateMock.mockRestore();
+    getDaosSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should get svg image from Gem response', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA_ERC721
+    );
+
+    const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    const dbCreateMock = (
+      prismaMock.buyNFTPoll as any
+    ).create.mockResolvedValue(DB_INSERT_DATA_ERC_721);
+
+    server.use(
+      // Set SVG image
+      rest.get(GEM_SMALL_IMAGE_URL, async (_req, res, ctx) =>
+        res(
+          ctx.set('Content-Type', 'image/svg+xml'),
+          ctx.body('<svg height="200" width="200"><line/></svg>')
+        )
+      )
+    );
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            channelId: DB_INSERT_DATA_ERC_721.channelID,
+            guildId: DB_INSERT_DATA_ERC_721.guildID,
+            id: DB_INSERT_DATA_ERC_721.messageID,
+            react: reactSpy,
+          }) as any
+      );
+
+    await buy.execute(interaction);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.image?.url
+    ).toBe('attachment://svg2png.png');
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .files?.[0]
+    ).toBeInstanceOf(MessageAttachment);
+
+    // Cleanup
+
+    dbCreateMock.mockRestore();
+    getDaosSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should fallback gracefully if svg image conversion fails', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA_ERC721
+    );
+
+    const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    const dbCreateMock = (
+      prismaMock.buyNFTPoll as any
+    ).create.mockResolvedValue(DB_INSERT_DATA_ERC_721);
+
+    server.use(
+      // Set SVG image
+      rest.get(GEM_SMALL_IMAGE_URL, async (_req, res, ctx) =>
+        res(
+          ctx.set('Content-Type', 'image/svg+xml'),
+          // Set bad markup
+          ctx.body('<svg height="200" width="200"><line/><')
+        )
+      )
+    );
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            channelId: DB_INSERT_DATA_ERC_721.channelID,
+            guildId: DB_INSERT_DATA_ERC_721.guildID,
+            id: DB_INSERT_DATA_ERC_721.messageID,
+            react: reactSpy,
+          }) as any
+      );
+
+    await buy.execute(interaction);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.image?.url
+    ).toBe(GEM_ERC721_RESPONSE_FIXTURE.data[0].smallImageUrl);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .files?.[0]
+    ).toBe(undefined);
+
+    // Cleanup
+
+    dbCreateMock.mockRestore();
+    getDaosSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should fallback gracefully if fetching image fails', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA_ERC721
+    );
+
+    const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    const dbCreateMock = (
+      prismaMock.buyNFTPoll as any
+    ).create.mockResolvedValue(DB_INSERT_DATA_ERC_721);
+
+    server.use(
+      // Set SVG image
+      rest.get(GEM_SMALL_IMAGE_URL, async (_req, res, ctx) =>
+        res(ctx.status(500))
+      )
+    );
+
+    // Mock `getDaos`
+    const getDaosSpy = jest
+      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            channelId: DB_INSERT_DATA_ERC_721.channelID,
+            guildId: DB_INSERT_DATA_ERC_721.guildID,
+            id: DB_INSERT_DATA_ERC_721.messageID,
+            react: reactSpy,
+          }) as any
+      );
+
+    await buy.execute(interaction);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.image?.url
+    ).toBe(GEM_ERC721_RESPONSE_FIXTURE.data[0].smallImageUrl);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .files?.[0]
+    ).toBe(undefined);
 
     // Cleanup
 
@@ -887,13 +1143,6 @@ describe('buy unit tests', () => {
 
     const reactSpy = jest.fn();
 
-    server.use(
-      rest.post(
-        'https://gem-public-api.herokuapp.com/assets',
-        async (_req, res, ctx) => res(ctx.json(GEM_ERC721_RESPONSE_FIXTURE))
-      )
-    );
-
     // Mock `getDaos`
     const getDaosSpy = jest
       .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
@@ -941,13 +1190,6 @@ describe('buy unit tests', () => {
     (prismaMock.buyNFTPoll as any).create.mockImplementation(() => {
       throw new Error('Some bad error');
     });
-
-    server.use(
-      rest.post(
-        'https://gem-public-api.herokuapp.com/assets',
-        async (_req, res, ctx) => res(ctx.json(GEM_ERC721_RESPONSE_FIXTURE))
-      )
-    );
 
     // Mock `getDaos`
     const getDaosSpy = jest
@@ -1018,13 +1260,6 @@ describe('buy unit tests', () => {
     (prismaMock.buyNFTPoll as any).create.mockImplementation(() => {
       throw new Error('Some bad error');
     });
-
-    server.use(
-      rest.post(
-        'https://gem-public-api.herokuapp.com/assets',
-        async (_req, res, ctx) => res(ctx.json(GEM_ERC721_RESPONSE_FIXTURE))
-      )
-    );
 
     // Mock `getDaos`
     const getDaosSpy = jest
@@ -1097,13 +1332,6 @@ describe('buy unit tests', () => {
      */
     (prismaMock.buyNFTPoll as any).create.mockResolvedValue(
       DB_INSERT_DATA_ERC_721
-    );
-
-    server.use(
-      rest.post(
-        'https://gem-public-api.herokuapp.com/assets',
-        async (_req, res, ctx) => res(ctx.json(GEM_ERC721_RESPONSE_FIXTURE))
-      )
     );
 
     // Mock `getDaos`
