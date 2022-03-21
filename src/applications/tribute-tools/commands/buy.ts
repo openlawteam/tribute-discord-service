@@ -9,7 +9,7 @@ import {
 import {isAddress, fromWei, toBN} from 'web3-utils';
 import {SlashCommandBuilder} from '@discordjs/builders';
 import {URL} from 'url';
-import {z} from 'zod';
+import {z, ZodType} from 'zod';
 import fetch from 'node-fetch';
 import sharp from 'sharp';
 
@@ -29,36 +29,34 @@ type RequiredGemAssetResponse = {
   data: {
     address: string;
     name: string;
-    // If ERC-1155 there will be no root-level `priceInfo`
-    priceInfo?: {price: string} | null;
-    // If ERC-721 there will be no root-level `sellOrders`
-    sellOrders?: {quantity: string; perItemEthPrice: string}[];
     smallImageUrl: string;
     standard: TokenStandard;
     tokenId: string;
   }[];
 };
 
-const RequiredResponseSchema = z.object({
+type RequiredGemRouteResponse = {
+  route: {
+    price: string;
+  }[];
+};
+
+const RequiredGemAssetResponseSchema = z.object({
   data: z
     .array(
       z.object({
         address: z.string(),
         name: z.string(),
-        priceInfo: z
-          .object({
-            price: z.string(),
-          })
-          .nullish(),
-        sellOrders: z
-          .array(z.object({quantity: z.string(), perItemEthPrice: z.string()}))
-          .optional(),
         smallImageUrl: z.string(),
         standard: z.nativeEnum(TokenStandard),
         tokenId: z.string(),
       })
     )
     .nonempty(),
+});
+
+const RequiredGemRouteResponseSchema = z.object({
+  route: z.array(z.object({price: z.string()})).nonempty(),
 });
 
 const COMMAND_NAME: string = 'buy';
@@ -88,6 +86,8 @@ const NO_PRICE_ERROR_MESSAGE: string =
 
 const NO_GEM_API_KEY_ERROR_MESSAGE: string =
   'A required Gem API key was not found.';
+
+const GEM_API_BASE_PATH: string = 'https://gem-public-api.herokuapp.com';
 
 function isValidURL(url: string): boolean {
   try {
@@ -134,25 +134,15 @@ function parseBuyURL(url: string): {contractAddress: string; tokenID: string} {
  * Validate JSON Schema
  *
  * @param data
- * @returns `RequiredGemAssetResponse`
+ * @param schema
+ * @returns `T`
+ *
  * @see https://github.com/colinhacks/zod
  * @see https://2ality.com/2020/06/validating-data-typescript.html#example%3A-validating-data-via-the-library-zod
  */
-function validateResponse(data: unknown): RequiredGemAssetResponse {
+function validateResponse<T>(data: unknown, schema: ZodType<T>): T {
   // Return data, or throw.
-  return RequiredResponseSchema.parse(data);
-}
-
-function getPrice({data}: RequiredGemAssetResponse): string | undefined {
-  const [{priceInfo, sellOrders, standard}] = data;
-
-  if (standard === TokenStandard.ERC721) {
-    return priceInfo?.price;
-  }
-
-  if (standard === TokenStandard.ERC1155 && sellOrders) {
-    return sellOrders.filter((so) => so.quantity === '1')[0]?.perItemEthPrice;
-  }
+  return schema.parse(data);
 }
 
 async function getImage(
@@ -270,42 +260,39 @@ async function execute(interaction: CommandInteraction) {
     return;
   }
 
-  const assetResponse = await fetch(
-    'https://gem-public-api.herokuapp.com/assets',
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': GEM_API_KEY,
+  const assetResponse = await fetch(`${GEM_API_BASE_PATH}/assets`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-KEY': GEM_API_KEY,
+    },
+    body: JSON.stringify({
+      filters: {
+        tokenIds: [tokenID],
+        address: contractAddress,
       },
-      body: JSON.stringify({
-        filters: {
-          tokenIds: [tokenID],
-          address: contractAddress,
-        },
-        fields: {
-          address: 1,
-          collectionName: 1,
-          currentBasePrice: 1,
-          currentEthPrice: 1,
-          id: 1,
-          marketplace: 1,
-          marketUrl: 1,
-          name: 1,
-          paymentToken: 1,
-          priceInfo: 1,
-          sellOrders: 1,
-          smallImageUrl: 1,
-          standard: 1,
-          tokenId: 1,
-          url: 1,
-        },
-        offset: 0,
-        limit: 1,
-        status: ['all'],
-      }),
-      method: 'POST',
-    }
-  );
+      fields: {
+        address: 1,
+        collectionName: 1,
+        currentBasePrice: 1,
+        currentEthPrice: 1,
+        id: 1,
+        marketplace: 1,
+        marketUrl: 1,
+        name: 1,
+        paymentToken: 1,
+        priceInfo: 1,
+        sellOrders: 1,
+        smallImageUrl: 1,
+        standard: 1,
+        tokenId: 1,
+        url: 1,
+      },
+      offset: 0,
+      limit: 1,
+      status: ['all'],
+    }),
+    method: 'POST',
+  });
 
   // Check Gem response
   if (!assetResponse.ok) {
@@ -321,7 +308,10 @@ async function execute(interaction: CommandInteraction) {
   let assetResponseJSON: RequiredGemAssetResponse;
 
   try {
-    assetResponseJSON = validateResponse(await assetResponse.json());
+    assetResponseJSON = validateResponse<RequiredGemAssetResponse>(
+      await assetResponse.json(),
+      RequiredGemAssetResponseSchema
+    );
   } catch (error) {
     // Reply with an error/help message that only the user can see.
     await interaction.reply({
@@ -333,12 +323,72 @@ async function execute(interaction: CommandInteraction) {
   }
 
   const {
-    data: [{name, smallImageUrl}],
+    data: [{name, smallImageUrl, standard}],
   } = assetResponseJSON;
 
-  const responsePriceWEI = getPrice(assetResponseJSON);
+  /**
+   * For the purposes of getting buy-related information,
+   * using `/route` is currently better than using `/assets` for ERC-1155's.
+   * It also works for ERC-721's.
+   */
+  const routeResponse = await fetch(`${GEM_API_BASE_PATH}/route`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-KEY': GEM_API_KEY,
+    },
+    body: JSON.stringify({
+      balanceToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+      buy: [
+        {
+          address: contractAddress,
+          amount: 1,
+          standard,
+          tokenId: tokenID,
+        },
+      ],
+      // Should be empty as we are getting buy information
+      sell: [],
+      // We can set to 0x0 as there is no wallet
+      sender: '0x0000000000000000000000000000000000000000',
+    }),
+    method: 'POST',
+  });
 
-  // Validate the NFT price - it may be a brand new listing (e.g. <= ~15min old)
+  // Check Gem response
+  if (!routeResponse.ok) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: POLL_SETUP_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
+  let routeResponseJSON: RequiredGemRouteResponse;
+
+  try {
+    routeResponseJSON = validateResponse<RequiredGemRouteResponse>(
+      await routeResponse.json(),
+      RequiredGemRouteResponseSchema
+    );
+  } catch (error) {
+    /**
+     * Reply with an error/help message that only the user can see.
+     * It may be a brand new listing, already bought, unindexed, etc.
+     */
+    await interaction.reply({
+      content: NO_PRICE_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
+  const {
+    route: [{price: responsePriceWEI}],
+  } = routeResponseJSON;
+
   if (!responsePriceWEI) {
     // Reply with an error/help message that only the user can see.
     await interaction.reply({
