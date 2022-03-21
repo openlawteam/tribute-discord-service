@@ -163,7 +163,7 @@ describe('buyPollReactionHandler unit tests', () => {
         .setLabel('Buy')
         .setStyle('LINK')
         .setURL(
-          `${BUY_EXTERNAL_URL}/?daoName=test&tokenId=${DB_ENTRY.tokenID}&contractAddress=${DB_ENTRY.contractAddress}&id=${DB_ENTRY.uuid}`
+          `${BUY_EXTERNAL_URL}/?daoName=test&tokenId=${DB_ENTRY.tokenID}&contractAddress=${DB_ENTRY.contractAddress}&id=${DB_ENTRY.uuid}&price=${DB_ENTRY.amountWEI}`
         )
         .setEmoji('💸')
     );
