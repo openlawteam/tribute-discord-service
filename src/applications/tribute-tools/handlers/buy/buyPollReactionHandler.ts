@@ -196,7 +196,7 @@ export async function buyPollReactionHandler({
             .setLabel('Buy')
             .setStyle('LINK')
             .setURL(
-              `${BUY_EXTERNAL_URL}/?daoName=${dao.internalName}&tokenId=${tokenID}&contractAddress=${contractAddress}&id=${uuid}`
+              `${BUY_EXTERNAL_URL}/?daoName=${dao.internalName}&tokenId=${tokenID}&contractAddress=${contractAddress}&id=${uuid}&price=${amountWEI}`
             )
             .setEmoji('💸')
         );
