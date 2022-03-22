@@ -111,7 +111,7 @@ describe('buy unit tests', () => {
   const GEM_SMALL_IMAGE_URL: string =
     'https://lh3.googleusercontent.com/some-image';
 
-  const GEM_ERC721_RESPONSE_FIXTURE = {
+  const GEM_ERC721_ASSET_RESPONSE_FIXTURE = {
     data: [
       {
         _id: '6195e798d1f72e1267eee0d9',
@@ -140,7 +140,7 @@ describe('buy unit tests', () => {
     ],
   };
 
-  const GEM_ERC1155_RESPONSE_FIXTURE = {
+  const GEM_ERC1155_ASSET_RESPONSE_FIXTURE = {
     data: [
       {
         _id: '6228f2599c6e5620b6c60db1',
@@ -172,33 +172,86 @@ describe('buy unit tests', () => {
     ],
   };
 
+  const GEM_ERC721_ROUTE_RESPONSE_FIXTURE = {
+    transaction:
+      '0x892848074ddea461a15f337250da3ce55580ca8502ee6238998a21c8713c8ed18ea960e1b9bc576bbe3c7c59613e1ca417e9a5350731bb239f96749f7df940389482b0800fef92dd92bbf93b8847512bf0a7835e6ee489213527d4fe05d42a43e3d1a30a7f1febefe935965d2cddfb00000000000000000000000000000000000000000000000000000000000015206241be7eaf8edc5c089d1cb18948a3f5c6640b1e6d8a41ec96315a679d7df20b117be14f00000030927f74c9de0000',
+    amountToBalance: {
+      type: 'BigNumber',
+      hex: '0x30927f74c9de0000',
+    },
+    value: {
+      type: 'BigNumber',
+      hex: '0x30927f74c9de0000',
+    },
+    route: [
+      {
+        action: 'buy',
+        marketplace: 'opensea',
+        assetIn: {
+          amount: '285000000000000000',
+          asset: '0x0000000000000000000000000000000000000000',
+          decimals: 18,
+        },
+        standard: 'ERC721',
+        maker: '0x21c8713c8ed18ea960e1b9bc576bbe3c7c59613e',
+        price: '285000000000000000',
+        contract: '0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8',
+        tokenId: '5314',
+        quantity: '1',
+        protocolFee: 250,
+        assetOut: {
+          standard: 'ERC721',
+          name: 'Sad Girl #5314',
+          tokenId: '5314',
+          symbol: 'SadGirlsBar',
+        },
+      },
+    ],
+    unavailable: [],
+    contractAddress: '0x00000000a50bb64b4bbeceb18715748dface08af',
+  };
+
+  const GEM_ERC1155_ROUTE_RESPONSE_FIXTURE = {
+    ...GEM_ERC721_ROUTE_RESPONSE_FIXTURE,
+    route: [
+      {
+        ...GEM_ERC721_ROUTE_RESPONSE_FIXTURE.route[0],
+        standard: 'ERC1155',
+        assetOut: {
+          ...GEM_ERC721_ROUTE_RESPONSE_FIXTURE.route[0].assetOut,
+          standard: 'ERC1155',
+        },
+      },
+    ],
+  };
+
   const DB_INSERT_DATA_ERC_721 = {
-    amountWEI: GEM_ERC721_RESPONSE_FIXTURE.data[0].priceInfo.price,
+    amountWEI: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].priceInfo.price,
     channelID: '886976610018934824',
-    contractAddress: GEM_ERC721_RESPONSE_FIXTURE.data[0].address,
+    contractAddress: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].address,
     createdAt: new Date(0),
     guildID: '722525233755717762',
     id: 1,
     messageID: '123456789',
     name: 'Sad Girl #5314',
     processed: false,
-    tokenID: GEM_ERC721_RESPONSE_FIXTURE.data[0].tokenId,
+    tokenID: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].tokenId,
     upvoteCount: 0,
     voteThreshold: 3,
   };
 
   const DB_INSERT_DATA_ERC_1155 = {
     amountWEI:
-      GEM_ERC1155_RESPONSE_FIXTURE.data[0].sellOrders[0].perItemEthPrice,
+      GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].sellOrders[0].perItemEthPrice,
     channelID: '886976610018934824',
-    contractAddress: GEM_ERC1155_RESPONSE_FIXTURE.data[0].address,
+    contractAddress: GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].address,
     createdAt: new Date(0),
     guildID: '722525233755717762',
     id: 1,
     messageID: '123456789',
-    name: GEM_ERC1155_RESPONSE_FIXTURE.data[0].name,
+    name: GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].name,
     processed: false,
-    tokenID: GEM_ERC1155_RESPONSE_FIXTURE.data[0].tokenId,
+    tokenID: GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].tokenId,
     upvoteCount: 0,
     voteThreshold: 3,
   };
@@ -207,7 +260,13 @@ describe('buy unit tests', () => {
     server.use(
       rest.post(
         'https://gem-public-api.herokuapp.com/assets',
-        async (_req, res, ctx) => res(ctx.json(GEM_ERC721_RESPONSE_FIXTURE))
+        async (_req, res, ctx) =>
+          res(ctx.json(GEM_ERC721_ASSET_RESPONSE_FIXTURE))
+      ),
+      rest.post(
+        'https://gem-public-api.herokuapp.com/route',
+        async (_req, res, ctx) =>
+          res(ctx.json(GEM_ERC721_ROUTE_RESPONSE_FIXTURE))
       ),
       // Set PNG image
       rest.get(GEM_SMALL_IMAGE_URL, async (_req, res, ctx) =>
@@ -265,12 +324,12 @@ describe('buy unit tests', () => {
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.image?.url
-    ).toBe(GEM_ERC721_RESPONSE_FIXTURE.data[0].smallImageUrl);
+    ).toBe(GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].smallImageUrl);
 
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.title
-    ).toBe(GEM_ERC721_RESPONSE_FIXTURE.data[0].name);
+    ).toBe(GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].name);
 
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
@@ -302,13 +361,13 @@ describe('buy unit tests', () => {
 
     expect(dbCreateMock).toHaveBeenNthCalledWith(1, {
       data: {
-        amountWEI: GEM_ERC721_RESPONSE_FIXTURE.data[0].priceInfo.price,
+        amountWEI: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].priceInfo.price,
         channelID: DB_INSERT_DATA_ERC_721.channelID,
-        contractAddress: GEM_ERC721_RESPONSE_FIXTURE.data[0].address,
+        contractAddress: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].address,
         guildID: DB_INSERT_DATA_ERC_721.guildID,
         messageID: DB_INSERT_DATA_ERC_721.messageID,
-        name: GEM_ERC721_RESPONSE_FIXTURE.data[0].name,
-        tokenID: GEM_ERC721_RESPONSE_FIXTURE.data[0].tokenId,
+        name: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].name,
+        tokenID: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].tokenId,
         voteThreshold: DB_INSERT_DATA_ERC_721.voteThreshold,
       },
     });
@@ -342,7 +401,8 @@ describe('buy unit tests', () => {
     server.use(
       rest.post(
         'https://gem-public-api.herokuapp.com/assets',
-        async (_req, res, ctx) => res(ctx.json(GEM_ERC1155_RESPONSE_FIXTURE))
+        async (_req, res, ctx) =>
+          res(ctx.json(GEM_ERC1155_ASSET_RESPONSE_FIXTURE))
       )
     );
 
@@ -371,17 +431,17 @@ describe('buy unit tests', () => {
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.description
-    ).toMatch(/📊 \*\*Should we buy it for 1.165 ETH\?\*\*/i);
+    ).toMatch(/📊 \*\*Should we buy it for 0\.285 ETH\?\*\*/i);
 
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.image?.url
-    ).toBe(GEM_ERC1155_RESPONSE_FIXTURE.data[0].smallImageUrl);
+    ).toBe(GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].smallImageUrl);
 
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.title
-    ).toBe(GEM_ERC1155_RESPONSE_FIXTURE.data[0].name);
+    ).toBe(GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].name);
 
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
@@ -413,14 +473,13 @@ describe('buy unit tests', () => {
 
     expect(dbCreateMock).toHaveBeenNthCalledWith(1, {
       data: {
-        amountWEI:
-          GEM_ERC1155_RESPONSE_FIXTURE.data[0].sellOrders[0].currentEthPrice,
+        amountWEI: GEM_ERC1155_ROUTE_RESPONSE_FIXTURE.route[0].price,
         channelID: DB_INSERT_DATA_ERC_1155.channelID,
-        contractAddress: GEM_ERC1155_RESPONSE_FIXTURE.data[0].address,
+        contractAddress: GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].address,
         guildID: DB_INSERT_DATA_ERC_1155.guildID,
         messageID: DB_INSERT_DATA_ERC_1155.messageID,
-        name: GEM_ERC1155_RESPONSE_FIXTURE.data[0].name,
-        tokenID: GEM_ERC1155_RESPONSE_FIXTURE.data[0].tokenId,
+        name: GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].name,
+        tokenID: GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].tokenId,
         voteThreshold: DB_INSERT_DATA_ERC_1155.voteThreshold,
       },
     });
@@ -473,7 +532,7 @@ describe('buy unit tests', () => {
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.image?.url
-    ).toBe(GEM_ERC721_RESPONSE_FIXTURE.data[0].smallImageUrl);
+    ).toBe(GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].smallImageUrl);
 
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
@@ -604,7 +663,7 @@ describe('buy unit tests', () => {
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.image?.url
-    ).toBe(GEM_ERC721_RESPONSE_FIXTURE.data[0].smallImageUrl);
+    ).toBe(GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].smallImageUrl);
 
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
@@ -666,7 +725,7 @@ describe('buy unit tests', () => {
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.image?.url
-    ).toBe(GEM_ERC721_RESPONSE_FIXTURE.data[0].smallImageUrl);
+    ).toBe(GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].smallImageUrl);
 
     expect(
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
@@ -901,12 +960,12 @@ describe('buy unit tests', () => {
 
     server.use(
       rest.post(
-        'https://gem-public-api.herokuapp.com/assets',
+        'https://gem-public-api.herokuapp.com/route',
         async (_req, res, ctx) =>
           res(
             ctx.json({
-              ...GEM_ERC721_RESPONSE_FIXTURE,
-              data: [{...GEM_ERC721_RESPONSE_FIXTURE.data[0], priceInfo: null}],
+              ...GEM_ERC721_ROUTE_RESPONSE_FIXTURE,
+              route: [],
             })
           )
       )
@@ -943,12 +1002,12 @@ describe('buy unit tests', () => {
 
     server.use(
       rest.post(
-        'https://gem-public-api.herokuapp.com/assets',
+        'https://gem-public-api.herokuapp.com/route',
         async (_req, res, ctx) =>
           res(
             ctx.json({
-              ...GEM_ERC1155_RESPONSE_FIXTURE,
-              data: [{...GEM_ERC1155_RESPONSE_FIXTURE.data[0], sellOrders: []}],
+              ...GEM_ERC1155_ROUTE_RESPONSE_FIXTURE,
+              route: [],
             })
           )
       )
@@ -989,8 +1048,10 @@ describe('buy unit tests', () => {
         async (_req, res, ctx) =>
           res(
             ctx.json({
-              ...GEM_ERC721_RESPONSE_FIXTURE,
-              data: [{...GEM_ERC721_RESPONSE_FIXTURE.data[0], name: null}],
+              ...GEM_ERC721_ASSET_RESPONSE_FIXTURE,
+              data: [
+                {...GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0], name: null},
+              ],
             })
           )
       )
@@ -1030,7 +1091,7 @@ describe('buy unit tests', () => {
         async (_req, res, ctx) =>
           res(
             ctx.json({
-              ...GEM_ERC721_RESPONSE_FIXTURE,
+              ...GEM_ERC721_ASSET_RESPONSE_FIXTURE,
               data: [],
             })
           )
@@ -1071,9 +1132,12 @@ describe('buy unit tests', () => {
         async (_req, res, ctx) =>
           res(
             ctx.json({
-              ...GEM_ERC721_RESPONSE_FIXTURE,
+              ...GEM_ERC721_ASSET_RESPONSE_FIXTURE,
               data: [
-                {...GEM_ERC721_RESPONSE_FIXTURE.data[0], smallImageUrl: null},
+                {
+                  ...GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0],
+                  smallImageUrl: null,
+                },
               ],
             })
           )
@@ -1098,7 +1162,7 @@ describe('buy unit tests', () => {
     });
   });
 
-  test('should reply with error if Gem response is not OK', async () => {
+  test('should reply with error if Gem asset response is not OK', async () => {
     const client = new Client(CLIENT_OPTIONS);
 
     const interaction = new FakeDiscordCommandInteraction(
@@ -1111,6 +1175,41 @@ describe('buy unit tests', () => {
     server.use(
       rest.post(
         'https://gem-public-api.herokuapp.com/assets',
+        async (_req, res, ctx) => res(ctx.status(500))
+      )
+    );
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {guildId: '722525233755717762', react: reactSpy}) as any
+      );
+
+    const buyResult = await buy.execute(interaction);
+
+    expect(buyResult).toBe(undefined);
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+
+    expect(interactionReplySpy.mock.calls[0][0]).toEqual({
+      content: 'Something went wrong while setting up the poll.',
+      ephemeral: true,
+    });
+  });
+
+  test('should reply with error if Gem route response is not OK', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA_ERC721
+    );
+
+    const reactSpy = jest.fn();
+
+    server.use(
+      rest.post(
+        'https://gem-public-api.herokuapp.com/route',
         async (_req, res, ctx) => res(ctx.status(500))
       )
     );
