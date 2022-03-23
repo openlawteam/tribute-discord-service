@@ -1,6 +1,7 @@
 import Router from '@koa/router';
 
 import {HTTP_API_BASE_PATH} from '../../config';
+import {tributeToolsFeeWebhook} from './tributeToolsFeeWebhook';
 
 /**
  * Koa `Router` Instance
@@ -16,6 +17,7 @@ const tributeToolsRouter = new Router({
  *
  * (router: Router) => void
  */
+tributeToolsFeeWebhook(tributeToolsRouter);
 
 /**
  * Export `@koa/router` routes
