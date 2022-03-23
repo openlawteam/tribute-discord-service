@@ -55,6 +55,7 @@ export function legacyTributeDraftCreatedAction(
       ) {
         return;
       }
+
       const {
         adapters,
         baseURL,
