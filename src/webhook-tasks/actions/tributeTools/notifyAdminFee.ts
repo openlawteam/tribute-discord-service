@@ -26,7 +26,7 @@ export async function notifyAdminFee(
         {name: 'Amount', value: `${amountETH} ETH`},
       ]);
 
-    https: await client.send({
+    await client.send({
       embeds: [embed],
       username: `Tribute Tools${APP_ENV === 'production' ? '' : ' [dev]'}`,
     });
