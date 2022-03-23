@@ -6,7 +6,8 @@ import {getDiscordWebhookClient} from '../../../services';
 import {TributeToolsFeeWebhookPayload} from '../../../http-api/middleware/tributeTools/tributeToolsFeeWebhook';
 
 // @todo move
-const WEBHOOK_ID: string = APP_ENV === 'production' ? '' : '886976872611729439';
+const WEBHOOK_ID: string =
+  APP_ENV === 'production' ? '956221982540709888' : '886976872611729439';
 
 export async function notifyAdminFee(
   payload: TributeToolsFeeWebhookPayload
