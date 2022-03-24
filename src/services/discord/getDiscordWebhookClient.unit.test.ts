@@ -14,8 +14,12 @@ describe('getDiscordWebhookClient unit tests', () => {
       name: 'A Test Webhook',
     };
 
-    // Mock result
-    prismaMock.discordWebhook.findUnique.mockResolvedValue(webhook);
+    /**
+     * Mock result
+     *
+     * @todo fix types
+     */
+    (prismaMock.discordWebhook as any).findUnique.mockResolvedValue(webhook);
 
     const client = await getDiscordWebhookClient('abc123');
 
@@ -26,8 +30,12 @@ describe('getDiscordWebhookClient unit tests', () => {
   test('should throw an error if no webhook found', async () => {
     const noWebhook: null = null;
 
-    // Mock result
-    prismaMock.discordWebhook.findUnique.mockResolvedValue(noWebhook);
+    /**
+     * Mock result
+     *
+     * @todo fix types
+     */
+    (prismaMock.discordWebhook as any).findUnique.mockResolvedValue(noWebhook);
 
     try {
       await getDiscordWebhookClient('abc123');
@@ -39,8 +47,14 @@ describe('getDiscordWebhookClient unit tests', () => {
   });
 
   test('should throw an error if query fails', async () => {
-    // Mock error
-    prismaMock.discordWebhook.findUnique.mockRejectedValue(new Error('Ugh!'));
+    /**
+     * Mock error
+     *
+     * @todo fix types
+     */
+    (prismaMock.discordWebhook as any).findUnique.mockRejectedValue(
+      new Error('Ugh!')
+    );
 
     try {
       await getDiscordWebhookClient('abc123');
