@@ -5,9 +5,10 @@ import {createHTTPError, validateZod} from '../../helpers';
 import {notifyAdminFee} from '../../../webhook-tasks/actions';
 
 export const TributeToolsFeePayloadSchema = z.object({
-  amount: z.string(),
-  daoName: z.string(),
-  description: z.string(),
+  amount: z.string().nonempty(),
+  daoName: z.string().nonempty(),
+  description: z.string().nonempty(),
+  totalContribution: z.string().nonempty(),
 });
 
 export type TributeToolsFeeWebhookPayload = z.infer<

@@ -33,6 +33,7 @@ describe('tributeToolsFeeWebhook unit tests', () => {
     amount: '1000000000000000000',
     daoName: 'tribute',
     description: 'Fee for tribute',
+    totalContribution: '100000000000000000000',
   };
 
   afterAll(async () => {
@@ -88,14 +89,16 @@ describe('tributeToolsFeeWebhook unit tests', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    const response = await requestHelper(
+    // Assert wrong type
+
+    const badTypeResponse = await requestHelper(
       // Insert bad payload
       {body: JSON.stringify({...PAYLOAD, daoName: 123})},
       port
     );
 
-    expect(response.ok).toBe(false);
-    expect(response.status).toBe(400);
+    expect(badTypeResponse.ok).toBe(false);
+    expect(badTypeResponse.status).toBe(400);
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
 
     expect(zodErrorHelper(consoleErrorSpy.mock.calls[0][0])).toEqual([
@@ -105,6 +108,29 @@ describe('tributeToolsFeeWebhook unit tests', () => {
         expected: 'string',
         received: 'number',
         path: ['daoName'],
+      },
+    ]);
+
+    // Assert empty `string`
+
+    const emptyStringResponse = await requestHelper(
+      // Insert bad payload
+      {body: JSON.stringify({...PAYLOAD, daoName: ''})},
+      port
+    );
+
+    expect(emptyStringResponse.ok).toBe(false);
+    expect(emptyStringResponse.status).toBe(400);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+
+    expect(zodErrorHelper(consoleErrorSpy.mock.calls[1][0])).toEqual([
+      {
+        code: 'too_small',
+        inclusive: true,
+        message: 'String must contain at least 1 character(s)',
+        minimum: 1,
+        path: ['daoName'],
+        type: 'string',
       },
     ]);
 

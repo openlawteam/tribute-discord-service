@@ -7,6 +7,7 @@ describe('notifyAdminFee unit tests', () => {
     amount: '1000000000000000000',
     daoName: 'tribute',
     description: 'Fee is due to be collected',
+    totalContribution: '100000000000000000000',
   };
 
   const EMBED = new MessageEmbed()
@@ -14,7 +15,8 @@ describe('notifyAdminFee unit tests', () => {
     .setDescription(PAYLOAD.description)
     .addFields([
       {name: 'DAO', value: PAYLOAD.daoName},
-      {name: 'Amount', value: `1 ETH`},
+      {name: 'Amount', value: '1 ETH'},
+      {name: 'Total Contribution', value: '100 ETH'},
     ]);
 
   test('should send Discord message', async () => {

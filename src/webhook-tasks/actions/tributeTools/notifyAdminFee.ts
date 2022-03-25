@@ -13,11 +13,16 @@ export async function notifyAdminFee(
   payload: TributeToolsFeeWebhookPayload
 ): Promise<void> {
   try {
-    const {amount, daoName, description} = payload;
+    const {amount, daoName, description, totalContribution} = payload;
 
     const client = await getDiscordWebhookClient(WEBHOOK_ID);
 
     const amountETH: string = fromWei(toBN(amount), 'ether');
+
+    const totalContributionETH: string = fromWei(
+      toBN(totalContribution),
+      'ether'
+    );
 
     const embed = new MessageEmbed()
       .setTitle('💸 Admin Fee Due')
@@ -25,6 +30,7 @@ export async function notifyAdminFee(
       .addFields([
         {name: 'DAO', value: daoName},
         {name: 'Amount', value: `${amountETH} ETH`},
+        {name: 'Total Contribution', value: `${totalContributionETH} ETH`},
       ]);
 
     await client.send({
