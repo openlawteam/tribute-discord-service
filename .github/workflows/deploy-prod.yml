@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
 
 env:
   ## Required Env Vars
@@ -20,8 +21,8 @@ env:
   DEPLOYMENT_FOLDER: gke-projects/$GCP_PROJECT_ID/prod/deployments/
   IMAGE_NAME: $GCP_PROJECT_ID/$GITHUB_REPO_NAME
   REGISTRY_HOSTNAME: gcr.io
-  GIT_COMMITTER_NAME: 'Pizza Dog'
-  GIT_COMMITTER_EMAIL: 'dev@tributelabs.xyz'
+  GIT_COMMITTER_NAME: "Pizza Dog"
+  GIT_COMMITTER_EMAIL: "dev@tributelabs.xyz"
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
@@ -52,10 +53,10 @@ jobs:
           docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG"
           docker tag "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:"$TAG" "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:${{ env.DEPLOYMENT_BRANCH }}
           docker push "$REGISTRY_HOSTNAME"/${{ env.IMAGE_NAME }}:${{ env.DEPLOYMENT_BRANCH }}
-          
+
       - name: Checkout openlawteam/infrastructure repo
         uses: actions/checkout@v2
-        with: 
+        with:
           repository: ${{ env.INFRA_REPO }}
           token: ${{ secrets.PAT_OLBOT_PUB_REPOS_RW }}
 
