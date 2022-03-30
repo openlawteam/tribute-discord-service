@@ -1,1 +1,1 @@
-export * from './tributeToolsEventEmitter';
+export * from './adminFeeEvent';

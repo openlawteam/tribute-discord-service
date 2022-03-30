@@ -14,4 +14,5 @@
  *
  */
 
+export {adminFeeRunner} from './tributeTools';
 export {sponsoredProposalRunnerSubscribeLogs} from './web3/subscribeLogs';
