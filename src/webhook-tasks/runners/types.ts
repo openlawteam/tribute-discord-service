@@ -1,18 +1,14 @@
 import {EventEmitter} from 'events';
-import StrictEventEmitter from 'strict-event-emitter-types/types/src';
 
-import {EventEmitterEventNames} from '../../singletons/eventEmitters';
 import {EventNames} from '../../config';
 
-export type RunnerReturn<
-  TEventEmitter extends StrictEventEmitter<EventEmitter, any> | undefined = any
-> = {
+export type RunnerReturn = {
   eventEmitter?: EventEmitter;
   /**
    * Friendly name for logging and debugging.
    * Typically, this will be from the event's data.
    */
-  eventName: EventEmitterEventNames<TEventEmitter> | EventNames;
+  eventName: EventNames;
   /**
    * A callback to unsubscribe, stop polling, etc.
    */

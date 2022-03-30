@@ -6,9 +6,7 @@ import {TRIBUTE_TOOLS_ADMIN_FEE_EVENT} from '../../events';
 
 const {eventEmitter, name} = TRIBUTE_TOOLS_ADMIN_FEE_EVENT;
 
-export function adminFeeRunner(
-  _daos: Daos | undefined
-): RunnerReturn<typeof eventEmitter> {
+export function adminFeeRunner(_daos: Daos | undefined): RunnerReturn {
   eventEmitter?.on('adminFee', notifyAdminFee);
 
   const stop = async () => {

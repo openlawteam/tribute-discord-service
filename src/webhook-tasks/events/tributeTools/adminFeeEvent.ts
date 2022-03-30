@@ -5,5 +5,5 @@ export const TRIBUTE_TOOLS_ADMIN_FEE_EVENT: EventTributeTools<
   typeof tributeToolsEventEmitter
 > = {
   eventEmitter: tributeToolsEventEmitter,
-  name: 'adminFee',
+  name: 'TRIBUTE_TOOLS_ADMIN_FEE',
 };
