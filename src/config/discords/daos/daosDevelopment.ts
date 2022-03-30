@@ -1,10 +1,10 @@
 import {
   SnapshotHubProposalResolverArgs,
   snapshotHubResolverSelector,
-} from '../../services/snapshotHub';
-import {BURN_ADDRESS} from '../../helpers';
+} from '../../../services/snapshotHub';
+import {BURN_ADDRESS} from '../../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
-import {DaoDiscordConfig} from '../types';
+import {DaoDiscordConfig} from '../../types';
 
 /**
  * A DEVELOPMENT configuration mapping for DAO's this app recognises.
