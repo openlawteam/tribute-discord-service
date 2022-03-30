@@ -1,7 +1,7 @@
 import {EventEmitter} from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types';
-import {ERROR_EVENT_NAME} from '.';
 
+import {ERROR_EVENT_NAME} from '.';
 import {TributeToolsFeeWebhookPayload} from '../../http-api/middleware/tributeTools/tributeToolsFeeWebhook';
 
 // Define `tributeToolsEventEmitter` event names and payloads

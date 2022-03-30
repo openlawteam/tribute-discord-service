@@ -3,9 +3,9 @@ import StrictEventEmitter from 'strict-event-emitter-types';
 
 import {EventNames} from '../../config';
 
-export interface EventBase<
-  TEventEmitter extends StrictEventEmitter<EventEmitter, any> = any
-> {
-  eventEmitter?: TEventEmitter;
+export interface EventBase<TEventEmitter = any> {
+  eventEmitter?: TEventEmitter extends StrictEventEmitter<EventEmitter, any>
+    ? TEventEmitter
+    : undefined;
   name: EventNames;
 }
