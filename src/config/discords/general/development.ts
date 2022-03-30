@@ -1,9 +1,9 @@
-import {DiscordConfig} from '../types';
+import {DiscordConfig} from '../../types';
 
-const PRODUCTION_DISCORD_NAMES = ['tributeLabs'] as const;
+const DEVELOPMENT_DISCORD_NAMES = ['tributeLabs'] as const;
 
-export const PRODUCTION_DISCORD_CONFIGS: Record<
-  typeof PRODUCTION_DISCORD_NAMES[number],
+export const DEVELOPMENT_DISCORD_CONFIGS: Record<
+  typeof DEVELOPMENT_DISCORD_NAMES[number],
   DiscordConfig
 > = {
   tributeLabs: {
