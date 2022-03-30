@@ -15,7 +15,7 @@ import {
 } from '../../services/snapshotHub';
 import {BURN_ADDRESS} from '../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
-import {DaoData} from '../types';
+import {DaoEntityConfig} from '../types';
 */
 
 /**
@@ -38,7 +38,7 @@ export const DAO_NAMES_LOCALHOST = ['test'] as const;
 
 export const DAOS_LOCALHOST: Record<
   typeof DAO_NAMES_LOCALHOST[number],
-  DaoData
+  DaoEntityConfig
 > = {
   test: {
     actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],

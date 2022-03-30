@@ -1,10 +1,10 @@
-import {DaoData, Daos} from '../config/types';
+import {DaoEntityConfig, Daos} from '../config/types';
 import {normalizeString} from './normalizeString';
 
 export function getDaoDataByAddress(
   address: string,
   daos: Daos | undefined
-): DaoData | undefined {
+): DaoEntityConfig | undefined {
   if (!daos) return;
 
   return Object.entries(daos).find(

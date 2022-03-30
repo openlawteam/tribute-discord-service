@@ -1,9 +1,9 @@
-import {CORE_DAO_ADAPTERS, DaoData} from '../config';
+import {CORE_DAO_ADAPTERS, DaoEntityConfig} from '../config';
 import {filterDaosByActiveEvent} from './filterDaosByActiveEvent';
 import {GUILD_ID_FIXTURE} from '../../test/fixtures/constants';
 
 describe('filterDaosByActiveEvent unit tests', () => {
-  const TEST_DAOS: Record<string, DaoData> = {
+  const TEST_DAOS: Record<string, DaoEntityConfig> = {
     test: {
       actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],
       adapters: {

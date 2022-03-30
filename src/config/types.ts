@@ -8,6 +8,37 @@ export type ActionNames = typeof ACTIONS[number];
 export type ApplicationNames = typeof APPLICATIONS[number];
 export type EventNames = typeof EVENTS[number];
 
+export interface EntityConfig {
+  /**
+   * Actions to be run, or not
+   */
+  actions: DaoDataAction[];
+  /**
+   * Applications (bots)
+   */
+  applications?: Partial<DaoDataApplicationsMap>;
+  /**
+   * A public, full, base URL
+   *
+   * e.g. `https://tributelabs.xyz`
+   */
+  baseURL?: string;
+  /**
+   * Events to be watched, or not
+   */
+  events: DaoDataEvent[];
+  /**
+   * A friendly name for display
+   *
+   * E.g. `Tribute DAO`, `Tribute Labs`
+   */
+  friendlyName: string;
+  /**
+   * Discord guild (server) ID
+   */
+  guildID: string;
+}
+
 export type DaoDataEvent = {name: EventNames; active?: boolean};
 
 export type DaoDataAction = {
@@ -16,41 +47,13 @@ export type DaoDataAction = {
   active?: boolean;
 };
 
-export type Daos = Record<string, DaoData>;
+export type Daos = Record<string, DaoEntityConfig>;
 
-export type DaoData<InternalNames = string> = {
+export interface DaoEntityConfig<InternalNames = string> extends EntityConfig {
   /**
    * Adapter information
    */
   adapters?: Record<AdapterID, DaoDataAdapter>;
-  /**
-   * Actions to be run, or not, for the DAO
-   */
-  actions: DaoDataAction[];
-  /**
-   * Applications (bots)
-   */
-  applications?: Partial<DaoDataApplicationsMap>;
-  /**
-   * A public, full, base URL for the DAO
-   *
-   * e.g. `https://muse0.xyz`
-   */
-  baseURL?: string;
-  /**
-   * Events to be watched, or not, for the DAO
-   */
-  events: DaoDataEvent[];
-  /**
-   * A friendly name for the DAO
-   *
-   * E.g. `Tribute DAO`
-   */
-  friendlyName: string;
-  /**
-   * Discord guild (server) ID
-   */
-  guildID: string;
   /**
    * Internal DAO name
    *
@@ -65,13 +68,13 @@ export type DaoData<InternalNames = string> = {
    * DAO's deployed `DaoRegistry.sol` contract address
    */
   registryContractAddress: string;
-};
+}
 
 export type DaoDataAdapter = {
   /**
    * A base URL path, without `/`.
    *
-   * Used together with `DaoData['baseURL']` to form
+   * Used together with `DaoEntityConfig['baseURL']` to form
    * a URL for links (i.e. used by `actions` in Discord webhook content).
    *
    * This works for simple URL structures (i.e. `tribute-ui`).

@@ -21,7 +21,7 @@ import {
   SponsoredProposalTemplateData,
 } from '../../../templates';
 import {actionErrorHandler} from '../../helpers/actionErrorHandler';
-import {DaoData} from '../../../../config/types';
+import {DaoEntityConfig} from '../../../../config/types';
 import {DiscordMessageEmbeds} from '../..';
 import {getDiscordWebhookClient} from '../../../../services/discord';
 import {getProposalAdapterID} from '../../../../services';
@@ -38,7 +38,7 @@ import {web3} from '../../../../singletons';
  */
 export function sponsoredProposalActionSubscribeLogs(
   event: EventWeb3Logs,
-  daos: Record<string, DaoData> | undefined
+  daos: Record<string, DaoEntityConfig> | undefined
 ): (d: Log) => Promise<void> {
   return async (eventData) => {
     try {

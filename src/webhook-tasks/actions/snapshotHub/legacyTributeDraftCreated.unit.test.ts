@@ -14,7 +14,7 @@ import {
   SnapshotDraftCreatedEmbedTemplateData,
   SnapshotDraftCreatedTemplateData,
 } from '../../templates';
-import {ActionNames, DaoData} from '../../../config';
+import {ActionNames, DaoEntityConfig} from '../../../config';
 import {BURN_ADDRESS} from '../../../helpers';
 import {EventBase} from '../../events';
 import {legacyTributeDraftCreatedAction} from './legacyTributeDraftCreated';
@@ -125,7 +125,7 @@ const EVENT_DATA: SnapshotHubEventPayload = {
   space: 'tribute',
 };
 
-const FAKE_DAOS: Record<string, DaoData> = {
+const FAKE_DAOS: Record<string, DaoEntityConfig> = {
   ...FAKE_DAOS_FIXTURE,
   test: {
     ...FAKE_DAOS_FIXTURE.test,
