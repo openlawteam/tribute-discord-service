@@ -2,7 +2,7 @@ import {z} from 'zod';
 import Router from '@koa/router';
 
 import {createHTTPError, validateZod} from '../../helpers';
-import {notifyAdminFee} from '../../../webhook-tasks/actions';
+import {tributeToolsEventEmitter} from '../../../singletons/eventEmitters';
 
 export const TributeToolsFeePayloadSchema = z.object({
   amount: z.string().nonempty(),
@@ -30,7 +30,7 @@ export function tributeToolsFeeWebhook(router: Router): void {
         TributeToolsFeePayloadSchema
       );
 
-      await notifyAdminFee(validatedBody);
+      tributeToolsEventEmitter.emit('adminFee', validatedBody);
 
       ctx.status = 200;
     } catch (error) {

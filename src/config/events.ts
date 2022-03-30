@@ -12,4 +12,8 @@ export const EVENTS = [
    * Tribute DAO
    */
   'SPONSORED_PROPOSAL',
+  /**
+   * Tribute Tools
+   */
+  'TRIBUTE_TOOLS_ADMIN_FEE',
 ] as const;

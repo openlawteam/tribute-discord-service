@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 
 import {HTTP_API_BASE_PATH} from '../../config';
 import {httpServer} from '../..';
+import {tributeToolsEventEmitter} from '../../../singletons/eventEmitters';
 
 describe('tributeToolsFeeWebhook unit tests', () => {
   const server = httpServer({noLog: true, useAnyAvailablePort: true});
@@ -41,44 +42,30 @@ describe('tributeToolsFeeWebhook unit tests', () => {
   });
 
   test('should send 200 response', async () => {
+    const spy = jest.fn();
     const {port} = server?.address() as AddressInfo;
-
-    const notifyAdminFeeSpy = jest
-      .spyOn(
-        await import(
-          '../../../webhook-tasks/actions/tributeTools/notifyAdminFee'
-        ),
-        'notifyAdminFee'
-      )
-      .mockImplementation(async () => {});
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
       .mockImplementation(() => {});
 
+    tributeToolsEventEmitter.once('adminFee', spy);
+
     const response = await requestHelper({body: JSON.stringify(PAYLOAD)}, port);
 
     expect(response.ok).toBe(true);
     expect(response.status).toBe(200);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenNthCalledWith(1, PAYLOAD);
 
     // Cleanup
 
     consoleWarnSpy.mockRestore();
-    notifyAdminFeeSpy.mockRestore();
   });
 
   test('should send 400 response', async () => {
     const {port} = server?.address() as AddressInfo;
-
-    const notifyAdminFeeSpy = jest
-      .spyOn(
-        await import(
-          '../../../webhook-tasks/actions/tributeTools/notifyAdminFee'
-        ),
-        'notifyAdminFee'
-      )
-      .mockImplementation(async () => {});
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
@@ -138,7 +125,6 @@ describe('tributeToolsFeeWebhook unit tests', () => {
 
     consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
-    notifyAdminFeeSpy.mockRestore();
   });
 
   test('should send 500 response', async () => {
@@ -146,16 +132,11 @@ describe('tributeToolsFeeWebhook unit tests', () => {
 
     const ERROR = new Error('Some bad error.');
 
-    const notifyAdminFeeSpy = jest
-      .spyOn(
-        await import(
-          '../../../webhook-tasks/actions/tributeTools/notifyAdminFee'
-        ),
-        'notifyAdminFee'
-      )
-      .mockImplementation(async () => {
-        throw ERROR;
-      });
+    const spy = jest.fn().mockImplementation(() => {
+      throw ERROR;
+    });
+
+    tributeToolsEventEmitter.once('adminFee', spy);
 
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
@@ -166,21 +147,18 @@ describe('tributeToolsFeeWebhook unit tests', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    const response = await requestHelper(
-      // Insert bad payload
-      {body: JSON.stringify(PAYLOAD)},
-      port
-    );
+    const response = await requestHelper({body: JSON.stringify(PAYLOAD)}, port);
 
     expect(response.ok).toBe(false);
     expect(response.status).toBe(500);
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
     expect(consoleErrorSpy).toHaveBeenNthCalledWith(1, ERROR);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenNthCalledWith(1, PAYLOAD);
 
     // Cleanup
 
     consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
-    notifyAdminFeeSpy.mockRestore();
   });
 });

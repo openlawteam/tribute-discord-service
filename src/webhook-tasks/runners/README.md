@@ -1,6 +1,6 @@
 **Add runners for `./events` and `./actions`.**
 
-Runners establish the processes which watch for events and run actions.
+Runners establish the processes which watch for any events and run any actions.
 
 **Updating which runners are executed**
 
