@@ -3,14 +3,14 @@ import {
   legacyTributeProposalResolver,
   SnapshotHubProposalResolverArgs,
 } from '../../src/services/snapshotHub';
-import {DaoEntityConfig} from '../../src/config/types';
+import {DaoDiscordConfig} from '../../src/config/types';
 import {
   BYTES32_FIXTURE,
   ETH_ADDRESS_FIXTURE,
   GUILD_ID_FIXTURE,
 } from './constants';
 
-export const FAKE_DAOS_FIXTURE: Record<string, DaoEntityConfig> = {
+export const FAKE_DAOS_FIXTURE: Record<string, DaoDiscordConfig> = {
   test: {
     actions: [
       {

@@ -19,7 +19,7 @@ import {
   SnapshotHubLegacyTributeProposalEntry,
   SnapshotHubMessageType,
 } from '../../../services/snapshotHub';
-import {ActionNames, DaoEntityConfig} from '../../../config';
+import {ActionNames, DaoDiscordConfig} from '../../../config';
 import {BURN_ADDRESS} from '../../../helpers';
 import {EventBase} from '../../events';
 import {legacyTributeGovernanceProposalCreatedAction} from './legacyTributeGovernanceProposalCreated';
@@ -151,7 +151,7 @@ const EVENT_DATA: SnapshotHubEventPayload = {
   space: 'tribute',
 };
 
-const FAKE_DAOS_FIXTURE_GOVERNANCE: Record<string, DaoEntityConfig> = {
+const FAKE_DAOS_FIXTURE_GOVERNANCE: Record<string, DaoDiscordConfig> = {
   ...FAKE_DAOS_FIXTURE,
   test: {
     ...FAKE_DAOS_FIXTURE.test,
@@ -430,7 +430,7 @@ describe('legacyTributeGovernanceProposalCreatedAction unit tests', () => {
   });
 
   test('should exit if action is not active', async () => {
-    const FAKE_DAOS_NO_ACTION: Record<string, DaoEntityConfig> = {
+    const FAKE_DAOS_NO_ACTION: Record<string, DaoDiscordConfig> = {
       ...FAKE_DAOS_FIXTURE,
       test: {
         ...FAKE_DAOS_FIXTURE.test,

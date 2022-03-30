@@ -1,6 +1,6 @@
 **Add configuration for a DAO in order to respond to any of its related events**
 
-See `config/types.ts` `DaoEntityConfig` for documentation about the configuration.
+See `config/types.ts` `DaoDiscordConfig` for documentation about the configuration.
 
 Example:
 

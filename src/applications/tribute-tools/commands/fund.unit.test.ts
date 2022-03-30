@@ -15,7 +15,7 @@ import {
   GUILD_ID_FIXTURE,
 } from '../../../../test';
 import {CANCEL_POLL_FUND_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
-import {DaoEntityConfig} from '../../../config';
+import {DaoDiscordConfig} from '../../../config';
 import {fund} from './fund';
 import {prismaMock} from '../../../../test/prismaMock';
 
@@ -330,7 +330,7 @@ describe('fund unit tests', () => {
                 },
               },
             },
-          } as Record<string, DaoEntityConfig>)
+          } as Record<string, DaoDiscordConfig>)
       );
 
     const interactionReplySpy = jest

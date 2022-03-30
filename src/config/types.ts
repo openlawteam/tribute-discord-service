@@ -8,7 +8,7 @@ export type ActionNames = typeof ACTIONS[number];
 export type ApplicationNames = typeof APPLICATIONS[number];
 export type EventNames = typeof EVENTS[number];
 
-export interface EntityConfig {
+export interface DiscordConfig {
   /**
    * Actions to be run, or not
    */
@@ -47,9 +47,10 @@ export type DaoDataAction = {
   active?: boolean;
 };
 
-export type Daos = Record<string, DaoEntityConfig>;
+export type Daos = Record<string, DaoDiscordConfig>;
 
-export interface DaoEntityConfig<InternalNames = string> extends EntityConfig {
+export interface DaoDiscordConfig<InternalNames = string>
+  extends DiscordConfig {
   /**
    * Adapter information
    */
@@ -74,7 +75,7 @@ export type DaoDataAdapter = {
   /**
    * A base URL path, without `/`.
    *
-   * Used together with `DaoEntityConfig['baseURL']` to form
+   * Used together with `DaoDiscordConfig['baseURL']` to form
    * a URL for links (i.e. used by `actions` in Discord webhook content).
    *
    * This works for simple URL structures (i.e. `tribute-ui`).

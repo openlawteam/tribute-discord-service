@@ -8,14 +8,14 @@ export async function getDaos(): Promise<Daos | undefined> {
     switch (appEnv) {
       case 'production':
         const {DAOS_PRODUCTION} = await import(
-          '../../config/daos/daosProduction'
+          '../../config/daoDiscords/daosProduction'
         );
 
         return DAOS_PRODUCTION;
 
       case 'development':
         const {DAOS_DEVELOPMENT} = await import(
-          '../../config/daos/daosDevelopment'
+          '../../config/daoDiscords/daosDevelopment'
         );
 
         return DAOS_DEVELOPMENT;
