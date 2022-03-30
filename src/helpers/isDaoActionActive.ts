@@ -1,7 +1,7 @@
-import {DaoDataAction} from '../config/types';
+import {ActionConfig} from '../config/types';
 
 export function isDaoActionActive(
-  daoDataAction: DaoDataAction | undefined
+  daoDataAction: ActionConfig | undefined
 ): boolean {
   if (!daoDataAction) return false;
 

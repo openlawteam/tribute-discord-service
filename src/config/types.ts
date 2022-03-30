@@ -12,7 +12,7 @@ export interface DiscordConfig {
   /**
    * Actions to be run, or not
    */
-  actions: DaoDataAction[];
+  actions: ActionConfig[];
   /**
    * Applications (bots)
    */
@@ -26,7 +26,7 @@ export interface DiscordConfig {
   /**
    * Events to be watched, or not
    */
-  events: DaoDataEvent[];
+  events: EventConfig[];
   /**
    * A friendly name for display
    *
@@ -39,10 +39,10 @@ export interface DiscordConfig {
   guildID: string;
 }
 
-export type DaoDataEvent = {name: EventNames; active?: boolean};
+export type EventConfig = {name: EventNames; active?: boolean};
 
-export type DaoDataAction = {
-  name: typeof ACTIONS[number];
+export type ActionConfig = {
+  name: ActionNames;
   webhookID: string;
   active?: boolean;
 };
