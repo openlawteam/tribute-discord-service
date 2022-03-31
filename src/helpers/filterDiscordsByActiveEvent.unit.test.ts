@@ -1,8 +1,8 @@
 import {CORE_DAO_ADAPTERS, DaoDiscordConfig} from '../config';
-import {filterDaosByActiveEvent} from './filterDaosByActiveEvent';
+import {filterDiscordsByActiveEvent} from './filterDiscordsByActiveEvent';
 import {GUILD_ID_FIXTURE} from '../../test/fixtures/constants';
 
-describe('filterDaosByActiveEvent unit tests', () => {
+describe('filterDiscordsByActiveEvent unit tests', () => {
   const TEST_DAOS: Record<string, DaoDiscordConfig> = {
     test: {
       actions: [{name: 'SPONSORED_PROPOSAL_WEBHOOK', webhookID: 'abc123'}],
@@ -77,7 +77,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
 
   test('should return filtered daos', async () => {
     // Assert `SPONSORED_PROPOSAL`
-    const filteredDaos = filterDaosByActiveEvent(
+    const filteredDaos = filterDiscordsByActiveEvent(
       TEST_DAOS,
       'SPONSORED_PROPOSAL'
     );
@@ -87,7 +87,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
     expect(filteredDaos?.test3).toEqual(TEST_DAOS.test3);
 
     // Assert `PROCESSED_PROPOSAL`
-    const filteredDaos1 = filterDaosByActiveEvent(
+    const filteredDaos1 = filterDiscordsByActiveEvent(
       TEST_DAOS,
       'PROCESSED_PROPOSAL' as any
     );
@@ -97,7 +97,7 @@ describe('filterDaosByActiveEvent unit tests', () => {
     expect(filteredDaos1?.test2).toEqual(TEST_DAOS.test2);
 
     // Assert no DAOs
-    const filteredDaos2 = filterDaosByActiveEvent(TEST_DAOS, 'MEOW' as any);
+    const filteredDaos2 = filterDiscordsByActiveEvent(TEST_DAOS, 'MEOW' as any);
 
     expect(Object.entries(filteredDaos2).length).toBe(0);
   });

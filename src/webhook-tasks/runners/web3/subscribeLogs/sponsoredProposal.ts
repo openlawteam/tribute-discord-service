@@ -6,7 +6,7 @@ import {
   subscribeLogs,
 } from '../helpers';
 import {Daos} from '../../../../config/types';
-import {filterDaosByActiveEvent, runAll} from '../../../../helpers';
+import {filterDiscordsByActiveEvent, runAll} from '../../../../helpers';
 import {RunnerReturn} from '../../types';
 import {SPONSORED_PROPOSAL_WEB3_LOGS} from '../../../events';
 import {sponsoredProposalActionSubscribeLogs} from '../../../actions';
@@ -24,7 +24,7 @@ export function sponsoredProposalRunnerSubscribeLogs(
   const {name: eventName, topics} = SPONSORED_PROPOSAL_WEB3_LOGS;
 
   // Only get addresses for DAOs which have the `SPONSORED_PROPOSAL` event enabled
-  const filteredDaos = filterDaosByActiveEvent(daos, 'SPONSORED_PROPOSAL');
+  const filteredDaos = filterDiscordsByActiveEvent(daos, 'SPONSORED_PROPOSAL');
 
   const registryAddresses: string[] = Object.entries(filteredDaos).map(
     ([_, data]) => data.registryContractAddress
