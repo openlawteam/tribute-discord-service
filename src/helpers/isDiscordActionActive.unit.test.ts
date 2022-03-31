@@ -1,16 +1,16 @@
-import {isDaoActionActive} from '.';
+import {isDiscordActionActive} from '.';
 
-describe('isDaoActionActive unit tests', () => {
+describe('isDiscordActionActive unit tests', () => {
   test('should return `true`', () => {
     expect(
-      isDaoActionActive({
+      isDiscordActionActive({
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
         webhookID: 'abc123',
       })
     ).toBe(true);
 
     expect(
-      isDaoActionActive({
+      isDiscordActionActive({
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
         webhookID: 'abc123',
         active: true,
@@ -18,7 +18,7 @@ describe('isDaoActionActive unit tests', () => {
     ).toBe(true);
 
     expect(
-      isDaoActionActive({
+      isDiscordActionActive({
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
         webhookID: 'abc123',
         active: undefined,
@@ -27,10 +27,10 @@ describe('isDaoActionActive unit tests', () => {
   });
 
   test('should return `false`', () => {
-    expect(isDaoActionActive(undefined)).toBe(false);
+    expect(isDiscordActionActive(undefined)).toBe(false);
 
     expect(
-      isDaoActionActive({
+      isDiscordActionActive({
         name: 'SPONSORED_PROPOSAL_WEBHOOK',
         webhookID: 'abc123',
         active: false,

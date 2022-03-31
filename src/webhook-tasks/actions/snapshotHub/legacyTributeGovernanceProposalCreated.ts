@@ -1,8 +1,8 @@
 import {
   BURN_ADDRESS,
-  getDaoAction,
+  getDiscordAction,
   getDaoDataBySnapshotSpace,
-  isDaoActionActive,
+  isDiscordActionActive,
   isDebug,
   normalizeString,
 } from '../../../helpers';
@@ -46,13 +46,16 @@ export function legacyTributeGovernanceProposalCreatedAction(
 
       const {space} = snapshotEvent;
       const dao = getDaoDataBySnapshotSpace(space, daos);
-      const daoAction = getDaoAction('SNAPSHOT_PROPOSAL_CREATED_WEBHOOK', dao);
+      const daoAction = getDiscordAction(
+        'SNAPSHOT_PROPOSAL_CREATED_WEBHOOK',
+        dao
+      );
 
       if (
         !dao ||
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
-        !isDaoActionActive(daoAction)
+        !isDiscordActionActive(daoAction)
       ) {
         return;
       }

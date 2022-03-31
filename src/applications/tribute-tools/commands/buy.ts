@@ -15,7 +15,7 @@ import sharp from 'sharp';
 
 import {CANCEL_POLL_BUY_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
 import {Command} from '../../types';
-import {getDaoDataByGuildID, getEnv} from '../../../helpers';
+import {getDiscordDataByGuildID, getEnv} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {getVoteThreshold} from '../helpers';
 import {prisma} from '../../../singletons';
@@ -402,7 +402,10 @@ async function execute(interaction: CommandInteraction) {
   // Gem UI asset URL does not get returned, currently.
   const gemAssetURL: string = `https://www.gem.xyz/asset/${contractAddress}/${tokenID}`;
   const price = fromWei(toBN(responsePriceWEI), 'ether');
-  const dao = getDaoDataByGuildID(interaction.guildId || '', await getDaos());
+  const dao = getDiscordDataByGuildID(
+    interaction.guildId || '',
+    await getDaos()
+  );
 
   const image = await getImage(smallImageUrl);
 

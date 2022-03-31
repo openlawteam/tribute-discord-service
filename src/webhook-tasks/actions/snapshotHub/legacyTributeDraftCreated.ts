@@ -1,7 +1,7 @@
 import {
-  getDaoAction,
+  getDiscordAction,
   getDaoDataBySnapshotSpace,
-  isDaoActionActive,
+  isDiscordActionActive,
   isDebug,
 } from '../../../helpers';
 import {
@@ -45,13 +45,13 @@ export function legacyTributeDraftCreatedAction(
 
       const {space} = snapshotEvent;
       const dao = getDaoDataBySnapshotSpace(space, daos);
-      const daoAction = getDaoAction('SNAPSHOT_DRAFT_CREATED_WEBHOOK', dao);
+      const daoAction = getDiscordAction('SNAPSHOT_DRAFT_CREATED_WEBHOOK', dao);
 
       if (
         !dao ||
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
-        !isDaoActionActive(daoAction)
+        !isDiscordActionActive(daoAction)
       ) {
         return;
       }

@@ -10,7 +10,7 @@ import {
 import {Prisma} from '@prisma/client';
 import {time} from '@discordjs/builders';
 
-import {getDaoDataByGuildID} from '../../../../helpers';
+import {getDiscordDataByGuildID} from '../../../../helpers';
 import {getDaos} from '../../../../services';
 import {prisma} from '../../../../singletons';
 import {SWEEP_EXTERNAL_URL} from '../../config';
@@ -132,7 +132,7 @@ export function sweepEndedPollsHandler({
           let sweepChannelMessage: Message | undefined = undefined;
 
           if (result > 0) {
-            const dao = getDaoDataByGuildID(guildID, await getDaos());
+            const dao = getDiscordDataByGuildID(guildID, await getDaos());
 
             if (!dao) {
               throw new Error(`Could not find DAO by \'guildID\' ${guildID}`);

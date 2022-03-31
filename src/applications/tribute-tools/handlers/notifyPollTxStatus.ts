@@ -7,7 +7,7 @@ import {
   TributeToolsWebhookTxType,
 } from '../../../http-api/types';
 import {APPLICATION_COMMANDS} from '../../../config';
-import {getDaoDataByGuildID} from '../../../helpers';
+import {getDiscordDataByGuildID} from '../../../helpers';
 import {getDaos} from '../../../services';
 import {getTributeToolsClient} from '../getTributeToolsClient';
 import {prisma} from '../../../singletons';
@@ -183,7 +183,7 @@ export async function notifyPollTxStatus(
       throw new Error(`No \`actionMessageID\` was found.`);
     }
 
-    const dao = getDaoDataByGuildID(guildID, await getDaos());
+    const dao = getDiscordDataByGuildID(guildID, await getDaos());
     const command = getCommand(type);
 
     const actionChannelID =

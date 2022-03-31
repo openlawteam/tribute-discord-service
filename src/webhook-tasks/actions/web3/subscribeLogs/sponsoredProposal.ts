@@ -6,10 +6,10 @@ import {
 } from '../../../events';
 import {
   DISCORD_EMPTY_EMBED,
-  getDaoAction,
+  getDiscordAction,
   getDaoDataByAddress,
   getEtherscanURL,
-  isDaoActionActive,
+  isDiscordActionActive,
   isDebug,
 } from '../../../../helpers';
 import {
@@ -45,13 +45,13 @@ export function sponsoredProposalActionSubscribeLogs(
       if (!eventData) return;
 
       const dao = getDaoDataByAddress(eventData.address, daos);
-      const daoAction = getDaoAction('SPONSORED_PROPOSAL_WEBHOOK', dao);
+      const daoAction = getDiscordAction('SPONSORED_PROPOSAL_WEBHOOK', dao);
 
       if (
         !dao ||
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
-        !isDaoActionActive(daoAction) ||
+        !isDiscordActionActive(daoAction) ||
         !SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH
       ) {
         return;

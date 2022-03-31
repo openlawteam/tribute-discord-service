@@ -1,4 +1,4 @@
-import {DaoDiscordConfig, DiscordConfig, EventNames} from '../config/types';
+import {DiscordConfig, EventNames} from '../config/types';
 
 export function filterDiscordsByActiveEvent<TDiscord extends DiscordConfig>(
   discords: Record<string, TDiscord> | undefined = {},

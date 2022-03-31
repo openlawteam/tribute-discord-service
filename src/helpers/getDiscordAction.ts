@@ -1,12 +1,12 @@
 import {ACTIONS} from '../config/actions';
-import {DaoDiscordConfig, ActionConfig} from '../config/types';
+import {DiscordConfig, ActionConfig} from '../config/types';
 import {normalizeString} from '.';
 
-export function getDaoAction(
+export function getDiscordAction<TDiscord extends DiscordConfig>(
   actionName: typeof ACTIONS[number],
-  daoData: DaoDiscordConfig | undefined
+  discordData: TDiscord | undefined
 ): ActionConfig | undefined {
-  return daoData?.actions.find(
+  return discordData?.actions.find(
     ({name}) => normalizeString(name) === normalizeString(actionName)
   );
 }

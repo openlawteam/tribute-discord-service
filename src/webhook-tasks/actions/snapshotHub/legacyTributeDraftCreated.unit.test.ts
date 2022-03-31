@@ -255,10 +255,13 @@ describe('legacyTributeDraftCreatedAction unit tests', () => {
   });
 
   test('should exit if no `snapshotEvent`', async () => {
-    const getDaoAction = await import('../../../helpers/getDaoAction');
+    const getDiscordAction = await import('../../../helpers/getDiscordAction');
     const {cleanup, sendSpy} = await mockHelper();
 
-    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+    const getDaoDataByAddressSpy = jest.spyOn(
+      getDiscordAction,
+      'getDiscordAction'
+    );
 
     await legacyTributeDraftCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
@@ -390,10 +393,13 @@ describe('legacyTributeDraftCreatedAction unit tests', () => {
   });
 
   test('should exit if `snapshotEvent.event !== event.snapshotEventName`', async () => {
-    const getDaoAction = await import('../../../helpers/getDaoAction');
+    const getDiscordAction = await import('../../../helpers/getDiscordAction');
     const {cleanup, sendSpy} = await mockHelper();
 
-    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+    const getDaoDataByAddressSpy = jest.spyOn(
+      getDiscordAction,
+      'getDiscordAction'
+    );
 
     await legacyTributeDraftCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,

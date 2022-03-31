@@ -1,4 +1,4 @@
-import {DAOS_DEVELOPMENT, DAOS_PRODUCTION} from '../../config/daos';
+import {DAOS_DEVELOPMENT, DAOS_PRODUCTION} from '../../config/discords/daos';
 import {getDaos} from './getDaos';
 import {getEnv} from '../../helpers';
 

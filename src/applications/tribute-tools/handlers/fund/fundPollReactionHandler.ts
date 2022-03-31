@@ -10,7 +10,7 @@ import {
 } from 'discord.js';
 import {channelMention, time} from '@discordjs/builders';
 
-import {getDaoDataByGuildID} from '../../../../helpers';
+import {getDiscordDataByGuildID} from '../../../../helpers';
 import {getDaos} from '../../../../services';
 import {prisma} from '../../../../singletons';
 import {THUMBS_EMOJIS, FUND_EXTERNAL_URL} from '../../config';
@@ -84,7 +84,7 @@ export async function fundPollReactionHandler({
         console.error(error);
       }
 
-      const dao = getDaoDataByGuildID(pollEntry.guildID, await getDaos());
+      const dao = getDiscordDataByGuildID(pollEntry.guildID, await getDaos());
 
       if (!dao) {
         throw new Error(
@@ -171,7 +171,7 @@ export async function fundPollReactionHandler({
           },
         });
 
-        const dao = getDaoDataByGuildID(guildID, await getDaos());
+        const dao = getDiscordDataByGuildID(guildID, await getDaos());
 
         if (!dao) {
           throw new Error(`Could not find DAO by \'guildID\' ${guildID}`);
