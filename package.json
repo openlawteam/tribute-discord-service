@@ -45,7 +45,7 @@
     "@koa/router": "^10.1.1",
     "@prisma/client": "^3.11.1",
     "dayjs": "^1.11.0",
-    "discord-api-types": "^0.28.0",
+    "discord-api-types": "^0.30.0",
     "discord.js": "^13.6.0",
     "http-terminator": "^3.2.0",
     "koa": "^2.13.4",
