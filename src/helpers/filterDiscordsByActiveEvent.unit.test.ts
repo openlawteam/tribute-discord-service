@@ -29,7 +29,7 @@ describe('filterDiscordsByActiveEvent unit tests', () => {
         },
       },
       baseURL: 'https://demo.tributedao.com',
-      events: [{name: 'PROCESSED_PROPOSAL' as any}],
+      events: [{name: 'SNAPSHOT_PROPOSAL_CREATED'}],
       friendlyName: 'Tribute DAO [DEV]',
       guildID: GUILD_ID_FIXTURE,
       internalName: 'test1',
@@ -47,7 +47,7 @@ describe('filterDiscordsByActiveEvent unit tests', () => {
       baseURL: 'https://demo.tributedao.com',
       events: [
         {name: 'SPONSORED_PROPOSAL', active: false},
-        {name: 'PROCESSED_PROPOSAL' as any, active: true},
+        {name: 'SNAPSHOT_PROPOSAL_CREATED', active: true},
       ],
       friendlyName: 'Tribute DAO [DEV]',
       guildID: GUILD_ID_FIXTURE,
@@ -66,7 +66,7 @@ describe('filterDiscordsByActiveEvent unit tests', () => {
       baseURL: 'https://demo.tributedao.com',
       events: [
         {name: 'SPONSORED_PROPOSAL', active: true},
-        {name: 'PROCESSED_PROPOSAL' as any, active: false},
+        {name: 'SNAPSHOT_PROPOSAL_CREATED', active: false},
       ],
       friendlyName: 'Tribute DAO [DEV]',
       guildID: GUILD_ID_FIXTURE,
@@ -75,7 +75,7 @@ describe('filterDiscordsByActiveEvent unit tests', () => {
     },
   };
 
-  test('should return filtered daos', async () => {
+  test('should return filtered dao configs', async () => {
     // Assert `SPONSORED_PROPOSAL`
     const filteredDaos = filterDiscordsByActiveEvent(
       TEST_DAOS,
@@ -89,7 +89,7 @@ describe('filterDiscordsByActiveEvent unit tests', () => {
     // Assert `PROCESSED_PROPOSAL`
     const filteredDaos1 = filterDiscordsByActiveEvent(
       TEST_DAOS,
-      'PROCESSED_PROPOSAL' as any
+      'SNAPSHOT_PROPOSAL_CREATED'
     );
 
     expect(Object.entries(filteredDaos1).length).toBe(2);
@@ -97,7 +97,10 @@ describe('filterDiscordsByActiveEvent unit tests', () => {
     expect(filteredDaos1?.test2).toEqual(TEST_DAOS.test2);
 
     // Assert no DAOs
-    const filteredDaos2 = filterDiscordsByActiveEvent(TEST_DAOS, 'MEOW' as any);
+    const filteredDaos2 = filterDiscordsByActiveEvent(
+      TEST_DAOS,
+      'BAD_EVENT' as any
+    );
 
     expect(Object.entries(filteredDaos2).length).toBe(0);
   });
