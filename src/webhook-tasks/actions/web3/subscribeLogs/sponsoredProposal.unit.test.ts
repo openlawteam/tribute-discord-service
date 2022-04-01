@@ -230,10 +230,15 @@ describe('sponsoredProposal unit tests', () => {
   });
 
   test('should exit if no dao found', async () => {
-    const getDaoAction = await import('../../../../helpers/getDaoAction');
+    const getDiscordAction = await import(
+      '../../../../helpers/getDiscordAction'
+    );
     const {cleanup, sendSpy} = await mockHelper();
 
-    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+    const getDaoDataByAddressSpy = jest.spyOn(
+      getDiscordAction,
+      'getDiscordAction'
+    );
 
     await sponsoredProposalActionSubscribeLogs(
       SPONSORED_PROPOSAL_WEB3_LOGS,

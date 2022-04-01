@@ -1,4 +1,4 @@
-import {getDaos} from '../../../services';
+import {getDaoDiscordConfigs} from '../../../services';
 import {SNAPSHOT_PROPOSAL_CREATED_EVENT} from '../../events/snapshotHub';
 import {SnapshotHubEvents} from '../../actions/snapshotHub/types';
 import {snapshotProposalEventRunner} from './proposalEventRunner';
@@ -39,7 +39,7 @@ describe('proposalEventRunner unit tests', () => {
     );
 
     expect(legacyTributeGovernanceProposalCreatedSpy.mock.calls[0][1]).toEqual(
-      await getDaos()
+      await getDaoDiscordConfigs()
     );
 
     // Assert `legacyTributeDraftCreated` called
@@ -50,7 +50,7 @@ describe('proposalEventRunner unit tests', () => {
     );
 
     expect(legacyTributeDraftCreatedSpy.mock.calls[0][1]).toEqual(
-      await getDaos()
+      await getDaoDiscordConfigs()
     );
 
     // Cleanup

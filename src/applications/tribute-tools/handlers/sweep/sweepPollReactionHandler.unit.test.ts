@@ -105,10 +105,12 @@ describe('sweepPollReactionHandler unit tests', () => {
       result: 100,
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
 
     /**
@@ -124,7 +126,7 @@ describe('sweepPollReactionHandler unit tests', () => {
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
-    expect(getDaosSpy).toHaveBeenCalledTimes(1);
+    expect(getDaoConfigsSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledWith('123');
     expect(userSendSpy).toHaveBeenCalledTimes(1);
@@ -136,7 +138,7 @@ describe('sweepPollReactionHandler unit tests', () => {
     // Cleanup
 
     dbSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
     userReactionRemoveSpy.mockRestore();
     userSendSpy.mockRestore();
   });
@@ -408,10 +410,12 @@ describe('sweepPollReactionHandler unit tests', () => {
       uuid: 'abc123def456',
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
 
     const consoleErrorSpy = jest
@@ -439,7 +443,7 @@ describe('sweepPollReactionHandler unit tests', () => {
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
-    expect(getDaosSpy).toHaveBeenCalledTimes(1);
+    expect(getDaoConfigsSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledWith('123');
     expect(userSendSpy).toHaveBeenCalledTimes(1);
@@ -452,7 +456,7 @@ describe('sweepPollReactionHandler unit tests', () => {
 
     consoleErrorSpy.mockRestore();
     dbSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
     userReactionRemoveSpy.mockRestore();
     userSendSpy.mockRestore();
   });
@@ -498,10 +502,12 @@ describe('sweepPollReactionHandler unit tests', () => {
       uuid: 'abc123def456',
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
 
     const consoleErrorSpy = jest
@@ -523,7 +529,7 @@ describe('sweepPollReactionHandler unit tests', () => {
     expect(consoleErrorSpy.mock.calls[0][0]).toMatch(ERROR_REGEXP);
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
-    expect(getDaosSpy).toHaveBeenCalledTimes(1);
+    expect(getDaoConfigsSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledWith('123');
     expect(userSendSpy).toHaveBeenCalledTimes(1);
@@ -536,7 +542,7 @@ describe('sweepPollReactionHandler unit tests', () => {
 
     consoleErrorSpy.mockRestore();
     dbSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
     userReactionRemoveSpy.mockRestore();
     userSendSpy.mockRestore();
   });

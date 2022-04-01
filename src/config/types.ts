@@ -8,49 +8,58 @@ export type ActionNames = typeof ACTIONS[number];
 export type ApplicationNames = typeof APPLICATIONS[number];
 export type EventNames = typeof EVENTS[number];
 
-export type DaoDataEvent = {name: EventNames; active?: boolean};
-
-export type DaoDataAction = {
-  name: typeof ACTIONS[number];
-  webhookID: string;
-  active?: boolean;
-};
-
-export type Daos = Record<string, DaoData>;
-
-export type DaoData<InternalNames = string> = {
+export interface DiscordConfig {
   /**
-   * Adapter information
+   * Actions to be run, or not
    */
-  adapters?: Record<AdapterID, DaoDataAdapter>;
-  /**
-   * Actions to be run, or not, for the DAO
-   */
-  actions: DaoDataAction[];
+  actions: ActionConfig[];
   /**
    * Applications (bots)
    */
   applications?: Partial<DaoDataApplicationsMap>;
   /**
-   * A public, full, base URL for the DAO
+   * A public, full, base URL
    *
-   * e.g. `https://muse0.xyz`
+   * e.g. `https://tributelabs.xyz`
    */
   baseURL?: string;
   /**
-   * Events to be watched, or not, for the DAO
+   * Events to be watched, or not
    */
-  events: DaoDataEvent[];
+  events: EventConfig[];
   /**
-   * A friendly name for the DAO
+   * A friendly name for display
    *
-   * E.g. `Tribute DAO`
+   * E.g. `Tribute DAO`, `Tribute Labs`
    */
   friendlyName: string;
   /**
    * Discord guild (server) ID
    */
   guildID: string;
+}
+
+export type EventConfig = {name: EventNames; active?: boolean};
+
+export type ActionConfig = {
+  name: ActionNames;
+  webhookID: string;
+  active?: boolean;
+};
+
+export type Daos = Record<string, DaoDiscordConfig>;
+
+export type DiscordConfigs<TDiscord extends DiscordConfig> = Record<
+  string,
+  TDiscord
+>;
+
+export interface DaoDiscordConfig<InternalNames = string>
+  extends DiscordConfig {
+  /**
+   * Adapter information
+   */
+  adapters?: Record<AdapterID, DaoDataAdapter>;
   /**
    * Internal DAO name
    *
@@ -65,13 +74,13 @@ export type DaoData<InternalNames = string> = {
    * DAO's deployed `DaoRegistry.sol` contract address
    */
   registryContractAddress: string;
-};
+}
 
 export type DaoDataAdapter = {
   /**
    * A base URL path, without `/`.
    *
-   * Used together with `DaoData['baseURL']` to form
+   * Used together with `DaoDiscordConfig['baseURL']` to form
    * a URL for links (i.e. used by `actions` in Discord webhook content).
    *
    * This works for simple URL structures (i.e. `tribute-ui`).

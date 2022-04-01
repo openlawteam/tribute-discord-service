@@ -1,10 +1,10 @@
 import {
   SnapshotHubProposalResolverArgs,
   snapshotHubResolverSelector,
-} from '../../services/snapshotHub';
-import {BURN_ADDRESS} from '../../helpers';
+} from '../../../services/snapshotHub';
+import {BURN_ADDRESS} from '../../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
-import {DaoData} from '../types';
+import {DaoDiscordConfig} from '../../types';
 
 /**
  * A PRODUCTION configuration mapping for DAO's this app recognises.
@@ -47,7 +47,7 @@ const DEFAULT_PROPOSAL_RESOLVER = async <R = any>(
 
 export const DAOS_PRODUCTION: Record<
   typeof DAO_NAMES_PRODUCTION[number],
-  DaoData<typeof DAO_NAMES_PRODUCTION[number]>
+  DaoDiscordConfig<typeof DAO_NAMES_PRODUCTION[number]>
 > = {
   museo: {
     actions: [

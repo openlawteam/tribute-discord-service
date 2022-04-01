@@ -7,12 +7,11 @@ import {
 } from 'discord.js';
 import {SlashCommandBuilder} from '@discordjs/builders';
 
-import {Command} from '../../types';
-import {DEV_COMMAND_NOT_READY} from '../helpers';
-import {getDaoDataByGuildID, normalizeString} from '../../../helpers';
-import {getDaos} from '../../../services';
-import {prisma, web3} from '../../../singletons';
 import {CANCEL_POLL_FUND_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
+import {Command} from '../../types';
+import {getDaoDiscordConfigs} from '../../../services';
+import {getDiscordDataByGuildID, normalizeString} from '../../../helpers';
+import {prisma, web3} from '../../../singletons';
 
 const COMMAND_NAME: string = 'fund';
 
@@ -100,7 +99,10 @@ async function execute(interaction: CommandInteraction) {
 
     return;
   }
-  const dao = getDaoDataByGuildID(interaction.guildId || '', await getDaos());
+  const dao = getDiscordDataByGuildID(
+    interaction.guildId || '',
+    await getDaoDiscordConfigs()
+  );
 
   if (!dao) {
     // Reply with an error/help message that only the user can see.

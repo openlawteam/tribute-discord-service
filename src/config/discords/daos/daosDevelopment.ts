@@ -1,10 +1,10 @@
 import {
   SnapshotHubProposalResolverArgs,
   snapshotHubResolverSelector,
-} from '../../services/snapshotHub';
-import {BURN_ADDRESS} from '../../helpers';
+} from '../../../services/snapshotHub';
+import {BURN_ADDRESS} from '../../../helpers';
 import {CORE_DAO_ADAPTERS} from './daoAdapters';
-import {DaoData} from '../types';
+import {DaoDiscordConfig} from '../../types';
 
 /**
  * A DEVELOPMENT configuration mapping for DAO's this app recognises.
@@ -43,7 +43,7 @@ const DEFAULT_PROPOSAL_RESOLVER = async <R = any>(
 
 export const DAOS_DEVELOPMENT: Record<
   typeof DAO_NAMES_DEVELOPMENT[number],
-  DaoData<typeof DAO_NAMES_DEVELOPMENT[number]>
+  DaoDiscordConfig<typeof DAO_NAMES_DEVELOPMENT[number]>
 > = {
   tribute: {
     actions: [

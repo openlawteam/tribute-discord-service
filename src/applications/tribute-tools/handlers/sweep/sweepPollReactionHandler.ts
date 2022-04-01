@@ -7,8 +7,8 @@ import {
 import {Prisma} from '@prisma/client';
 import {channelMention} from '@discordjs/builders';
 
-import {getDaoDataByGuildID} from '../../../../helpers';
-import {getDaos} from '../../../../services';
+import {getDaoDiscordConfigs} from '../../../../services';
+import {getDiscordDataByGuildID} from '../../../../helpers';
 import {prisma} from '../../../../singletons';
 
 export async function sweepPollReactionHandler({
@@ -85,7 +85,10 @@ export async function sweepPollReactionHandler({
       let resultChannelID: string | undefined;
 
       if (result > 0) {
-        const dao = getDaoDataByGuildID(pollEntry.guildID, await getDaos());
+        const dao = getDiscordDataByGuildID(
+          pollEntry.guildID,
+          await getDaoDiscordConfigs()
+        );
 
         if (!dao) {
           console.error(

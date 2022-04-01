@@ -130,10 +130,12 @@ describe('fundPollReactionHandler unit tests', () => {
       voteThreshold: 3,
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
 
     /**
@@ -212,7 +214,7 @@ describe('fundPollReactionHandler unit tests', () => {
 
     dbFindSpy.mockRestore();
     dbUpdateSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
   });
 
   test('should exit with no error if dao cannot be found', async () => {
@@ -249,10 +251,12 @@ describe('fundPollReactionHandler unit tests', () => {
       voteThreshold: 3,
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => undefined);
 
     /**
@@ -291,7 +295,7 @@ describe('fundPollReactionHandler unit tests', () => {
 
     dbFindSpy.mockRestore();
     dbUpdateSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
   });
 
   test('should exit with no error if result channel ID cannot be found', async () => {
@@ -328,10 +332,12 @@ describe('fundPollReactionHandler unit tests', () => {
       voteThreshold: 3,
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => ({
         ...FAKE_DAOS_FIXTURE,
         test: {...FAKE_DAOS_FIXTURE.test, applications: {}},
@@ -373,7 +379,7 @@ describe('fundPollReactionHandler unit tests', () => {
 
     dbFindSpy.mockRestore();
     dbUpdateSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
   });
 
   test('should exit with no error if `user` is a bot', () => {
@@ -477,10 +483,12 @@ describe('fundPollReactionHandler unit tests', () => {
       voteThreshold: 3,
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
 
     const consoleErrorSpy = jest
@@ -508,7 +516,7 @@ describe('fundPollReactionHandler unit tests', () => {
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
-    expect(getDaosSpy).toHaveBeenCalledTimes(1);
+    expect(getDaoConfigsSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledWith('123');
     expect(userSendSpy).toHaveBeenCalledTimes(1);
@@ -521,7 +529,7 @@ describe('fundPollReactionHandler unit tests', () => {
 
     consoleErrorSpy.mockRestore();
     dbSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
     userReactionRemoveSpy.mockRestore();
     userSendSpy.mockRestore();
   });
@@ -567,10 +575,12 @@ describe('fundPollReactionHandler unit tests', () => {
       voteThreshold: 3,
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
 
     const consoleErrorSpy = jest
@@ -592,7 +602,7 @@ describe('fundPollReactionHandler unit tests', () => {
     expect(consoleErrorSpy.mock.calls[0][0]).toMatch(ERROR_REGEXP);
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
-    expect(getDaosSpy).toHaveBeenCalledTimes(1);
+    expect(getDaoConfigsSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledWith('123');
     expect(userSendSpy).toHaveBeenCalledTimes(1);
@@ -605,7 +615,7 @@ describe('fundPollReactionHandler unit tests', () => {
 
     consoleErrorSpy.mockRestore();
     dbSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
     userReactionRemoveSpy.mockRestore();
     userSendSpy.mockRestore();
   });
@@ -700,10 +710,12 @@ describe('fundPollReactionHandler unit tests', () => {
       voteThreshold: 3,
     };
 
-    const getDaos = await import('../../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
-    const getDaosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+    const getDaoConfigsSpy = jest
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
 
     /**
@@ -719,7 +731,7 @@ describe('fundPollReactionHandler unit tests', () => {
 
     expect(dbSpy).toHaveBeenCalledTimes(1);
     expect(dbSpy).toHaveBeenCalledWith({where: {messageID: 'abc123'}});
-    expect(getDaosSpy).toHaveBeenCalledTimes(1);
+    expect(getDaoConfigsSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledTimes(1);
     expect(userReactionRemoveSpy).toHaveBeenCalledWith('123');
     expect(userSendSpy).toHaveBeenCalledTimes(1);
@@ -731,7 +743,7 @@ describe('fundPollReactionHandler unit tests', () => {
     // Cleanup
 
     dbSpy.mockRestore();
-    getDaosSpy.mockRestore();
+    getDaoConfigsSpy.mockRestore();
     userReactionRemoveSpy.mockRestore();
     userSendSpy.mockRestore();
   });

@@ -14,7 +14,7 @@ import {
   SnapshotDraftCreatedEmbedTemplateData,
   SnapshotDraftCreatedTemplateData,
 } from '../../templates';
-import {ActionNames, DaoData} from '../../../config';
+import {ActionNames, DaoDiscordConfig} from '../../../config';
 import {BURN_ADDRESS} from '../../../helpers';
 import {EventBase} from '../../events';
 import {legacyTributeDraftCreatedAction} from './legacyTributeDraftCreated';
@@ -125,7 +125,7 @@ const EVENT_DATA: SnapshotHubEventPayload = {
   space: 'tribute',
 };
 
-const FAKE_DAOS: Record<string, DaoData> = {
+const FAKE_DAOS: Record<string, DaoDiscordConfig> = {
   ...FAKE_DAOS_FIXTURE,
   test: {
     ...FAKE_DAOS_FIXTURE.test,
@@ -255,10 +255,13 @@ describe('legacyTributeDraftCreatedAction unit tests', () => {
   });
 
   test('should exit if no `snapshotEvent`', async () => {
-    const getDaoAction = await import('../../../helpers/getDaoAction');
+    const getDiscordAction = await import('../../../helpers/getDiscordAction');
     const {cleanup, sendSpy} = await mockHelper();
 
-    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+    const getDaoDataByAddressSpy = jest.spyOn(
+      getDiscordAction,
+      'getDiscordAction'
+    );
 
     await legacyTributeDraftCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
@@ -390,10 +393,13 @@ describe('legacyTributeDraftCreatedAction unit tests', () => {
   });
 
   test('should exit if `snapshotEvent.event !== event.snapshotEventName`', async () => {
-    const getDaoAction = await import('../../../helpers/getDaoAction');
+    const getDiscordAction = await import('../../../helpers/getDiscordAction');
     const {cleanup, sendSpy} = await mockHelper();
 
-    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+    const getDaoDataByAddressSpy = jest.spyOn(
+      getDiscordAction,
+      'getDiscordAction'
+    );
 
     await legacyTributeDraftCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,

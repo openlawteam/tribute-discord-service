@@ -11,7 +11,8 @@ abi-types
 
 # Code config
 
-daosLocalhost.ts
+src/config/**/daosLocalhost.ts
+src/config/**/localhost.ts
 
 # Jest, Codecov
 

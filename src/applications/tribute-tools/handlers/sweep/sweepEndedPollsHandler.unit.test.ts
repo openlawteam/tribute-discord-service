@@ -65,9 +65,12 @@ describe('sweepEndedPollsHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).update.mockImplementation(async () => {});
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const client = new Client({
@@ -309,9 +312,12 @@ describe('sweepEndedPollsHandler unit tests', () => {
       prismaMock.floorSweeperPoll as any
     ).findMany.mockResolvedValue([DB_ENTRY]);
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const client = new Client({

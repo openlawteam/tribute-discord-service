@@ -1,9 +1,9 @@
-import {getDaos} from '../services/dao/getDaos';
+import {getDaoDiscordConfigs} from '../services/discordConfig';
 import {getEnv} from '../helpers';
 import {RunnerReturn, runners} from './runners';
 
 export async function startWebhookTasks(): Promise<RunnerReturn[]> {
-  const daos = await getDaos();
+  const daos = await getDaoDiscordConfigs();
 
   const runnersToReturn: RunnerReturn[] = [];
 

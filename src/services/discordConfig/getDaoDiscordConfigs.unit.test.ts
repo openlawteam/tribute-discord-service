@@ -1,8 +1,8 @@
-import {DAOS_DEVELOPMENT, DAOS_PRODUCTION} from '../../config/daos';
-import {getDaos} from './getDaos';
+import {DAO_DISCORDS_LOCALHOST_PATH, getDaoDiscordConfigs} from './';
+import {DAOS_DEVELOPMENT, DAOS_PRODUCTION} from '../../config/discords/daos';
 import {getEnv} from '../../helpers';
 
-describe('getDaos unit tests', () => {
+describe('getDaoDiscordConfigs unit tests', () => {
   const appEnvOriginal = getEnv('APP_ENV');
   const consoleWarnOriginal = console.warn;
 
@@ -20,33 +20,31 @@ describe('getDaos unit tests', () => {
     console.warn = consoleWarnOriginal;
   });
 
-  test('should return localhost daos', async () => {
+  test('should return localhost dao configs', async () => {
     process.env.APP_ENV = 'localhost';
 
-    const localhostDaos = await getDaos();
+    const localhostDaos = await getDaoDiscordConfigs();
 
     try {
       // Attempt assert `undefined` (no config file)
       expect(localhostDaos).toBe(undefined);
     } catch (error) {
-      const maybeFile: string = '../../config/daos/daosLocalhost';
-
       // Assert result matches config file's `DAOS_LOCALHOST`.
-      const {DAOS_LOCALHOST} = await import(maybeFile);
+      const {DAOS_LOCALHOST} = await import(DAO_DISCORDS_LOCALHOST_PATH);
 
       expect(localhostDaos).toEqual(DAOS_LOCALHOST);
     }
   });
 
-  test('should return development daos', async () => {
+  test('should return development dao configs', async () => {
     process.env.APP_ENV = 'development';
 
-    expect(await getDaos()).toBe(DAOS_DEVELOPMENT);
+    expect(await getDaoDiscordConfigs()).toBe(DAOS_DEVELOPMENT);
   });
 
-  test('should return production daos', async () => {
+  test('should return production dao configs', async () => {
     process.env.APP_ENV = 'production';
 
-    expect(await getDaos()).toEqual(DAOS_PRODUCTION);
+    expect(await getDaoDiscordConfigs()).toEqual(DAOS_PRODUCTION);
   });
 });

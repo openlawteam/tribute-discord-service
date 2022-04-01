@@ -1,7 +1,7 @@
 import {
-  getDaoAction,
+  getDiscordAction,
   getDaoDataBySnapshotSpace,
-  isDaoActionActive,
+  isDiscordActionOrEventActive,
   isDebug,
 } from '../../../helpers';
 import {
@@ -16,7 +16,7 @@ import {
   SnapshotHubMessageType,
 } from '../../../services/snapshotHub';
 import {actionErrorHandler} from '../helpers/actionErrorHandler';
-import {DaoData} from '../../../config/types';
+import {DaoDiscordConfig} from '../../../config/types';
 import {DiscordMessageEmbeds} from '..';
 import {EventSnapshotProposalWebhook} from '../../events/snapshotHub';
 import {getDiscordWebhookClient} from '../../../services/discord';
@@ -29,13 +29,13 @@ import {takeSnapshotProposalID} from './helpers';
  * draft is created on a Snapshot Hub.
  *
  * @param event `EventSnapshotProposalWebhook`
- * @param daos `Record<string, DaoData> | undefined` Web3.js subscription log data
+ * @param daos `Record<string, DaoDiscordConfig> | undefined` Web3.js subscription log data
  *
  * @returns `(d: SnapshotHubEventPayload) => Promise<void>`
  */
 export function legacyTributeDraftCreatedAction(
   event: EventSnapshotProposalWebhook,
-  daos: Record<string, DaoData> | undefined
+  daos: Record<string, DaoDiscordConfig> | undefined
 ): (s: SnapshotHubEventPayload) => Promise<void> {
   return async (snapshotEvent) => {
     try {
@@ -45,13 +45,13 @@ export function legacyTributeDraftCreatedAction(
 
       const {space} = snapshotEvent;
       const dao = getDaoDataBySnapshotSpace(space, daos);
-      const daoAction = getDaoAction('SNAPSHOT_DRAFT_CREATED_WEBHOOK', dao);
+      const daoAction = getDiscordAction('SNAPSHOT_DRAFT_CREATED_WEBHOOK', dao);
 
       if (
         !dao ||
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
-        !isDaoActionActive(daoAction)
+        !isDiscordActionOrEventActive(daoAction)
       ) {
         return;
       }

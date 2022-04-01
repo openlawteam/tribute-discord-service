@@ -13,4 +13,8 @@ export const ACTIONS = [
    * Tribute DAO
    */
   'SPONSORED_PROPOSAL_WEBHOOK',
+  /**
+   * Tribute Tools
+   */
+  'TRIBUTE_TOOLS_ADMIN_FEE_WEBHOOK',
 ] as const;

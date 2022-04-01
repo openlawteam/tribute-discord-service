@@ -6,10 +6,10 @@ import {
 } from '../../../events';
 import {
   DISCORD_EMPTY_EMBED,
-  getDaoAction,
+  getDiscordAction,
   getDaoDataByAddress,
   getEtherscanURL,
-  isDaoActionActive,
+  isDiscordActionOrEventActive,
   isDebug,
 } from '../../../../helpers';
 import {
@@ -21,7 +21,7 @@ import {
   SponsoredProposalTemplateData,
 } from '../../../templates';
 import {actionErrorHandler} from '../../helpers/actionErrorHandler';
-import {DaoData} from '../../../../config/types';
+import {DaoDiscordConfig} from '../../../../config/types';
 import {DiscordMessageEmbeds} from '../..';
 import {getDiscordWebhookClient} from '../../../../services/discord';
 import {getProposalAdapterID} from '../../../../services';
@@ -38,20 +38,20 @@ import {web3} from '../../../../singletons';
  */
 export function sponsoredProposalActionSubscribeLogs(
   event: EventWeb3Logs,
-  daos: Record<string, DaoData> | undefined
+  daos: Record<string, DaoDiscordConfig> | undefined
 ): (d: Log) => Promise<void> {
   return async (eventData) => {
     try {
       if (!eventData) return;
 
       const dao = getDaoDataByAddress(eventData.address, daos);
-      const daoAction = getDaoAction('SPONSORED_PROPOSAL_WEBHOOK', dao);
+      const daoAction = getDiscordAction('SPONSORED_PROPOSAL_WEBHOOK', dao);
 
       if (
         !dao ||
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
-        !isDaoActionActive(daoAction) ||
+        !isDiscordActionOrEventActive(daoAction) ||
         !SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH
       ) {
         return;

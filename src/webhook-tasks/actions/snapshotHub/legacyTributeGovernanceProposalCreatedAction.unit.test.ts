@@ -19,7 +19,7 @@ import {
   SnapshotHubLegacyTributeProposalEntry,
   SnapshotHubMessageType,
 } from '../../../services/snapshotHub';
-import {ActionNames, DaoData} from '../../../config';
+import {ActionNames, DaoDiscordConfig} from '../../../config';
 import {BURN_ADDRESS} from '../../../helpers';
 import {EventBase} from '../../events';
 import {legacyTributeGovernanceProposalCreatedAction} from './legacyTributeGovernanceProposalCreated';
@@ -151,7 +151,7 @@ const EVENT_DATA: SnapshotHubEventPayload = {
   space: 'tribute',
 };
 
-const FAKE_DAOS_FIXTURE_GOVERNANCE: Record<string, DaoData> = {
+const FAKE_DAOS_FIXTURE_GOVERNANCE: Record<string, DaoDiscordConfig> = {
   ...FAKE_DAOS_FIXTURE,
   test: {
     ...FAKE_DAOS_FIXTURE.test,
@@ -298,10 +298,13 @@ describe('legacyTributeGovernanceProposalCreatedAction unit tests', () => {
   });
 
   test('should exit if no `snapshotEvent`', async () => {
-    const getDaoAction = await import('../../../helpers/getDaoAction');
+    const getDiscordAction = await import('../../../helpers/getDiscordAction');
     const {cleanup, sendSpy} = await mockHelper();
 
-    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+    const getDaoDataByAddressSpy = jest.spyOn(
+      getDiscordAction,
+      'getDiscordAction'
+    );
 
     await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
@@ -394,10 +397,13 @@ describe('legacyTributeGovernanceProposalCreatedAction unit tests', () => {
   });
 
   test('should exit if `snapshotEvent.event !== event.snapshotEventName`', async () => {
-    const getDaoAction = await import('../../../helpers/getDaoAction');
+    const getDiscordAction = await import('../../../helpers/getDiscordAction');
     const {cleanup, sendSpy} = await mockHelper();
 
-    const getDaoDataByAddressSpy = jest.spyOn(getDaoAction, 'getDaoAction');
+    const getDaoDataByAddressSpy = jest.spyOn(
+      getDiscordAction,
+      'getDiscordAction'
+    );
 
     await legacyTributeGovernanceProposalCreatedAction(
       SNAPSHOT_PROPOSAL_CREATED_EVENT,
@@ -430,7 +436,7 @@ describe('legacyTributeGovernanceProposalCreatedAction unit tests', () => {
   });
 
   test('should exit if action is not active', async () => {
-    const FAKE_DAOS_NO_ACTION: Record<string, DaoData> = {
+    const FAKE_DAOS_NO_ACTION: Record<string, DaoDiscordConfig> = {
       ...FAKE_DAOS_FIXTURE,
       test: {
         ...FAKE_DAOS_FIXTURE.test,
