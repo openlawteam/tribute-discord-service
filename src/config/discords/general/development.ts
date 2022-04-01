@@ -7,7 +7,12 @@ export const DEVELOPMENT_DISCORD_CONFIGS: Record<
   DiscordConfig
 > = {
   tributeLabs: {
-    actions: [],
+    actions: [
+      {
+        name: 'TRIBUTE_TOOLS_ADMIN_FEE_WEBHOOK',
+        webhookID: '886976872611729439',
+      },
+    ],
     baseURL: 'https://tributelabs.xyz',
     events: [],
     friendlyName: 'Tribute Labs [DEV]',

@@ -7,10 +7,15 @@ export const PRODUCTION_DISCORD_CONFIGS: Record<
   DiscordConfig
 > = {
   tributeLabs: {
-    actions: [],
+    actions: [
+      {
+        name: 'TRIBUTE_TOOLS_ADMIN_FEE_WEBHOOK',
+        webhookID: '956221982540709888',
+      },
+    ],
     baseURL: 'https://tributelabs.xyz',
     events: [],
-    friendlyName: 'Tribute Labs [DEV]',
+    friendlyName: 'Tribute Labs',
     guildID: '722525233755717762',
   },
 };
