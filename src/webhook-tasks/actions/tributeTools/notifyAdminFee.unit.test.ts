@@ -1,5 +1,6 @@
 import {MessageEmbed} from 'discord.js';
 
+import {DISCORD_CONFIGS_FIXTURE} from '../../../../test/fixtures';
 import {notifyAdminFee} from './notifyAdminFee';
 
 describe('notifyAdminFee unit tests', () => {
@@ -22,6 +23,13 @@ describe('notifyAdminFee unit tests', () => {
   test('should send Discord message', async () => {
     const sendSpy = jest.fn();
 
+    const getDiscordConfigsSpy = jest
+      .spyOn(
+        await import('../../../services/discordConfig/getDiscordConfigs'),
+        'getDiscordConfigs'
+      )
+      .mockImplementation(async () => DISCORD_CONFIGS_FIXTURE);
+
     const getDiscordWebhookClientSpy = jest
       .spyOn(
         await import('../../../services/discord/getDiscordWebhookClient'),
@@ -39,29 +47,39 @@ describe('notifyAdminFee unit tests', () => {
     expect(getDiscordWebhookClientSpy).toHaveBeenCalledTimes(1);
 
     // Assert `getDiscordWebhookClient` was called with dev channel ID
-    expect(getDiscordWebhookClientSpy).toHaveBeenNthCalledWith(
-      1,
-      '886976872611729439'
-    );
+    expect(getDiscordWebhookClientSpy).toHaveBeenNthCalledWith(1, 'abc123');
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
 
     // Assert message was sent
     expect(sendSpy).toHaveBeenNthCalledWith(1, {
       embeds: [EMBED],
-      username: 'Tribute Tools [dev]',
+      username: 'Tribute Tools [DEV]',
     });
 
     // Cleanup
+
+    getDiscordConfigsSpy.mockRestore();
     getDiscordWebhookClientSpy.mockRestore();
   });
 
-  test('should throw an error when message cannot be sent', async () => {
+  test('should handle error when message cannot be sent', async () => {
     const ERROR = new Error('Some bad error');
 
-    const sendSpy = jest.fn().mockImplementation(async () => {
+    const getDiscordConfigsSpy = jest
+      .spyOn(
+        await import('../../../services/discordConfig/getDiscordConfigs'),
+        'getDiscordConfigs'
+      )
+      .mockImplementation(async () => DISCORD_CONFIGS_FIXTURE);
+
+    const sendSpyError = jest.fn().mockImplementation(async () => {
       throw ERROR;
     });
+
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
     const getDiscordWebhookClientSpy = jest
       .spyOn(
@@ -71,9 +89,54 @@ describe('notifyAdminFee unit tests', () => {
       .mockImplementation(
         async () =>
           ({
-            send: sendSpy,
+            send: sendSpyError,
           } as any)
       );
+
+    await notifyAdminFee(PAYLOAD);
+
+    expect(getDiscordWebhookClientSpy).toHaveBeenCalledTimes(1);
+
+    // Assert `getDiscordWebhookClient` was called with dev channel ID
+    expect(getDiscordWebhookClientSpy).toHaveBeenNthCalledWith(1, 'abc123');
+
+    expect(sendSpyError).toHaveBeenCalledTimes(1);
+
+    // Assert message was sent
+    expect(sendSpyError).toHaveBeenNthCalledWith(1, {
+      embeds: [EMBED],
+      username: 'Tribute Tools [DEV]',
+    });
+
+    // Wait for `forEach` loop to complete
+    await new Promise((r) => setTimeout(r, 0));
+
+    // Assert error was handled
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy).toHaveBeenNthCalledWith(
+      1,
+      `Something went wrong while sending admin fee Discord message to \`tribute\`: ${ERROR}`
+    );
+
+    // Cleanup
+
+    consoleErrorSpy.mockRestore();
+    getDiscordConfigsSpy.mockRestore();
+    getDiscordWebhookClientSpy.mockRestore();
+  });
+
+  test('should throw error when configs could not be fetched', async () => {
+    const ERROR = new Error('Some bad error');
+
+    const getDiscordConfigsSpy = jest
+      .spyOn(
+        await import('../../../services/discordConfig/getDiscordConfigs'),
+        'getDiscordConfigs'
+      )
+      .mockImplementation(async () => {
+        throw ERROR;
+      });
 
     let e: Error | undefined = undefined;
 
@@ -85,26 +148,16 @@ describe('notifyAdminFee unit tests', () => {
       }
     }
 
-    expect(getDiscordWebhookClientSpy).toHaveBeenCalledTimes(1);
+    expect(getDiscordConfigsSpy).toHaveBeenCalledTimes(1);
 
-    // Assert `getDiscordWebhookClient` was called with dev channel ID
-    expect(getDiscordWebhookClientSpy).toHaveBeenNthCalledWith(
-      1,
-      '886976872611729439'
-    );
+    // Wait for `forEach` loop to complete
+    await new Promise((r) => setTimeout(r, 0));
 
-    expect(sendSpy).toHaveBeenCalledTimes(1);
-
-    // Assert message was sent
-    expect(sendSpy).toHaveBeenNthCalledWith(1, {
-      embeds: [EMBED],
-      username: 'Tribute Tools [dev]',
-    });
-
-    // Assert call resulted in an error
-    expect(e).toEqual(ERROR);
+    // Assert error was handled
+    expect(e).toBe(ERROR);
 
     // Cleanup
-    getDiscordWebhookClientSpy.mockRestore();
+
+    getDiscordConfigsSpy.mockRestore();
   });
 });
