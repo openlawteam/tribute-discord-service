@@ -49,6 +49,11 @@ export type ActionConfig = {
 
 export type Daos = Record<string, DaoDiscordConfig>;
 
+export type DiscordConfigs<TDiscord extends DiscordConfig> = Record<
+  string,
+  TDiscord
+>;
+
 export interface DaoDiscordConfig<InternalNames = string>
   extends DiscordConfig {
   /**
