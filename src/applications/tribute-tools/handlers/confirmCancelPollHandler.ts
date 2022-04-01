@@ -7,8 +7,8 @@ import {
 import {Interaction, MessageEmbed, TextChannel} from 'discord.js';
 
 import {APPLICATION_COMMANDS} from '../../../config';
+import {getDaoDiscordConfigs} from '../../../services';
 import {getDiscordDataByGuildID} from '../../../helpers';
-import {getDaos} from '../../../services';
 import {getTributeToolsClient} from '..';
 import {prisma} from '../../../singletons';
 
@@ -161,7 +161,10 @@ export async function confirmCancelPollHandler(
     // If the poll is already processed, then we need to update the action channel's message.
     if (pollEntry.processed) {
       if (!pollEntry.actionMessageID) return;
-      const dao = getDiscordDataByGuildID(pollEntry.guildID, await getDaos());
+      const dao = getDiscordDataByGuildID(
+        pollEntry.guildID,
+        await getDaoDiscordConfigs()
+      );
 
       if (!dao) return;
 

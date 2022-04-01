@@ -301,7 +301,10 @@ describe('confirmCancelPollHandler unit tests', () => {
     ).update.mockResolvedValue({...DEFAULT_SWEEP_DB_ENTRY, processed: true});
 
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     await confirmCancelPollHandler(FAKE_INTERACTION);
@@ -591,7 +594,10 @@ describe('confirmCancelPollHandler unit tests', () => {
       }));
 
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => undefined);
 
     /**

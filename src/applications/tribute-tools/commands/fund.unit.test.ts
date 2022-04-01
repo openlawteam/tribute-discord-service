@@ -132,9 +132,12 @@ describe('fund unit tests', () => {
           (await {guildId: GUILD_ID_FIXTURE, react: reactSpy}) as any
       );
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const fundResult = await fund.execute(interaction);
@@ -265,9 +268,12 @@ describe('fund unit tests', () => {
 
     const reactSpy = jest.fn();
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       // Insert bad guild ID so the dao is not found
       .mockImplementation(async () => ({
         ...FAKE_DAOS_FIXTURE,
@@ -304,9 +310,12 @@ describe('fund unit tests', () => {
 
     const reactSpy = jest.fn();
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(
         async () =>
           ({
@@ -365,9 +374,12 @@ describe('fund unit tests', () => {
     const deleteSpy = jest.fn();
     const reactSpy = jest.fn();
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest

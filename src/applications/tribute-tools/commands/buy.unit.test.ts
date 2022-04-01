@@ -294,9 +294,12 @@ describe('buy unit tests', () => {
       prismaMock.buyNFTPoll as any
     ).create.mockResolvedValue(DB_INSERT_DATA_ERC_721);
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
@@ -406,9 +409,12 @@ describe('buy unit tests', () => {
       )
     );
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
@@ -510,9 +516,12 @@ describe('buy unit tests', () => {
       prismaMock.buyNFTPoll as any
     ).create.mockResolvedValue(DB_INSERT_DATA_ERC_721);
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
@@ -575,9 +584,12 @@ describe('buy unit tests', () => {
       )
     );
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
@@ -641,9 +653,12 @@ describe('buy unit tests', () => {
       )
     );
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
@@ -703,9 +718,12 @@ describe('buy unit tests', () => {
       )
     );
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
@@ -1242,9 +1260,12 @@ describe('buy unit tests', () => {
 
     const reactSpy = jest.fn();
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       // Insert bad guild ID so the dao is not found
       .mockImplementation(async () => ({
         ...FAKE_DAOS_FIXTURE,
@@ -1290,9 +1311,12 @@ describe('buy unit tests', () => {
       throw new Error('Some bad error');
     });
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
@@ -1360,9 +1384,12 @@ describe('buy unit tests', () => {
       throw new Error('Some bad error');
     });
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest
@@ -1433,9 +1460,12 @@ describe('buy unit tests', () => {
       DB_INSERT_DATA_ERC_721
     );
 
-    // Mock `getDaos`
+    // Mock getting dao discord configs
     const getDaosSpy = jest
-      .spyOn(await import('../../../services/dao/getDaos'), 'getDaos')
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
       .mockImplementation(async () => FAKE_DAOS_FIXTURE);
 
     const interactionReplySpy = jest

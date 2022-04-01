@@ -4,7 +4,7 @@ import {getEnv} from '../../helpers';
 export const DAO_DISCORDS_LOCALHOST_PATH: string =
   '../../config/discords/daos/daosLocalhost';
 
-export async function getDaos(): Promise<
+export async function getDaoDiscordConfigs(): Promise<
   DiscordConfigs<DaoDiscordConfig> | undefined
 > {
   const appEnv = getEnv('APP_ENV');

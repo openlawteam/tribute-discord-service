@@ -74,10 +74,12 @@ describe('notifyPollTxStatus unit tests', () => {
   };
 
   async function mockDaosHelper() {
-    const getDaos = await import('../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
     return jest
-      .spyOn(getDaos, 'getDaos')
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => FAKE_DAOS_FIXTURE);
   }
 
@@ -468,10 +470,12 @@ describe('notifyPollTxStatus unit tests', () => {
       prismaMock.buyNFTPoll as any
     ).findUnique.mockResolvedValue(BUY_DB_ENTRY);
 
-    const getDaos = await import('../../../services/dao/getDaos');
+    const getDaoConfigs = await import(
+      '../../../services/discordConfig/getDaoDiscordConfigs'
+    );
 
     const daosSpy = jest
-      .spyOn(getDaos, 'getDaos')
+      .spyOn(getDaoConfigs, 'getDaoDiscordConfigs')
       .mockImplementationOnce(async () => ({}));
 
     const messageEditSpy = jest.fn();

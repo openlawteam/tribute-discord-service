@@ -7,7 +7,7 @@ import {
   legacyTributeGovernanceProposalCreatedAction,
 } from '../../actions/snapshotHub';
 import {Daos} from '../../../config';
-import {getDaos} from '../../../services';
+import {getDaoDiscordConfigs} from '../../../services';
 import {runAll} from '../../../helpers';
 import {SNAPSHOT_PROPOSAL_CREATED_EVENT} from '../../events/snapshotHub';
 
@@ -21,7 +21,7 @@ export async function snapshotProposalEventRunner(
 ): Promise<void> {
   let actions: SnapshotHubEventActions | undefined;
 
-  const daos = await getDaos();
+  const daos = await getDaoDiscordConfigs();
 
   switch (payload.event) {
     case SnapshotHubEvents.PROPOSAL_CREATED:

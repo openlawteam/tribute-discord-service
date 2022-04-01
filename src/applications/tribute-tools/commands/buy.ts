@@ -15,8 +15,8 @@ import sharp from 'sharp';
 
 import {CANCEL_POLL_BUY_CUSTOM_ID, THUMBS_EMOJIS} from '../config';
 import {Command} from '../../types';
+import {getDaoDiscordConfigs} from '../../../services';
 import {getDiscordDataByGuildID, getEnv} from '../../../helpers';
-import {getDaos} from '../../../services';
 import {getVoteThreshold} from '../helpers';
 import {prisma} from '../../../singletons';
 
@@ -404,7 +404,7 @@ async function execute(interaction: CommandInteraction) {
   const price = fromWei(toBN(responsePriceWEI), 'ether');
   const dao = getDiscordDataByGuildID(
     interaction.guildId || '',
-    await getDaos()
+    await getDaoDiscordConfigs()
   );
 
   const image = await getImage(smallImageUrl);
