@@ -9,7 +9,7 @@ import {
   getDiscordAction,
   getDaoDataByAddress,
   getEtherscanURL,
-  isDiscordActionActive,
+  isDiscordActionOrEventActive,
   isDebug,
 } from '../../../../helpers';
 import {
@@ -51,7 +51,7 @@ export function sponsoredProposalActionSubscribeLogs(
         !dao ||
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
-        !isDiscordActionActive(daoAction) ||
+        !isDiscordActionOrEventActive(daoAction) ||
         !SPONSORED_PROPOSAL_EVENT_SIGNATURE_HASH
       ) {
         return;

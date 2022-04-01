@@ -2,7 +2,7 @@ import {
   BURN_ADDRESS,
   getDiscordAction,
   getDaoDataBySnapshotSpace,
-  isDiscordActionActive,
+  isDiscordActionOrEventActive,
   isDebug,
   normalizeString,
 } from '../../../helpers';
@@ -55,7 +55,7 @@ export function legacyTributeGovernanceProposalCreatedAction(
         !dao ||
         !dao.snapshotHub ||
         !daoAction?.webhookID ||
-        !isDiscordActionActive(daoAction)
+        !isDiscordActionOrEventActive(daoAction)
       ) {
         return;
       }
