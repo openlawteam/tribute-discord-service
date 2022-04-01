@@ -116,7 +116,7 @@ describe('notifyAdminFee unit tests', () => {
 
     expect(consoleErrorSpy).toHaveBeenNthCalledWith(
       1,
-      `Something went wrong while sending admin fee Discord message to \`tribute\`: ${ERROR}`
+      `Something went wrong while sending admin fee Discord message to \`Tribute Labs [DEV]\`: ${ERROR}`
     );
 
     // Cleanup
@@ -126,8 +126,12 @@ describe('notifyAdminFee unit tests', () => {
     getDiscordWebhookClientSpy.mockRestore();
   });
 
-  test('should throw error when configs could not be fetched', async () => {
+  test('should handle error when configs could not be fetched', async () => {
     const ERROR = new Error('Some bad error');
+
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
     const getDiscordConfigsSpy = jest
       .spyOn(
@@ -138,15 +142,7 @@ describe('notifyAdminFee unit tests', () => {
         throw ERROR;
       });
 
-    let e: Error | undefined = undefined;
-
-    try {
-      await notifyAdminFee(PAYLOAD);
-    } catch (error) {
-      if (error instanceof Error) {
-        e = error;
-      }
-    }
+    await notifyAdminFee(PAYLOAD);
 
     expect(getDiscordConfigsSpy).toHaveBeenCalledTimes(1);
 
@@ -154,10 +150,17 @@ describe('notifyAdminFee unit tests', () => {
     await new Promise((r) => setTimeout(r, 0));
 
     // Assert error was handled
-    expect(e).toBe(ERROR);
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy).toHaveBeenNthCalledWith(
+      1,
+      `Error while executing SPONSORED_PROPOSAL_WEBHOOK action for TRIBUTE_TOOLS_ADMIN_FEE event.\n${ERROR.stack}`
+    );
 
     // Cleanup
 
+    consoleErrorSpy.mockRestore();
     getDiscordConfigsSpy.mockRestore();
   });
 });

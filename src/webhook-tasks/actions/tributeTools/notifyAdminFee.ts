@@ -1,10 +1,12 @@
 import {fromWei, toBN} from 'web3-utils';
 import {MessageEmbed} from 'discord.js';
 
+import {actionErrorHandler} from '../helpers/actionErrorHandler';
 import {APP_ENV} from '../../../config';
 import {filterDiscordsByActiveAction} from '../../../helpers';
 import {getDiscordAction} from '../../../helpers';
 import {getDiscordConfigs, getDiscordWebhookClient} from '../../../services';
+import {TRIBUTE_TOOLS_ADMIN_FEE_EVENT} from '../../events';
 import {TributeToolsFeeWebhookPayload} from '../../../http-api/middleware/tributeTools/tributeToolsFeeWebhook';
 
 export async function notifyAdminFee(
@@ -55,11 +57,17 @@ export async function notifyAdminFee(
       } catch (error) {
         // Do not throw, let the loop continue to run
         console.error(
-          `Something went wrong while sending admin fee Discord message to \`${daoName}\`: ${error}`
+          `Something went wrong while sending admin fee Discord message to \`${config.friendlyName}\`: ${error}`
         );
       }
     });
   } catch (error) {
-    throw error;
+    if (error instanceof Error) {
+      actionErrorHandler({
+        actionName: 'SPONSORED_PROPOSAL_WEBHOOK',
+        error,
+        event: TRIBUTE_TOOLS_ADMIN_FEE_EVENT,
+      });
+    }
   }
 }
