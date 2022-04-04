@@ -51,7 +51,6 @@ describe('legacyTributeProposalResolver unit tests', () => {
 
     expect(
       await legacyTributeProposalResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
         apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
@@ -78,7 +77,6 @@ describe('legacyTributeProposalResolver unit tests', () => {
 
     expect(
       await legacyTributeProposalResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
         apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',

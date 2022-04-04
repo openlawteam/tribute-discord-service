@@ -14,8 +14,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
   test('should return a legacy Tribute snapshot hub draft', async () => {
     expect(
       await legacyTributeDraftResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
@@ -37,8 +36,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
 
     expect(
       await legacyTributeDraftResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
@@ -53,8 +51,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
 
     expect(
       await legacyTributeDraftResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
@@ -79,8 +76,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
 
     expect(
       await legacyTributeDraftResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
