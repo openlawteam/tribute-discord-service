@@ -4,7 +4,7 @@ import {
 } from '../../../test';
 import {legacyTributeDraftResolver} from './legacyTributeDraftResolver';
 import {rest, server} from '../../../test/msw/server';
-import {SnapshotHubLegacyTributeProposalEntry} from '.';
+import {SnapshotHubLegacyTributeDraftEntry} from '.';
 
 describe('legacyTributeDraftResolver unit tests', () => {
   const draftData = Object.entries(
@@ -29,7 +29,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
 
   test('should return `undefined` if response is empty', async () => {
     server.use(
-      rest.get<SnapshotHubLegacyTributeProposalEntry>(
+      rest.get<SnapshotHubLegacyTributeDraftEntry>(
         'http://*/api/*/draft/*',
         (_req, res, ctx) => res(ctx.status(404))
       )
@@ -45,7 +45,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
     ).toBe(undefined);
 
     server.use(
-      rest.get<SnapshotHubLegacyTributeProposalEntry>(
+      rest.get<SnapshotHubLegacyTributeDraftEntry>(
         'http://*/api/*/draft/*',
         (_req, res, ctx) => res(ctx.json({}))
       )

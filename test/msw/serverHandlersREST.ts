@@ -64,7 +64,7 @@ const snapshotHubLegacyTributeDraftGET =
 export const handlers = [
   alchemyAPI,
   discordWebhookPOST,
-  httpAPIAllGET,
   snapshotHubLegacyTributeDraftGET,
   snapshotHubLegacyTributeProposalGET,
+  httpAPIAllGET,
 ];
