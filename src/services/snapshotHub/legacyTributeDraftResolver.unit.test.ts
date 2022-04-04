@@ -29,7 +29,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
 
   test('should return `undefined` if response is empty', async () => {
     server.use(
-      rest.get<undefined, SnapshotHubLegacyTributeProposalEntry>(
+      rest.get<SnapshotHubLegacyTributeProposalEntry>(
         'http://*/api/*/draft/*',
         (_req, res, ctx) => res(ctx.status(404))
       )
@@ -45,7 +45,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
     ).toBe(undefined);
 
     server.use(
-      rest.get<undefined, SnapshotHubLegacyTributeProposalEntry>(
+      rest.get<SnapshotHubLegacyTributeProposalEntry>(
         'http://*/api/*/draft/*',
         (_req, res, ctx) => res(ctx.json({}))
       )

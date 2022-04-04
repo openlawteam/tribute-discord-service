@@ -16,7 +16,7 @@ import {rest} from './server';
  */
 
 const httpAPIAllGET = rest.get(
-  'http://localhost:*/api/*',
+  /https:\/\/localhost:(\d{1,})\/api\/.*/,
   // Bypass and use original response
   (_req, _res, _ctx) => undefined
 );
@@ -35,7 +35,7 @@ const alchemyAPI = rest.get(
  * Discord.js
  */
 
-const discordWebhookPOST = rest.post<undefined, APIMessage>(
+const discordWebhookPOST = rest.post<APIMessage>(
   'https://discord.com/api/*/webhooks/*/*',
   (_req, res, ctx) => res(ctx.json(DISCORD_WEBHOOK_POST_FIXTURE))
 );
@@ -44,19 +44,18 @@ const discordWebhookPOST = rest.post<undefined, APIMessage>(
  * Snapshot Hub
  */
 
-const snapshotHubLegacyTributeProposalGET = rest.get<
-  undefined,
-  SnapshotHubLegacyTributeProposalEntry
->('http://*/api/*/proposal/*', (_req, res, ctx) =>
-  res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE))
-);
+const snapshotHubLegacyTributeProposalGET =
+  rest.get<SnapshotHubLegacyTributeProposalEntry>(
+    'http://*/api/*/proposal/*',
+    (_req, res, ctx) =>
+      res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE))
+  );
 
-const snapshotHubLegacyTributeDraftGET = rest.get<
-  undefined,
-  SnapshotHubLegacyTributeDraftEntry
->('http://*/api/*/draft/*', (_req, res, ctx) =>
-  res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_DRAFT_FIXTURE))
-);
+const snapshotHubLegacyTributeDraftGET =
+  rest.get<SnapshotHubLegacyTributeDraftEntry>(
+    'http://*/api/*/draft/*',
+    (_req, res, ctx) => res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_DRAFT_FIXTURE))
+  );
 
 /**
  * HANDLERS TO EXPORT
