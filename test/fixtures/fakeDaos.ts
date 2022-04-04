@@ -61,7 +61,7 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoDiscordConfig> = {
 
         const DEFAULT_ARGS = {
           ...args,
-          apiBaseURL: 'http://docker-host:8081/api',
+          apiBaseURL: 'http://localhost:8081/api',
         };
 
         switch (resolver) {
@@ -106,7 +106,7 @@ export const FAKE_DAOS_FIXTURE: Record<string, DaoDiscordConfig> = {
 
         const DEFAULT_ARGS = {
           ...args,
-          apiBaseURL: 'http://docker-host:8081/api',
+          apiBaseURL: 'http://localhost:8081/api',
         };
 
         switch (resolver) {
