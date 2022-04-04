@@ -68,7 +68,7 @@
     "dotenv-cli": "^5.1.0",
     "jest": "^27.5.1",
     "jest-mock-extended": "^2.0.5",
-    "msw": "^0.35.0",
+    "msw": "^0.39.2",
     "nodemon": "^2.0.15",
     "prettier": "^2.6.2",
     "strict-event-emitter-types": "^2.0.0",

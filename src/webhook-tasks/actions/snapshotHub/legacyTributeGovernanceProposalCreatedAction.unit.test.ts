@@ -78,8 +78,12 @@ async function mockHelper(
     // Noop function to remove implementation, i.e. noisy error logs
     .mockImplementation(() => {});
 
-  // Mock result
-  prismaMock.discordWebhook.findUnique.mockResolvedValue(webhook);
+  /**
+   * Mock result
+   *
+   * @todo fix types
+   */
+  (prismaMock.discordWebhook as any).findUnique.mockResolvedValue(webhook);
 
   if (spyOnWebhookClient) {
     // Mock Discord.js `WebhookClient.send`
@@ -121,7 +125,7 @@ async function mockHelper(
 
 const mockGovernanceProposalResponse = () =>
   server.use(
-    rest.get<undefined, SnapshotHubLegacyTributeProposalEntry>(
+    rest.get<SnapshotHubLegacyTributeProposalEntry>(
       'http://*/api/*/proposal/*',
       (_req, res, ctx) =>
         res(

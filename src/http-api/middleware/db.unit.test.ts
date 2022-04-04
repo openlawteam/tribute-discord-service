@@ -13,8 +13,12 @@ describe('db unit tests', () => {
   });
 
   test('should return response when `GET /db`', async () => {
-    // Mock result
-    prismaMock.discordWebhook.findFirst.mockResolvedValue({
+    /**
+     * Mock result
+     *
+     * @todo fix types
+     */
+    (prismaMock.discordWebhook as any).findFirst.mockResolvedValue({
       id: 1,
       createdAt: new Date(0),
       webhookID: 'abc123',

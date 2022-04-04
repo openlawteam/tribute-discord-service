@@ -14,6 +14,10 @@ import {
   SnapshotDraftCreatedEmbedTemplateData,
   SnapshotDraftCreatedTemplateData,
 } from '../../templates';
+import {
+  SnapshotHubLegacyTributeDraftEntry,
+  SnapshotHubMessageType,
+} from '../../../services/snapshotHub';
 import {ActionNames, DaoDiscordConfig} from '../../../config';
 import {BURN_ADDRESS} from '../../../helpers';
 import {EventBase} from '../../events';
@@ -23,10 +27,6 @@ import {prismaMock} from '../../../../test/prismaMock';
 import {rest, server} from '../../../../test/msw/server';
 import {SNAPSHOT_PROPOSAL_CREATED_EVENT} from '../../events/snapshotHub';
 import {SnapshotHubEventPayload, SnapshotHubEvents} from './types';
-import {
-  SnapshotHubLegacyTributeDraftEntry,
-  SnapshotHubMessageType,
-} from '../../../services/snapshotHub';
 import {web3} from '../../../singletons';
 
 type MockHelperReturn = Promise<{
@@ -77,8 +77,12 @@ async function mockHelper(
     // Noop function to remove implementation, i.e. noisy error logs
     .mockImplementation(() => {});
 
-  // Mock result
-  prismaMock.discordWebhook.findUnique.mockResolvedValue(webhook);
+  /**
+   * Mock result
+   *
+   * @todo fix types
+   */
+  (prismaMock.discordWebhook as any).findUnique.mockResolvedValue(webhook);
 
   if (spyOnWebhookClient) {
     // Mock Discord.js `WebhookClient.send`
@@ -308,7 +312,7 @@ describe('legacyTributeDraftCreatedAction unit tests', () => {
 
   test('should exit if no `adapterID` found', async () => {
     server.use(
-      rest.get<undefined, SnapshotHubLegacyTributeDraftEntry>(
+      rest.get<SnapshotHubLegacyTributeDraftEntry>(
         'http://*/api/*/draft/*',
         (_req, res, ctx) =>
           res(
