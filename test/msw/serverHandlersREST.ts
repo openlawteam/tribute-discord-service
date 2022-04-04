@@ -36,14 +36,14 @@ const discordWebhookPOST = rest.post<APIMessage>(
 
 const snapshotHubLegacyTributeProposalGET =
   rest.get<SnapshotHubLegacyTributeProposalEntry>(
-    /https?:\/\/.*\/api\/.*\/proposal\/.*/,
+    'http://:host/api/:space/proposal/:proposalId',
     (_req, res, ctx) =>
       res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE))
   );
 
 const snapshotHubLegacyTributeDraftGET =
   rest.get<SnapshotHubLegacyTributeDraftEntry>(
-    /https?:\/\/.*\/api\/.*\/draft\/.*/,
+    'http://:host/api/:space/draft/:draftId',
     (_req, res, ctx) => res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_DRAFT_FIXTURE))
   );
 
