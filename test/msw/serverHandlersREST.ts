@@ -26,7 +26,7 @@ const httpAPIAllGET = rest.get(
  */
 
 const alchemyAPI = rest.get(
-  'https://eth-*.alchemyapi.io/v2/*',
+  /https:\/\/eth-.*\.alchemyapi\.io\/v2\/.*/,
   // Just responding with something so the msw doesn't log a warning
   (_req, res, ctx) => res(ctx.status(200))
 );
@@ -36,7 +36,7 @@ const alchemyAPI = rest.get(
  */
 
 const discordWebhookPOST = rest.post<APIMessage>(
-  'https://discord.com/api/*/webhooks/*/*',
+  /https:\/\/discord\.com\/api\/.*\/webhooks\/.*\/.*/,
   (_req, res, ctx) => res(ctx.json(DISCORD_WEBHOOK_POST_FIXTURE))
 );
 
@@ -46,14 +46,14 @@ const discordWebhookPOST = rest.post<APIMessage>(
 
 const snapshotHubLegacyTributeProposalGET =
   rest.get<SnapshotHubLegacyTributeProposalEntry>(
-    'http://*/api/*/proposal/*',
+    /https?:\/\/.*\/api\/.*\/proposal\/.*/,
     (_req, res, ctx) =>
       res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE))
   );
 
 const snapshotHubLegacyTributeDraftGET =
   rest.get<SnapshotHubLegacyTributeDraftEntry>(
-    'http://*/api/*/draft/*',
+    /https?:\/\/.*\/api\/.*\/draft\/.*/,
     (_req, res, ctx) => res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_DRAFT_FIXTURE))
   );
 
