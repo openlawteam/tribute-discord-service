@@ -14,8 +14,7 @@ describe('legacyTributeDraftResolver unit tests', () => {
   test('should return a legacy Tribute snapshot hub draft', async () => {
     expect(
       await legacyTributeDraftResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://fake-snapshot-hub.com/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
