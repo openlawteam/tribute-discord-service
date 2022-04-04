@@ -16,7 +16,7 @@ import {rest} from './server';
  */
 
 const httpAPIAllGET = rest.get(
-  /https:\/\/localhost:(\d{1,})\/api\/.*/,
+  /https?:\/\/localhost:(\d{1,})\/api\/.*/,
   // Bypass and use original response
   (_req, _res, _ctx) => undefined
 );
