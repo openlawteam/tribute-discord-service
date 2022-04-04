@@ -12,16 +12,6 @@ import {
 import {rest} from './server';
 
 /**
- * HTTP API
- */
-
-const httpAPIAllGET = rest.get(
-  /https?:\/\/localhost:(\d{1,})\/api\/.*/,
-  // Bypass and use original response
-  (_req, _res, _ctx) => undefined
-);
-
-/**
  * Alchemy API
  */
 
@@ -64,7 +54,6 @@ const snapshotHubLegacyTributeDraftGET =
 export const handlers = [
   alchemyAPI,
   discordWebhookPOST,
-  httpAPIAllGET,
   snapshotHubLegacyTributeDraftGET,
   snapshotHubLegacyTributeProposalGET,
 ];
