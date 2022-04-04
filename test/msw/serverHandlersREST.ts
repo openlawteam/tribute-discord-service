@@ -12,16 +12,6 @@ import {
 import {rest} from './server';
 
 /**
- * HTTP API
- */
-
-const httpAPIAllGET = rest.get(
-  /https?:\/\/localhost:(\d{1,})\/api\/.*/,
-  // Bypass and use original response
-  (_req, _res, _ctx) => undefined
-);
-
-/**
  * Alchemy API
  */
 
@@ -46,14 +36,14 @@ const discordWebhookPOST = rest.post<APIMessage>(
 
 const snapshotHubLegacyTributeProposalGET =
   rest.get<SnapshotHubLegacyTributeProposalEntry>(
-    /https?:\/\/.*\/api\/.*\/proposal\/.*/,
+    'http://:host/api/:space/proposal/:proposalId',
     (_req, res, ctx) =>
       res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_PROPOSAL_FIXTURE))
   );
 
 const snapshotHubLegacyTributeDraftGET =
   rest.get<SnapshotHubLegacyTributeDraftEntry>(
-    /https?:\/\/.*\/api\/.*\/draft\/.*/,
+    'http://:host/api/:space/draft/:draftId',
     (_req, res, ctx) => res(ctx.json(LEGACY_TRIBUTE_SNAPSHOT_HUB_DRAFT_FIXTURE))
   );
 
@@ -64,7 +54,6 @@ const snapshotHubLegacyTributeDraftGET =
 export const handlers = [
   alchemyAPI,
   discordWebhookPOST,
-  httpAPIAllGET,
   snapshotHubLegacyTributeDraftGET,
   snapshotHubLegacyTributeProposalGET,
 ];

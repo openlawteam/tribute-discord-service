@@ -14,8 +14,7 @@ describe('legacyTributeProposalResolver unit tests', () => {
   test('should return a legacy Tribute snapshot hub proposal', async () => {
     expect(
       await legacyTributeProposalResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
@@ -30,15 +29,14 @@ describe('legacyTributeProposalResolver unit tests', () => {
   test('should return `undefined` if response is empty', async () => {
     server.use(
       rest.get<SnapshotHubLegacyTributeProposalEntry>(
-        'http://*/api/*/proposal/*',
+        'http://:host/api/:space/proposal/:proposalId',
         (_req, res, ctx) => res(ctx.status(404))
       )
     );
 
     expect(
       await legacyTributeProposalResolver({
-        // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
@@ -46,7 +44,7 @@ describe('legacyTributeProposalResolver unit tests', () => {
 
     server.use(
       rest.get<SnapshotHubLegacyTributeProposalEntry>(
-        'http://*/api/*/proposal/*',
+        'http://:host/api/:space/proposal/:proposalId',
         (_req, res, ctx) => res(ctx.json({}))
       )
     );
@@ -54,7 +52,7 @@ describe('legacyTributeProposalResolver unit tests', () => {
     expect(
       await legacyTributeProposalResolver({
         // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
@@ -63,8 +61,9 @@ describe('legacyTributeProposalResolver unit tests', () => {
 
   test('should not throw when error; returns `undefined`', async () => {
     server.use(
-      rest.get('http://*/api/*/proposal/*', (_req, res, ctx) =>
-        res(ctx.status(500))
+      rest.get(
+        'http://:host/api/:space/proposal/:proposalId',
+        (_req, res, ctx) => res(ctx.status(500))
       )
     );
 
@@ -80,7 +79,7 @@ describe('legacyTributeProposalResolver unit tests', () => {
     expect(
       await legacyTributeProposalResolver({
         // @see `docker-host` in `docker-compose.dev.yml`
-        apiBaseURL: 'http://docker-host:8081/api',
+        apiBaseURL: 'http://localhost:8081/api',
         proposalID: BYTES32_FIXTURE,
         space: 'tribute',
       })
