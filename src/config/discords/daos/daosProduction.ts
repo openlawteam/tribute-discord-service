@@ -333,7 +333,7 @@ export const DAOS_PRODUCTION: Record<
         name: 'TRIBUTE_TOOLS_BOT',
         commands: {
           BUY: {
-            resultChannelID: '',
+            resultChannelID: '970672147871699054',
             voteThresholds: new Map([
               [[0, 15], 5],
               [[15, 30], 10],
@@ -341,11 +341,11 @@ export const DAOS_PRODUCTION: Record<
             ]),
           },
           FUND: {
-            resultChannelID: '',
+            resultChannelID: '970672147871699054',
             voteThreshold: 3,
           },
           SWEEP: {
-            resultChannelID: '',
+            resultChannelID: '970672147871699054',
           },
         },
       },
@@ -353,7 +353,7 @@ export const DAOS_PRODUCTION: Record<
     baseURL: 'https://spaceshipdao.xyz',
     events: [],
     friendlyName: 'Spaceship DAO',
-    guildID: '',
+    guildID: '918208755060068412',
     internalName: 'spaceship',
     registryContractAddress: '0xAf7b9f6D0b20CA4C432645Dd0c70988810BC5E11',
     snapshotHub: {
