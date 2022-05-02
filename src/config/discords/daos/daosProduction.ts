@@ -30,6 +30,7 @@ export const DAO_NAMES_PRODUCTION = [
   'museo',
   'music',
   'nft',
+  'spaceship',
   'unicorn',
 ] as const;
 
@@ -322,6 +323,42 @@ export const DAOS_PRODUCTION: Record<
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
       space: 'darkhorse',
+    },
+  },
+
+  spaceship: {
+    actions: [],
+    applications: {
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
+        commands: {
+          BUY: {
+            resultChannelID: '',
+            voteThresholds: new Map([
+              [[0, 15], 5],
+              [[15, 30], 10],
+              [[30, 100], 20],
+            ]),
+          },
+          FUND: {
+            resultChannelID: '',
+            voteThreshold: 3,
+          },
+          SWEEP: {
+            resultChannelID: '',
+          },
+        },
+      },
+    },
+    baseURL: 'https://spaceshipdao.xyz',
+    events: [],
+    friendlyName: 'Spaceship DAO',
+    guildID: '',
+    internalName: 'spaceship',
+    registryContractAddress: '0xAf7b9f6D0b20CA4C432645Dd0c70988810BC5E11',
+    snapshotHub: {
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
+      space: 'spaceship',
     },
   },
 };
