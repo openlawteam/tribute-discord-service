@@ -24,6 +24,7 @@ import {DaoDiscordConfig} from '../../types';
  * @see `lao-backends` for most cases
  */
 export const DAO_NAMES_PRODUCTION = [
+  'bright',
   'darkhorse',
   'fashion',
   'metaverse',
@@ -359,6 +360,42 @@ export const DAOS_PRODUCTION: Record<
     snapshotHub: {
       proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
       space: 'spaceship',
+    },
+  },
+
+  bright: {
+    actions: [],
+    applications: {
+      TRIBUTE_TOOLS_BOT: {
+        name: 'TRIBUTE_TOOLS_BOT',
+        commands: {
+          BUY: {
+            resultChannelID: '971831377056116737',
+            voteThresholds: new Map([
+              [[0, 15], 5],
+              [[15, 30], 10],
+              [[30, 100], 20],
+            ]),
+          },
+          FUND: {
+            resultChannelID: '971831377056116737',
+            voteThreshold: 3,
+          },
+          SWEEP: {
+            resultChannelID: '971831377056116737',
+          },
+        },
+      },
+    },
+    baseURL: 'https://brightopportunities.io',
+    events: [],
+    friendlyName: 'Bright Opportunities DAO',
+    guildID: '960993112753319996',
+    internalName: 'bright',
+    registryContractAddress: '0x933F790b1B673B3b812A3dB8F3eF70d7ad776348',
+    snapshotHub: {
+      proposalResolver: DEFAULT_PROPOSAL_RESOLVER,
+      space: 'bright',
     },
   },
 };
