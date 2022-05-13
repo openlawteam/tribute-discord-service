@@ -32,7 +32,7 @@ describe('fund unit tests', () => {
 
   const INTERACTION_OPTIONS = [
     {name: 'address_to_fund', type: 3, value: ETH_ADDRESS_FIXTURE},
-    {name: 'amount_in_usdc', type: 4, value: 50},
+    {name: 'amount_in_usdc', type: 10, value: 50000.55},
     {
       name: 'purpose',
       type: 3,
@@ -93,7 +93,7 @@ describe('fund unit tests', () => {
 
   const DB_INSERT_DATA = {
     addressToFund: ETH_ADDRESS_FIXTURE,
-    amountUSDC: 50000,
+    amountUSDC: 50000.55,
     channelID: '886976610018934824',
     createdAt: new Date(0),
     guildID: '722525233755717762',
@@ -159,7 +159,7 @@ describe('fund unit tests', () => {
       (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
         .embeds?.[0]?.description
     ).toMatch(
-      /📊 \*\*Should we fund `0x04028Df0Cea639E97fDD3fC01bA5CC172613211D` for \$50 USDC\?\*\*/i
+      /📊 \*\*Should we fund `0x04028Df0Cea639E97fDD3fC01bA5CC172613211D` for \$50,000\.55 USDC\?\*\*/i
     );
 
     expect(
@@ -250,6 +250,45 @@ describe('fund unit tests', () => {
     expect(interactionReplySpy.mock.calls[0][0]).toEqual({
       content:
         'Invalid Ethereum address. Try something like: 0x000000000000000000000000000000000000bEEF.',
+      ephemeral: true,
+    });
+
+    // Cleanup
+
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should reply with error if `amount_in_usdc` option is not valid', async () => {
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(client, {
+      ...INTERACTION_DATA,
+      data: {
+        ...INTERACTION_DATA.data,
+        options: [
+          {name: 'address_to_fund', type: 3, value: ETH_ADDRESS_FIXTURE},
+          // `0` value
+          {name: 'amount_in_usdc', type: 10, value: 0},
+        ],
+      },
+    });
+
+    const reactSpy = jest.fn();
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {guildId: '722525233755717762', react: reactSpy}) as any
+      );
+
+    const fundResult = await fund.execute(interaction);
+
+    expect(fundResult).toBe(undefined);
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+
+    expect(interactionReplySpy.mock.calls[0][0]).toEqual({
+      content: 'Invalid USDC amount. Try something like: 50,000.50 or 50000.50',
       ephemeral: true,
     });
 

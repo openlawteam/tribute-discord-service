@@ -36,6 +36,9 @@ const NO_DAO_ERROR_MESSAGE: string =
 const INVALID_ETH_ADDRESS_ERROR_MESSAGE: string =
   'Invalid Ethereum address. Try something like: 0x000000000000000000000000000000000000bEEF.';
 
+const INVALID_USDC_AMOUNT_ERROR_MESSAGE: string =
+  'Invalid USDC amount. Try something like: 50,000.50 or 50000.50';
+
 // Sweep command structure
 const command = new SlashCommandBuilder()
   // Position required arguments first for better UX
@@ -47,10 +50,12 @@ const command = new SlashCommandBuilder()
       )
       .setRequired(true)
   )
-  .addIntegerOption((option) =>
+  .addNumberOption((option) =>
     option
       .setName(ARG_NAMES.amountUSDC)
-      .setDescription('Set the amount of USDC to fund. e.g. 50000')
+      .setDescription(
+        'Set the amount of USDC to fund. e.g. 50,000.50, or 50000.50'
+      )
       .setRequired(true)
   )
   .addStringOption((option) =>
@@ -81,7 +86,8 @@ async function execute(interaction: CommandInteraction) {
   const addressToFund: string =
     interaction.options.getString(addressToFundArgName) || '';
 
-  const amountUSDC = interaction.options.getInteger(amountUSDCArgName) || 0;
+  const amountUSDC: number =
+    interaction.options.getNumber(amountUSDCArgName) || 0;
 
   const purpose: string = interaction.options.getString(purposeArgName) || '';
 
@@ -99,6 +105,18 @@ async function execute(interaction: CommandInteraction) {
 
     return;
   }
+
+  // Validate USDC amount
+  if (!amountUSDC) {
+    // Reply with an error/help message that only the user can see.
+    await interaction.reply({
+      content: INVALID_USDC_AMOUNT_ERROR_MESSAGE,
+      ephemeral: true,
+    });
+
+    return;
+  }
+
   const dao = getDiscordDataByGuildID(
     interaction.guildId || '',
     await getDaoDiscordConfigs()
@@ -130,8 +148,9 @@ async function execute(interaction: CommandInteraction) {
   const embed = new MessageEmbed()
     .setTitle(purpose)
     .setDescription(
-      `📊 **Should we fund \`${addressToFund}\` for $${new Intl.NumberFormat(
-        'en-US'
+      `📊 **Should we fund \`${addressToFund}\` for ${new Intl.NumberFormat(
+        'en-US',
+        {style: 'currency', currency: 'USD'}
       ).format(amountUSDC)} USDC?**\n\u200B`
     ) /* `\u200B` = zero-width space */
     .setURL(`https://etherscan.io/address/${addressToFund}`)
