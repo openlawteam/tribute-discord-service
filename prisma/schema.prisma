@@ -51,6 +51,7 @@ model BuyNFTPoll {
   name            String   @db.VarChar(255)
   contractAddress String   @db.VarChar(255)
   tokenID         String   @db.VarChar(255)
+  // 78 = total decimal digits length, and 0 = number of digits stored to the right of the decimal point
   amountWEI       Decimal  @default(0) @db.Decimal(78, 0)
   processed       Boolean  @default(false) @db.Boolean
   voteThreshold   Int      @default(0) @db.Integer
@@ -70,7 +71,8 @@ model FundAddressPoll {
   createdAt       DateTime @default(now())
   purpose         String   @db.VarChar(255)
   addressToFund   String   @db.VarChar(255)
-  amountUSDC      Int      @default(0) @db.Integer
+  // 65 = total decimal digits length, and 2 = number of digits stored to the right of the decimal point
+  amountUSDC      Decimal  @default(0) @db.Decimal(65, 2)
   processed       Boolean  @default(false) @db.Boolean
   voteThreshold   Int      @default(0) @db.Integer
   upvoteCount     Int      @default(0) @db.Integer

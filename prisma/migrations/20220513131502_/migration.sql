@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "fund_address_poll" ALTER COLUMN "amountUSDC" SET DEFAULT 0,
+ALTER COLUMN "amountUSDC" SET DATA TYPE DECIMAL(65,2);
