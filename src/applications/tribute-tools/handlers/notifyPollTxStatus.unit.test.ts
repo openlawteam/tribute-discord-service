@@ -59,7 +59,7 @@ describe('notifyPollTxStatus unit tests', () => {
   const FUND_DB_ENTRY: FundAddressPoll = {
     actionMessageID: '987654321',
     addressToFund: ETH_ADDRESS_FIXTURE,
-    amountUSDC: 123,
+    amountUSDC: new Prisma.Decimal(123.55),
     channelID: '123456789',
     createdAt: new Date(0),
     guildID: GUILD_ID_FIXTURE,

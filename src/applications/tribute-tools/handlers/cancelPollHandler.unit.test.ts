@@ -54,7 +54,7 @@ describe('cancelPollHandler unit tests', () => {
   const DEFAULT_FUND_DB_ENTRY: FundAddressPoll = {
     actionMessageID: '123456789',
     addressToFund: ETH_ADDRESS_FIXTURE,
-    amountUSDC: 50000,
+    amountUSDC: new Prisma.Decimal(50000.55),
     channelID: '886976610018934824',
     createdAt: new Date(0),
     guildID: GUILD_ID_FIXTURE,
