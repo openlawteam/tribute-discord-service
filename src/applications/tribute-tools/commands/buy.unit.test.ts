@@ -36,7 +36,7 @@ describe('buy unit tests', () => {
       name: 'url',
       type: 3 /* `STRING` */,
       value:
-        'https://opensea.io/assets/0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8/5314',
+        'https://opensea.io/assets/ethereum/0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8/5314',
     },
   ];
 
@@ -45,7 +45,7 @@ describe('buy unit tests', () => {
       name: 'url',
       type: 3 /* `STRING` */,
       value:
-        'https://opensea.io/assets/0xc3ae6e60a37a5f7d6d68e60c45b1ae50da233bd4/0',
+        'https://opensea.io/assets/ethereum/0xc3ae6e60a37a5f7d6d68e60c45b1ae50da233bd4/0',
     },
   ];
 
@@ -134,7 +134,7 @@ describe('buy unit tests', () => {
           endingPrice: '285000000000000000',
           fees: null,
         },
-        url: 'https://opensea.io/assets/0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8/5314',
+        url: 'https://opensea.io/assets/ethereum/0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8/5314',
         tokenType: 'ERC721',
       },
     ],
@@ -166,7 +166,7 @@ describe('buy unit tests', () => {
             maker: '0xd982987638b66e72a1241a81a965050687d09b24',
           },
         ],
-        url: 'https://opensea.io/assets/0xc3ae6e60a37a5f7d6d68e60c45b1ae50da233bd4/0',
+        url: 'https://opensea.io/assets/ethereum/0xc3ae6e60a37a5f7d6d68e60c45b1ae50da233bd4/0',
         tokenType: 'ERC1155',
       },
     ],
