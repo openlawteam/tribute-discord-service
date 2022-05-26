@@ -89,6 +89,9 @@ const NO_GEM_API_KEY_ERROR_MESSAGE: string =
 
 const GEM_API_BASE_PATH: string = 'https://gem-public-api.herokuapp.com';
 
+const GEM_HOST_REGEX: RegExp = /^(www\.)?gem\.xyz/;
+const OPENSEA_HOST_REGEX: RegExp = /^(www\.)?opensea\.io/;
+
 function isValidURL(url: string): boolean {
   try {
     new URL(url);
@@ -103,8 +106,8 @@ function isValidURLHost(url: string): boolean {
   try {
     const {host} = new URL(url);
 
-    const isGem = /^(www\.)?gem\.xyz/.test(host);
-    const isOS = /^(www\.)?opensea\.io/.test(host);
+    const isGem = GEM_HOST_REGEX.test(host);
+    const isOS = OPENSEA_HOST_REGEX.test(host);
 
     if (!isGem && !isOS) {
       throw new Error('URL `host` is not valid.');
@@ -117,15 +120,29 @@ function isValidURLHost(url: string): boolean {
 }
 
 function parseBuyURL(url: string): {contractAddress: string; tokenID: string} {
-  const {pathname} = new URL(url);
+  const {host, pathname} = new URL(url);
 
   const contractAddress =
-    pathname.split(/\//).find((p, i) => i === 2 && isAddress(p)) || '';
+    pathname.split(/\//).find((p, i) => {
+      // e.g. `https://www.gem.xyz/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/309000489`
+      if (GEM_HOST_REGEX.test(host)) return i === 2 && isAddress(p);
+
+      // e.g. `/assets/ethereum/0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8/5314`
+      if (OPENSEA_HOST_REGEX.test(host)) return i === 3 && isAddress(p);
+    }) || '';
 
   const tokenID =
-    pathname
-      .split(/\//)
-      .find((p, i) => i === 3 && Number.isInteger(parseInt(p))) || '';
+    pathname.split(/\//).find((p, i) => {
+      // e.g. `/assets/ethereum/0x335eeef8e93a7a757d9e7912044d9cd264e2b2d8/5314`
+      if (OPENSEA_HOST_REGEX.test(host)) {
+        return i === 4 && Number.isInteger(parseInt(p));
+      }
+
+      // e.g. `https://www.gem.xyz/asset/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/309000489`
+      if (GEM_HOST_REGEX.test(host)) {
+        return i === 3 && Number.isInteger(parseInt(p));
+      }
+    }) || '';
 
   return {contractAddress, tokenID};
 }
