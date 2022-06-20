@@ -25,21 +25,8 @@ enum TokenStandard {
   ERC721 = 'ERC721',
 }
 
-type RequiredGemAssetResponse = {
-  data: {
-    address: string;
-    name: string;
-    smallImageUrl: string;
-    standard: TokenStandard;
-    tokenId: string;
-  }[];
-};
-
-type RequiredGemRouteResponse = {
-  route: {
-    price: string;
-  }[];
-};
+type RequiredGemAssetResponse = z.infer<typeof RequiredGemAssetResponseSchema>;
+type RequiredGemRouteResponse = z.infer<typeof RequiredGemRouteResponseSchema>;
 
 const RequiredGemAssetResponseSchema = z.object({
   data: z
@@ -56,7 +43,15 @@ const RequiredGemAssetResponseSchema = z.object({
 });
 
 const RequiredGemRouteResponseSchema = z.object({
-  route: z.array(z.object({price: z.string()})).nonempty(),
+  route: z
+    .array(
+      z.object({
+        assetIn: z.object({
+          amount: z.union([z.string(), z.object({hex: z.string()})]),
+        }),
+      })
+    )
+    .nonempty(),
 });
 
 const COMMAND_NAME: string = 'buy';
@@ -403,8 +398,16 @@ async function execute(interaction: CommandInteraction) {
   }
 
   const {
-    route: [{price: responsePriceWEI}],
+    route: [
+      {
+        assetIn: {amount},
+      },
+    ],
   } = routeResponseJSON;
+
+  const responsePriceWEI: string = toBN(
+    typeof amount === 'string' ? amount : amount?.hex
+  ).toString();
 
   if (!responsePriceWEI) {
     // Reply with an error/help message that only the user can see.
