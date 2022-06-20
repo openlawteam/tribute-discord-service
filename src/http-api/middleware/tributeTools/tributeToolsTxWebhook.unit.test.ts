@@ -190,6 +190,7 @@ describe('tributeToolsTxWebhook unit tests', () => {
           "Invalid enum value. Expected 'singleBuy' | 'fund' | 'sweep', received 'BAD'",
         options: ['singleBuy', 'fund', 'sweep'],
         path: ['data', 'type'],
+        received: 'BAD',
       },
     ]);
 
@@ -294,9 +295,11 @@ describe('tributeToolsTxWebhook unit tests', () => {
     expect(zodErrorHelper(consoleErrorSpy.mock.calls[5][0])).toEqual([
       {
         code: 'invalid_enum_value',
-        message: "Invalid enum value. Expected 'failed' | 'success'",
+        message:
+          "Invalid enum value. Expected 'failed' | 'success', received 'BAD'",
         options: ['failed', 'success'],
         path: ['data', 'tx', 'status'],
+        received: 'BAD',
       },
     ]);
 
