@@ -177,11 +177,11 @@ describe('buy unit tests', () => {
       '0x892848074ddea461a15f337250da3ce55580ca8502ee6238998a21c8713c8ed18ea960e1b9bc576bbe3c7c59613e1ca417e9a5350731bb239f96749f7df940389482b0800fef92dd92bbf93b8847512bf0a7835e6ee489213527d4fe05d42a43e3d1a30a7f1febefe935965d2cddfb00000000000000000000000000000000000000000000000000000000000015206241be7eaf8edc5c089d1cb18948a3f5c6640b1e6d8a41ec96315a679d7df20b117be14f00000030927f74c9de0000',
     amountToBalance: {
       type: 'BigNumber',
-      hex: '0x30927f74c9de0000',
+      hex: '0x3f485fd70fc8000',
     },
     value: {
       type: 'BigNumber',
-      hex: '0x30927f74c9de0000',
+      hex: '0x3f485fd70fc8000',
     },
     route: [
       {
@@ -487,6 +487,147 @@ describe('buy unit tests', () => {
         name: GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].name,
         tokenID: GEM_ERC1155_ASSET_RESPONSE_FIXTURE.data[0].tokenId,
         voteThreshold: DB_INSERT_DATA_ERC_1155.voteThreshold,
+      },
+    });
+
+    // Cleanup
+
+    dbCreateMock.mockRestore();
+    getDaosSpy.mockRestore();
+    interactionReplySpy.mockRestore();
+  });
+
+  test('should run execute when price is hex encoded (e.g. LooksRare, NFTX, x2y2 marketplaces)', async () => {
+    // Mock with erc-721 route for hexadecimal price information
+    server.use(
+      rest.post(
+        'https://gem-public-api.herokuapp.com/route',
+        async (_req, res, ctx) =>
+          res(
+            ctx.json({
+              ...GEM_ERC721_ROUTE_RESPONSE_FIXTURE,
+              route: [
+                {
+                  ...GEM_ERC721_ROUTE_RESPONSE_FIXTURE.route[0],
+                  assetIn: {
+                    ...GEM_ERC721_ROUTE_RESPONSE_FIXTURE.route[0].assetIn,
+                    /**
+                     * For marketplaces other than OpenSea, the `amount`
+                     * will be an object with `hex` and `type` fields.
+                     */
+                    amount: {
+                      hex: '0x3f485fd70fc8000',
+                      type: 'BigNumber',
+                    },
+                  },
+                  /**
+                   * For marketplaces other than OpenSea, the `price`
+                   * field is typically not set.
+                   */
+                  price: undefined,
+                },
+              ],
+            })
+          )
+      )
+    );
+
+    const client = new Client(CLIENT_OPTIONS);
+
+    const interaction = new FakeDiscordCommandInteraction(
+      client,
+      INTERACTION_DATA_ERC721
+    );
+
+    const reactSpy = jest.fn();
+
+    /**
+     * Mock db insert entry
+     *
+     * @todo fix types
+     */
+    const dbCreateMock = (
+      prismaMock.buyNFTPoll as any
+    ).create.mockResolvedValue(DB_INSERT_DATA_ERC_721);
+
+    // Mock getting dao discord configs
+    const getDaosSpy = jest
+      .spyOn(
+        await import('../../../services/discordConfig/getDaoDiscordConfigs'),
+        'getDaoDiscordConfigs'
+      )
+      .mockImplementation(async () => FAKE_DAOS_FIXTURE);
+
+    const interactionReplySpy = jest
+      .spyOn(interaction, 'reply')
+      .mockImplementation(
+        async (_o) =>
+          (await {
+            channelId: DB_INSERT_DATA_ERC_721.channelID,
+            guildId: DB_INSERT_DATA_ERC_721.guildID,
+            id: DB_INSERT_DATA_ERC_721.messageID,
+            react: reactSpy,
+          }) as any
+      );
+
+    const buyResult = await buy.execute(interaction);
+
+    expect(buyResult).toBe(undefined);
+    expect(interactionReplySpy.mock.calls.length).toBe(1);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.description
+    ).toMatch(/📊 \*\*Should we buy it for 0\.285 ETH\?\*\*/i);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.image?.url
+    ).toBe(GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].smallImageUrl);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.title
+    ).toBe(GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].name);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.footer?.text
+    ).toMatch(
+      /After a threshold has been reached the vote is final,\neven if you change your vote\./i
+    );
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .embeds?.[0]?.fields
+    ).toEqual([{inline: false, name: 'Vote Threshold', value: '3 upvotes'}]);
+
+    expect(
+      (interactionReplySpy.mock.calls[0][0] as InteractionReplyOptions)
+        .components
+    ).toEqual([
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setCustomId(CANCEL_POLL_BUY_CUSTOM_ID)
+          .setLabel('Cancel poll')
+          .setStyle('SECONDARY')
+      ),
+    ]);
+
+    expect(reactSpy.mock.calls.length).toBe(2);
+    expect(reactSpy.mock.calls).toEqual([['👍'], ['👎']]);
+    expect(dbCreateMock).toHaveBeenCalledTimes(1);
+
+    expect(dbCreateMock).toHaveBeenNthCalledWith(1, {
+      data: {
+        amountWEI: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].priceInfo.price,
+        channelID: DB_INSERT_DATA_ERC_721.channelID,
+        contractAddress: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].address,
+        guildID: DB_INSERT_DATA_ERC_721.guildID,
+        messageID: DB_INSERT_DATA_ERC_721.messageID,
+        name: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].name,
+        tokenID: GEM_ERC721_ASSET_RESPONSE_FIXTURE.data[0].tokenId,
+        voteThreshold: DB_INSERT_DATA_ERC_721.voteThreshold,
       },
     });
 
