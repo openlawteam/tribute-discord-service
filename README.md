@@ -86,6 +86,6 @@ Any push to `main` will run a development environment release to Tribute Labs' G
 
 ### Production
 
-It is recommended to use [`bump`](https://github.com/mroth/bump) locally to deploy a production release; the formatting is nice! Bump will determine the next semantic version and open a page to create a new GitHub release. The tag will be created once the GitHub release is published, not when `bump` is run.
+It is recommended to use `npm run release` locally to deploy a production release. The command will determine the next semantic version and open a page to create a new GitHub release.
 
-Any tags (`v*`) pushed to `main` will run a production environment release to Tribute Labs' Google Cloud->Kubernetes Engine. The `deploy-prod.yml` GitHub Action will run and, if successful, will push a commit to `infrastructure`, which will complete the deployment to Google Cloud.
+Any tags (`v*`) pushed to `main` (i.e. via `npm run release`) will run a production environment release to Tribute Labs' Google Cloud->Kubernetes Engine. The `deploy-prod.yml` GitHub Action will run and, if successful, will push a commit to `infrastructure`, which will complete the deployment to Google Cloud.

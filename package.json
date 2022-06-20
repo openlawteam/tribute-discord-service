@@ -1,6 +1,6 @@
 {
   "name": "tribute-discord-service",
-  "version": "1.0.6",
+  "version": "1.14.3",
   "private": true,
   "description": "A Discord service to interact with curated TributeDAOs' Discord servers.",
   "main": "dist/src/index.js",
@@ -16,7 +16,7 @@
     "docker:up": "docker-compose -f docker-compose.dev.yml up --build --remove-orphans",
     "generate-abi-types": "typechain --target=web3-v1 --out-dir='abi-types' 'src/abis/**/*.json'",
     "migrate:dev": "dotenv -e .env.dev -- npx prisma migrate dev",
-    "release": "np --no-publish --no-yarn",
+    "release": "release-it",
     "start:deployed": "npx prisma generate && prisma migrate deploy && node .",
     "start": "npx prisma generate --watch & npm run generate-abi-types && npm run docker:up",
     "style:fix": "prettier --write '{pages,prisma,src,styles,test}/**/*.{js,ts}'",
@@ -71,10 +71,28 @@
     "msw": "^0.39.2",
     "nodemon": "^2.0.15",
     "prettier": "^2.6.2",
+    "release-it": "^15.0.0",
     "strict-event-emitter-types": "^2.0.0",
     "ts-jest": "^27.1.4",
     "ts-node": "^10.7.0",
     "typechain": "^8.0.0",
     "typescript": "^4.6.3"
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "tribute-discord-service v${version}",
+      "requireBranch": "main",
+      "tagAnnotation": "tribute-discord-service v${version}",
+      "tagMatch": "v**"
+    },
+    "github": {
+      "release": true,
+      "releaseName": "v${version}",
+      "web": true
+    },
+    "npm": {
+      "ignoreVersion": true,
+      "publish": false
+    }
   }
 }
