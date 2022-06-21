@@ -8,7 +8,7 @@ import {snapshotWebhook} from './snapshotWebhook';
  *
  * @note `prefix` is set
  */
-const tributeToolsRouter = new Router({
+const snapshotRouter = new Router({
   prefix: `${HTTP_API_BASE_PATH}`,
 });
 
@@ -17,10 +17,10 @@ const tributeToolsRouter = new Router({
  *
  * (router: Router) => void
  */
-snapshotWebhook(tributeToolsRouter);
+snapshotWebhook(snapshotRouter);
 
 /**
  * Export `@koa/router` routes
  */
 
-export const tributeToolsRouterRoutes = tributeToolsRouter.routes();
+export const shapshotRouterRoutes = snapshotRouter.routes();

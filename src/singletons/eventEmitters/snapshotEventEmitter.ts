@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types';
 
 import {ERROR_EVENT_NAME, EventEmitterEventsBase} from '.';
-import {SnapshotWebhookEventPayload} from '../../http-api/middleware';
+import {SnapshotWebhookEventPayload} from '../../http-api/middleware/snapshot/snapshotWebhook';
 
 // Define `tributeToolsEventEmitter` event names and payloads
 interface SnapshotEvents extends EventEmitterEventsBase {

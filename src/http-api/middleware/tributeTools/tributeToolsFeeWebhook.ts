@@ -5,10 +5,10 @@ import {createHTTPError, validateZod} from '../../helpers';
 import {tributeToolsEventEmitter} from '../../../singletons/eventEmitters';
 
 export const TributeToolsFeePayloadSchema = z.object({
-  amount: z.string().nonempty(),
-  daoName: z.string().nonempty(),
-  description: z.string().nonempty(),
-  totalContribution: z.string().nonempty(),
+  amount: z.string().min(1),
+  daoName: z.string().min(1),
+  description: z.string().min(1),
+  totalContribution: z.string().min(1),
 });
 
 export type TributeToolsFeeWebhookPayload = z.infer<

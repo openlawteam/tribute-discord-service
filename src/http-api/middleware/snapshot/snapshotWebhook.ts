@@ -48,14 +48,12 @@ export function snapshotWebhook(router: Router): void {
         return;
       }
 
-      console.error(error);
-
       if (error instanceof Error) {
         // Respond with an error; perhaps the webhook will retry
         createHTTPError({ctx, message: SERVER_ERROR, status: 500});
       }
 
-      return;
+      console.error(error);
     }
   });
 }
