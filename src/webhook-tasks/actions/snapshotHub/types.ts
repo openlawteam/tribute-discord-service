@@ -8,8 +8,6 @@ export enum SnapshotHubEvents {
   PROPOSAL_START = 'proposal/start',
 }
 
-export type SnapshotHubProposalID = `proposal/${string}`;
-
 export type SnapshotHubEventPayload = {
   /**
    * Snapshot Hub event name
@@ -21,8 +19,10 @@ export type SnapshotHubEventPayload = {
   expire: number;
   /**
    * Proposal's ID string
+   *
+   * e.g. `proposal/123`
    */
-  id: SnapshotHubProposalID;
+  id: string;
   /**
    * Name of Snapshot Hub space
    *

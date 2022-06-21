@@ -1,9 +1,12 @@
 import {z} from 'zod';
 import Router from '@koa/router';
 
+import {
+  SnapshotHubEventPayload,
+  SnapshotHubEvents,
+} from '../../../webhook-tasks/actions';
 import {createHTTPError, validateZod} from '../../helpers';
 import {snapshotEventEmitter} from '../../../singletons/eventEmitters';
-import {SnapshotHubEvents} from '../../../webhook-tasks/actions';
 
 const RequiredPayloadSchema = z.object({
   event: z.nativeEnum(SnapshotHubEvents),
@@ -11,8 +14,6 @@ const RequiredPayloadSchema = z.object({
   id: z.string().regex(/^proposal\/.+/i),
   space: z.string(),
 });
-
-export type SnapshotWebhookEventPayload = z.infer<typeof RequiredPayloadSchema>;
 
 const PATH: string = '/snapshot-webhook';
 
@@ -24,7 +25,7 @@ const SERVER_ERROR: string =
 export function snapshotWebhook(router: Router): void {
   router.post(PATH, async (ctx) => {
     try {
-      const validatedBody = validateZod<SnapshotWebhookEventPayload>(
+      const validatedBody = validateZod<SnapshotHubEventPayload>(
         ctx.request.body,
         RequiredPayloadSchema
       );
@@ -48,12 +49,14 @@ export function snapshotWebhook(router: Router): void {
         return;
       }
 
+      console.error(error);
+
       if (error instanceof Error) {
         // Respond with an error; perhaps the webhook will retry
         createHTTPError({ctx, message: SERVER_ERROR, status: 500});
       }
 
-      console.error(error);
+      return;
     }
   });
 }

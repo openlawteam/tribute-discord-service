@@ -1,16 +1,18 @@
 import {AddressInfo} from 'node:net';
 import fetch from 'node-fetch';
 
+import {
+  SnapshotHubEventPayload,
+  SnapshotHubEvents,
+} from '../../../webhook-tasks/actions';
 import {HTTP_API_BASE_PATH} from '../../config';
 import {HTTPMethod} from '../../types';
 import {httpServer} from '../../httpServer';
-import {SnapshotHubEvents} from '../../../webhook-tasks/actions';
-import {SnapshotWebhookEventPayload} from './snapshotWebhook';
 
 describe('snapshotWebhook unit tests', () => {
   const server = httpServer({noLog: true, useAnyAvailablePort: true});
 
-  const DEFAULT_PAYLOAD: SnapshotWebhookEventPayload = {
+  const DEFAULT_PAYLOAD: SnapshotHubEventPayload = {
     event: SnapshotHubEvents.PROPOSAL_CREATED,
     expire: 1655818345,
     id: 'proposal/123',

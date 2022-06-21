@@ -16,7 +16,7 @@ describe('adminFeeRunner unit tests', () => {
    * we cannot accurately receive a count as we are using the `tributeToolsEventEmitter` singleton
    * and Jest runs tests async.
    */
-  test('should execute `adminFee` runner lifeycle', async () => {
+  test('should execute runner lifeycle', async () => {
     const notifyAdminFeeSpy = jest
       .spyOn(
         await import('../../actions/tributeTools/notifyAdminFee'),

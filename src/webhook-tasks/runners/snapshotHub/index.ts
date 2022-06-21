@@ -1,1 +1,1 @@
-export * from './proposalEventRunner';
+export * from './snapshotProposalCreatedRunner';
