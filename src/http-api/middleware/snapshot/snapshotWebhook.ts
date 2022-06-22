@@ -30,7 +30,15 @@ export function snapshotWebhook(router: Router): void {
         RequiredPayloadSchema
       );
 
-      snapshotEventEmitter.emit('proposalCreated', validatedBody);
+      switch (validatedBody.event) {
+        case SnapshotHubEvents.PROPOSAL_CREATED:
+          snapshotEventEmitter.emit('proposalCreated', validatedBody);
+
+          break;
+
+        default:
+          break;
+      }
 
       ctx.status = 202;
     } catch (error) {
