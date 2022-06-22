@@ -1,8 +1,8 @@
 import {
-  getDiscordAction,
   getDaoDataBySnapshotSpace,
-  isDiscordActionOrEventActive,
+  getDiscordAction,
   isDebug,
+  isDiscordActionOrEventActive,
 } from '../../../helpers';
 import {
   compileSimpleTemplate,
@@ -18,9 +18,9 @@ import {
 import {actionErrorHandler} from '../helpers/actionErrorHandler';
 import {DaoDiscordConfig} from '../../../config/types';
 import {DiscordMessageEmbeds} from '..';
-import {EventSnapshotProposalWebhook} from '../../events/snapshotHub';
 import {getDiscordWebhookClient} from '../../../services/discord';
 import {getProposalAdapterID} from '../../../services';
+import {SNAPSHOT_PROPOSAL_CREATED_EVENT} from '../../events/snapshotHub';
 import {SnapshotHubEventPayload} from './types';
 import {takeSnapshotProposalID} from './helpers';
 
@@ -34,7 +34,7 @@ import {takeSnapshotProposalID} from './helpers';
  * @returns `(d: SnapshotHubEventPayload) => Promise<void>`
  */
 export function legacyTributeDraftCreatedAction(
-  event: EventSnapshotProposalWebhook,
+  event: typeof SNAPSHOT_PROPOSAL_CREATED_EVENT,
   daos: Record<string, DaoDiscordConfig> | undefined
 ): (s: SnapshotHubEventPayload) => Promise<void> {
   return async (snapshotEvent) => {

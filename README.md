@@ -86,6 +86,6 @@ Any push to `main` will run a development environment release to Tribute Labs' G
 
 ### Production
 
-It is recommended to use `npm run release` locally to deploy a production release. The command will determine the next semantic version and open a page to create a new GitHub release.
+It is recommended to use `npm run release` locally to deploy a production release. Follow the prompts (typically answering `Y` for each). The command will determine the next semantic version and open a page to create a new GitHub release.
 
 Any tags (`v*`) pushed to `main` (i.e. via `npm run release`) will run a production environment release to Tribute Labs' Google Cloud->Kubernetes Engine. The `deploy-prod.yml` GitHub Action will run and, if successful, will push a commit to `infrastructure`, which will complete the deployment to Google Cloud.

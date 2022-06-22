@@ -1,5 +1,5 @@
-type AnyArgs = any[];
-type AnyArgsFunction = (...args: AnyArgs) => void;
+type AnyArgs<T = any> = T[];
+type AnyArgsFunction<T = any> = (...args: AnyArgs<T>) => void;
 
 /**
  * Takes an array of functions with any number of arguments
@@ -10,8 +10,10 @@ type AnyArgsFunction = (...args: AnyArgs) => void;
  * @param functions
  * @returns void
  */
-export function runAll(functions: AnyArgsFunction[]): AnyArgsFunction {
-  return (...args: AnyArgs): void => {
+export function runAll<TArgs = any>(
+  functions: AnyArgsFunction<TArgs>[]
+): AnyArgsFunction<TArgs> {
+  return function runAllEach(...args: AnyArgs<TArgs>): void {
     functions.forEach((f) => {
       try {
         f(...args);

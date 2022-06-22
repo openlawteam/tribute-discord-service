@@ -1,5 +1,5 @@
 export * from './db';
 export * from './default';
 export * from './health';
-export * from './snapshotWebhook';
+export * from './snapshot';
 export * from './tributeTools';

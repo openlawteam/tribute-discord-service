@@ -1,12 +1,23 @@
 import {AddressInfo} from 'node:net';
 import fetch from 'node-fetch';
 
-import {HTTP_API_BASE_PATH} from '../config';
-import {HTTPMethod} from '../types';
-import {httpServer} from '../httpServer';
+import {
+  SnapshotHubEventPayload,
+  SnapshotHubEvents,
+} from '../../../webhook-tasks/actions';
+import {HTTP_API_BASE_PATH} from '../../config';
+import {HTTPMethod} from '../../types';
+import {httpServer} from '../../httpServer';
 
 describe('snapshotWebhook unit tests', () => {
   const server = httpServer({noLog: true, useAnyAvailablePort: true});
+
+  const DEFAULT_PAYLOAD: SnapshotHubEventPayload = {
+    event: SnapshotHubEvents.PROPOSAL_CREATED,
+    expire: 1655818345,
+    id: 'proposal/123',
+    space: 'test',
+  };
 
   afterAll(async () => {
     await server?.close();
@@ -24,7 +35,11 @@ describe('snapshotWebhook unit tests', () => {
       await (
         await fetch(
           `http://localhost:${port}${HTTP_API_BASE_PATH}/snapshot-webhook`,
-          {method: HTTPMethod.POST}
+          {
+            body: JSON.stringify(DEFAULT_PAYLOAD),
+            headers: {'Content-Type': 'application/json'},
+            method: HTTPMethod.POST,
+          }
         )
       ).status
     ).toBe(202);
@@ -36,10 +51,6 @@ describe('snapshotWebhook unit tests', () => {
   test('should return 500 error code', async () => {
     const {port} = server?.address() as AddressInfo;
 
-    const proposalEventRunner = await import(
-      '../../webhook-tasks/runners/snapshotHub/proposalEventRunner'
-    );
-
     // Temporarily hide warnings from `msw`
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
@@ -50,30 +61,31 @@ describe('snapshotWebhook unit tests', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    const proposalEventRunnerSpy = jest
-      .spyOn(proposalEventRunner, 'snapshotProposalEventRunner')
-      .mockImplementation(async () => {
-        throw new Error('Some bad error.');
-      });
-
     expect(
       await (
         await fetch(
           `http://localhost:${port}${HTTP_API_BASE_PATH}/snapshot-webhook`,
           {
             method: HTTPMethod.POST,
-            body: JSON.stringify({test: 'cool'}),
+            body: JSON.stringify({...DEFAULT_PAYLOAD, event: 'bad'}),
             headers: {
               'Content-Type': 'application/json',
             },
           }
         )
       ).status
-    ).toBe(500);
+    ).toBe(400);
+
+    // Assert error logged
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(
+      /^Invalid body provided to \/snapshot\-webhook/i
+    );
 
     // Cleanup
     consoleWarnSpy.mockRestore();
     consoleErrorSpy.mockRestore();
-    proposalEventRunnerSpy.mockRestore();
   });
 });

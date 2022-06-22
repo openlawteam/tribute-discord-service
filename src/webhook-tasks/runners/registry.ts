@@ -15,4 +15,5 @@
  */
 
 export {adminFeeRunner} from './tributeTools';
+export {snapshotProposalCreatedRunner} from './snapshotHub';
 export {sponsoredProposalRunnerSubscribeLogs} from './web3/subscribeLogs';

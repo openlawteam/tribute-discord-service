@@ -1,13 +1,12 @@
 import {EventEmitter} from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types';
 
-import {ERROR_EVENT_NAME} from '.';
+import {ERROR_EVENT_NAME, EventEmitterEventsBase} from '.';
 import {TributeToolsFeeWebhookPayload} from '../../http-api/middleware/tributeTools/tributeToolsFeeWebhook';
 
 // Define `tributeToolsEventEmitter` event names and payloads
-interface TributeToolsEvents {
+interface TributeToolsEvents extends EventEmitterEventsBase {
   adminFee: TributeToolsFeeWebhookPayload;
-  [ERROR_EVENT_NAME]: unknown;
 }
 
 // Provides a typed `EventEmitter` singleton instance for Tribute Tools events

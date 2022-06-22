@@ -1,38 +1,46 @@
 import {z} from 'zod';
 import Router from '@koa/router';
 
+import {
+  SnapshotHubEventPayload,
+  SnapshotHubEvents,
+} from '../../../webhook-tasks/actions';
 import {createHTTPError, validateZod} from '../../helpers';
-import {tributeToolsEventEmitter} from '../../../singletons/eventEmitters';
+import {snapshotEventEmitter} from '../../../singletons/eventEmitters';
 
-export const TributeToolsFeePayloadSchema = z.object({
-  amount: z.string().min(1),
-  daoName: z.string().min(1),
-  description: z.string().min(1),
-  totalContribution: z.string().min(1),
+const RequiredPayloadSchema = z.object({
+  event: z.nativeEnum(SnapshotHubEvents),
+  expire: z.number(),
+  id: z.string().regex(/^proposal\/.+/i),
+  space: z.string(),
 });
 
-export type TributeToolsFeeWebhookPayload = z.infer<
-  typeof TributeToolsFeePayloadSchema
->;
-
-const PATH: string = '/webhook/admin-fee';
+const PATH: string = '/snapshot-webhook';
 
 const INVALID_BODY_ERROR: string = 'Incorrect `body` was provided.';
 
 const SERVER_ERROR: string =
   'Something went wrong while processing the webhook.';
 
-export function tributeToolsFeeWebhook(router: Router): void {
+export function snapshotWebhook(router: Router): void {
   router.post(PATH, async (ctx) => {
     try {
-      const validatedBody = validateZod<TributeToolsFeeWebhookPayload>(
+      const validatedBody = validateZod<SnapshotHubEventPayload>(
         ctx.request.body,
-        TributeToolsFeePayloadSchema
+        RequiredPayloadSchema
       );
 
-      tributeToolsEventEmitter.emit('adminFee', validatedBody);
+      switch (validatedBody.event) {
+        case SnapshotHubEvents.PROPOSAL_CREATED:
+          snapshotEventEmitter.emit('proposalCreated', validatedBody);
 
-      ctx.status = 200;
+          break;
+
+        default:
+          break;
+      }
+
+      ctx.status = 202;
     } catch (error) {
       if (error instanceof z.ZodError) {
         console.error(

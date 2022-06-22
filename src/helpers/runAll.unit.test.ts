@@ -42,7 +42,7 @@ describe('runAll unit tests', () => {
     const spyFunctionOne = jest.fn();
     const spyFunctionThree = jest.fn();
 
-    const spyFunctionTwo = jest.fn(() => {
+    const spyFunctionTwo = jest.fn().mockImplementation(() => {
       throw error;
     });
 
