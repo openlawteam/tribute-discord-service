@@ -187,7 +187,7 @@ function parseTimeForPollEndDate(pollDurationText: string): Date | undefined {
   }
 
   // Calculate poll end date using dayjs library and convert to native `Date`
-  return dayjs().add(amountNumber, unit).toDate();
+  return dayjs().add(amountNumber, durationUnit).toDate();
 }
 
 /**

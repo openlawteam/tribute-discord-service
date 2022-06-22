@@ -72,6 +72,8 @@ describe('fund unit tests', () => {
      */
     channel_id: '886976610018934824',
 
+    locale: 'en-US',
+
     /**
      * A continuation token for responding to the interaction
      */
