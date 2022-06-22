@@ -19,12 +19,10 @@ export function removeListener<TEventEmitter = any>({
   try {
     eventEmitter?.removeListener(name, listener);
 
-    const functionName: string = listener.name || 'anonymous';
-
-    console.log(`Removed \`${name}\` event listener: \`${functionName}\`.`);
+    console.log(`Removed \`${name}\` event listener: \`${listener.name}\`.`);
   } catch (error) {
     console.error(
-      `An error occurred while calling removing the event listener for \`${name}\`.`
+      `An error occurred while removing the event listener for \`${name}\`.`
     );
   }
 }
