@@ -2,8 +2,8 @@ import {REST} from '@discordjs/rest';
 import {Routes} from 'discord-api-types/v10';
 
 import {
-  ApplicationNames,
   APP_ENV,
+  ApplicationNames,
   DEVELOPMENT_GUILD_ID,
   ENVIRONMENT_VARIABLE_KEYS_BOT_TOKENS,
 } from '../../config';
@@ -36,14 +36,14 @@ export async function deployCommands({
    * slash commands the guild commands are not cached, whereas
    * global (common for production) are, and take ~1 hour to propagate.
    *
-   * @see https://discordjs.guide/interactions/registering-slash-commands.html#global-commands
+   * @see https://discordjs.guide/interactions/slash-commands.html#guild-commands
    */
   const route =
     APP_ENV === 'production'
       ? Routes.applicationCommands(applicationID)
       : Routes.applicationGuildCommands(applicationID, DEVELOPMENT_GUILD_ID);
 
-  const rest = new REST({version: '9'}).setToken(token);
+  const rest = new REST({version: '10'}).setToken(token);
 
   console.log(`♻️  Started refreshing ${name} application (/) commands.`);
 
